@@ -60,20 +60,22 @@ button, input[type="button"], input[type="submit"] {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #006B8E 0%, #00838F 100%);
-  color: white;
+  background: #ffffff;
+  color: #000;
   padding: 14px 32px;
   border-radius: 12px;
   font-weight: 600;
   text-decoration: none;
   display: inline-block;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 107, 142, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 107, 142, 0.4);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  background: #f5f5f5;
 }
 
 .btn-primary:active {
@@ -81,18 +83,19 @@ button, input[type="button"], input[type="submit"] {
 }
 
 .btn-contact {
-  background: #00838F;
-  color: white;
+  background: #ffffff;
+  color: #000;
   padding: 12px 20px;
   border-radius: 8px;
   text-decoration: none;
   display: inline-block;
   margin: 8px 8px 8px 0;
   font-weight: 500;
+  border: 1px solid #e0e0e0;
 }
 
 .btn-contact:hover {
-  background: #006B8E;
+  background: #f5f5f5;
 }
 
 /* Formularios */
@@ -144,7 +147,7 @@ img {
 
 /* Links */
 a {
-  color: #006B8E;
+  color: #1a3a52;
   text-decoration: none;
   transition: color 0.3s ease;
 }

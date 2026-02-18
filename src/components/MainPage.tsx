@@ -26,7 +26,7 @@ export default function MainPage() {
       {/* Photo and Text */}
       <section className="content-section">
         <img
-          src="/assets/foto01.png"
+          src="/assets/imagen01.png"
           alt="Marta y Sergio"
           className="main-photo fade-in"
         />

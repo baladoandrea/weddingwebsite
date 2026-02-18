@@ -17,7 +17,7 @@ export default function InfoPage() {
 
       {/* Intro Image */}
       <section className="hero-image">
-        <img src="/assets/imagen01.png" alt="Introducción" className="full-image" />
+        <img src="/assets/imagen02.png" alt="Introducción" className="full-image" />
       </section>
 
       {/* How to Get There */}

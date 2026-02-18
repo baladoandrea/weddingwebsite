@@ -10,7 +10,7 @@
 .menu-btn {
   width: 44px;
   height: 44px;
-  background: rgba(0, 107, 142, 0.95);
+  background: #1a3a52;
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -20,13 +20,14 @@
   align-items: center;
   gap: 5px;
   padding: 0;
-  box-shadow: 0 4px 12px rgba(0, 107, 142, 0.3);
+  box-shadow: 0 4px 12px rgba(26, 58, 82, 0.2);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
+  border: none;
 }
 
 .menu-btn:active {
-  background: rgba(0, 107, 142, 1);
+  background: #0f2436;
   transform: scale(0.95);
 }
 
@@ -41,7 +42,7 @@
 .ios-menu-icon .bar {
   width: 20px;
   height: 2px;
-  background: white;
+  background: #fff;
   border-radius: 2px;
   display: block;
   transition: transform 0.25s ease, opacity 0.2s ease;
@@ -72,7 +73,7 @@
   max-width: 280px;
   animation: slideInDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 107, 142, 0.1);
+  border: 1px solid #e5e5e5;
 }
 
 @keyframes slideInDown {
@@ -89,9 +90,9 @@
 .sidebar a {
   display: block;
   padding: 16px 20px;
-  color: #333;
+  color: #000;
   text-decoration: none;
-  border-bottom: 1px solid rgba(0, 107, 142, 0.1);
+  border-bottom: 1px solid #f0f0f0;
   transition: all 0.2s ease;
   font-weight: 500;
   font-size: 15px;
@@ -102,14 +103,14 @@
 }
 
 .sidebar a:hover {
-  background: rgba(0, 107, 142, 0.08);
-  color: #006B8E;
+  background: #f5f5f5;
+  color: #000;
   padding-left: 24px;
 }
 
 .sidebar a:active {
-  background: rgba(0, 107, 142, 0.15);
-  color: #006B8E;
+  background: #efefef;
+  color: #000;
 }
 
 /* Responsive */
