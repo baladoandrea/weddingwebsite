@@ -251,7 +251,7 @@
 /* Estilos específicos por página */
 .rsvp-page, .info-page, .gallery-page, .coruna-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #81d4fa 100%);
+  background: transparent; /* use body white background for a clean look */
 }
 
 /* Modal */

@@ -1,87 +1,101 @@
-/* Estilos de Galería */
+/* Estilos de Galería (Estilo iOS) */
 .gallery-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #81d4fa 100%);
-  padding-bottom: 40px;
+  background: #ffffff;
+  padding-bottom: 20px;
 }
 
 .gallery-header {
   text-align: center;
-  padding: 40px 20px 30px;
-  background: rgba(255, 255, 255, 0.7);
-  border-bottom: 2px solid rgba(0, 107, 142, 0.2);
+  padding: 28px 16px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .gallery-header h1 {
   font-size: 28px;
-  color: #006B8E;
-  margin: 0 0 8px 0;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
 }
 
 .gallery-header p {
-  color: #666;
-  font-size: 14px;
+  color: #aaa;
+  font-size: 13px;
   margin: 0;
+  font-weight: 400;
 }
 
 /* Filtro de Galería */
 .gallery-filter {
-  max-width: 600px;
-  margin: 30px auto;
-  padding: 0 20px;
+  max-width: 100%;
+  margin: 16px 0 12px 0;
+  padding: 0 16px;
 }
 
 .search-box {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .filter-input {
   width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #B2EBF2;
-  border-radius: 12px;
-  font-size: 16px;
-  background: white;
-  transition: all 0.3s ease;
+  padding: 10px 40px 10px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  background: #f5f5f5;
+  color: #000;
+  transition: background 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .filter-input:focus {
-  border-color: #006B8E;
-  box-shadow: 0 0 0 3px rgba(0, 107, 142, 0.1);
+  background: #efefef;
   outline: none;
+}
+
+.filter-input::placeholder {
+  color: #aaa;
 }
 
 .clear-filter {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
+  background: transparent;
   border: none;
-  color: #006B8E;
-  font-size: 18px;
+  color: #999;
+  font-size: 16px;
   cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
+  padding: 4px 6px;
+  width: auto;
+  height: auto;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.clear-filter:active {
+  color: #000;
 }
 
 /* Sugerencias de etiquetas */
 .tag-suggestions {
-  margin-top: 24px;
+  margin-top: 14px;
+  padding: 0 16px;
 }
 
 .tags-label {
-  font-size: 13px;
-  color: #666;
+  font-size: 11px;
+  color: #bbb;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
 }
 
 .tags-list {
@@ -91,67 +105,67 @@
 }
 
 .tag-btn {
-  background: white;
-  border: 2px solid #B2EBF2;
-  color: #006B8E;
+  background: #f3f3f3;
+  border: none;
+  color: #000;
   padding: 8px 12px;
-  border-radius: 20px;
+  border-radius: 16px;
   font-weight: 500;
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.tag-btn:hover {
-  border-color: #006B8E;
-  background: rgba(0, 107, 142, 0.05);
+.tag-btn:active {
+  background: #e0e0e0;
+  transform: scale(0.95);
 }
 
 .tag-btn.active {
-  background: #006B8E;
+  background: #000;
   color: white;
-  border-color: #006B8E;
+  border-color: #000;
 }
 
 /* Grid de Galería */
 .gallery-grid-section {
-  max-width: 600px;
-  margin: 30px auto;
-  padding: 0 20px;
+  max-width: 100%;
+  margin: 8px 0 0 0;
+  padding: 0;
 }
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 12px;
-  margin: 20px 0;
+  grid-template-columns: repeat(3, 1fr); /* iOS: 3 por fila siempre */
+  gap: 1px;
+  margin: 0;
+  background: #e5e5e5; /* Línea divisoria minimalista */
 }
 
 .gallery-item {
   position: relative;
   aspect-ratio: 1 / 1;
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
   background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
 }
 
-.gallery-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 107, 142, 0.2);
+.gallery-item:active {
+  opacity: 0.7;
 }
 
 .gallery-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease;
 }
 
-.gallery-item:hover img {
-  transform: scale(1.05);
+.gallery-item:active img {
+  transform: scale(0.98);
 }
 
 /* Etiquetas en galería */
@@ -160,53 +174,55 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-  padding: 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  padding: 6px;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 3px;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
-.gallery-item:hover .item-tags {
+.gallery-item:active .item-tags {
   opacity: 1;
 }
 
 .tag-badge {
-  background: rgba(0, 107, 142, 0.9);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 11px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 10px;
   font-weight: 500;
   cursor: pointer;
 }
 
-.tag-badge:hover {
-  background: rgba(0, 107, 142, 1);
+.tag-badge:active {
+  background: rgba(255, 255, 255, 1);
 }
 
 /* Sin resultados */
 .no-results {
   text-align: center;
-  padding: 40px 20px;
-  background: white;
-  border-radius: 12px;
-  margin: 20px 0;
-  box-shadow: var(--shadow-md);
+  padding: 40px 16px;
+  background: #ffffff;
+  border-radius: 0;
+  margin: 0;
+  box-shadow: none;
+  border-top: 1px solid #e5e5e5;
 }
 
 .no-results p {
-  color: #666;
-  margin-bottom: 20px;
+  color: #999;
+  margin-bottom: 16px;
+  font-size: 15px;
 }
 
 /* Galería vacía */
 .empty-gallery {
   text-align: center;
-  padding: 60px 20px;
-  color: #666;
+  padding: 60px 16px;
+  color: #999;
 }
 
 .empty-gallery p {
@@ -337,13 +353,42 @@
 }
 
 /* Responsive */
-@media (max-width: 480px) {
+@media (min-width: 768px) {
   .gallery-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
   }
 
-  .gallery-header h1 {
-    font-size: 24px;
+  .gallery-grid-section {
+    padding: 0 12px;
+  }
+
+  .gallery-item {
+    border-radius: 6px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .gallery-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .gallery-grid-section {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 0 20px;
+  }
+
+  .gallery-item {
+    border-radius: 8px;
+  }
+
+  .gallery-item:hover {
+    transform: scale(1.02);
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.05);
   }
 }
