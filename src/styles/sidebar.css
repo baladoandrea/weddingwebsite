@@ -1,0 +1,121 @@
+/* Menú Sidebar estilo iOS */
+.sidebar-wrapper {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 999;
+}
+
+/* Botón del menú iOS */
+.menu-btn {
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 107, 142, 0.95);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 107, 142, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.menu-btn:active {
+  background: rgba(0, 107, 142, 1);
+  transform: scale(0.95);
+}
+
+.ios-menu-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.ios-menu-icon .bar {
+  width: 20px;
+  height: 2px;
+  background: white;
+  border-radius: 2px;
+  display: block;
+  transition: transform 0.25s ease, opacity 0.2s ease;
+}
+
+/* Open state: transform into an X */
+.ios-menu-icon.open .bar:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.ios-menu-icon.open .bar:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.ios-menu-icon.open .bar:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 70px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  min-width: 220px;
+  max-width: 280px;
+  animation: slideInDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 107, 142, 0.1);
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sidebar a {
+  display: block;
+  padding: 16px 20px;
+  color: #333;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 107, 142, 0.1);
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.sidebar a:last-child {
+  border-bottom: none;
+}
+
+.sidebar a:hover {
+  background: rgba(0, 107, 142, 0.08);
+  color: #006B8E;
+  padding-left: 24px;
+}
+
+.sidebar a:active {
+  background: rgba(0, 107, 142, 0.15);
+  color: #006B8E;
+}
+
+/* Responsive */
+@media (max-width: 380px) {
+  .sidebar {
+    min-width: 90vw;
+    right: 10px;
+  }
+}

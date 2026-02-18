@@ -1,0 +1,62 @@
+[
+  {
+    "id": "main-quote",
+    "title": "Cita Principal",
+    "content": "En el Atlántico nos prometimos, y ante el mar queremos celebrar...",
+    "page": "principal"
+  },
+  {
+    "id": "location-title",
+    "title": "Ubicación",
+    "content": "Ubicación",
+    "page": "principal"
+  },
+  {
+    "id": "car-section",
+    "title": "Cómo llegar en coche",
+    "content": "Para llegar al Casón Amor en coche, dirígete hacia el centro de A Coruña y sigue las indicaciones hacia la zona de la Ciudad Vieja. Desde la avenida principal (AC-11), toma la salida hacia el Paseo Marítimo en dirección norte. El lugar se encuentra en un área peatonal protegida, por lo que el acceso directo no está permitido. Existen zonas de aparcamiento en las inmediaciones.",
+    "page": "info"
+  },
+  {
+    "id": "bus-section",
+    "title": "Cómo llegar en autobús",
+    "content": "Saldrá un autobús a las 11:30 desde la Plaza de Pontevedra. Habrá servicio de vuelta.",
+    "page": "info"
+  },
+  {
+    "id": "questions-section",
+    "title": "¿Alguna duda?",
+    "content": "Si tienes cualquier duda, petición o lo que sea, puedes escribirnos a Sergio o Marta por WhatsApp.",
+    "page": "info"
+  },
+  {
+    "id": "gift-section",
+    "title": "Regalo",
+    "content": "Vuestra presencia es nuestro mejor regalo. Pero si queréis tener un detalle con nosotros para nuestra nueva etapa, podéis hacerlo a través del siguiente número de cuenta: ES00 0000 0000 0000 0000 (Banco Ejemplo).",
+    "page": "info"
+  },
+  {
+    "id": "eat-section",
+    "title": "Dónde comer",
+    "content": "A Pulpeira de Melide: Para un pulpiño á feira. Casa Virginia: Recomendado el caldo y las filloas. Todo hecho con amor.",
+    "page": "coruna"
+  },
+  {
+    "id": "drink-section",
+    "title": "Dónde beber",
+    "content": "La Cervecería: Más conocida como LA ESTRELLA, parada imprescindible. Calle Galera: Repleta de buenos bares.",
+    "page": "coruna"
+  },
+  {
+    "id": "stay-section",
+    "title": "Dónde alojarse",
+    "content": "Casa Gerardo: Buen anfitrión, mejor abuelo.",
+    "page": "coruna"
+  },
+  {
+    "id": "see-section",
+    "title": "Qué ver",
+    "content": "Un partido del Depor en Riazor, derrota garantizada.",
+    "page": "coruna"
+  }
+]

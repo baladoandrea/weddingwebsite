@@ -1,0 +1,329 @@
+/* Estilos para RSVP Page */
+.rsvp-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #81d4fa 100%);
+  padding-bottom: 40px;
+}
+
+.rsvp-header {
+  text-align: center;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.7);
+  border-bottom: 2px solid rgba(0, 107, 142, 0.2);
+}
+
+.rsvp-header h1 {
+  font-size: 28px;
+  color: #006B8E;
+  margin: 0 0 12px 0;
+}
+
+.rsvp-subtitle {
+  color: #666;
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.rsvp-form-section {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+/* Guest Search */
+.guest-search {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.guest-search h2 {
+  color: #006B8E;
+  margin-top: 0;
+}
+
+.search-input-group {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #B2EBF2;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #006B8E;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 107, 142, 0.1);
+}
+
+.guest-list {
+  background: #f9f9f9;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #E0E0E0;
+}
+
+.guest-item {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  text-align: left;
+  border: none;
+  border-bottom: 1px solid #E0E0E0;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  color: #333;
+  font-size: 16px;
+}
+
+.guest-item:last-child {
+  border-bottom: none;
+}
+
+.guest-item:hover {
+  background: rgba(0, 107, 142, 0.05);
+  color: #006B8E;
+  padding-left: 20px;
+}
+
+.guest-item:active {
+  background: rgba(0, 107, 142, 0.1);
+}
+
+.no-results {
+  color: #666;
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+}
+
+/* Attendance Form */
+.selected-guest {
+  background: #f0f7ff;
+  border-left: 4px solid #006B8E;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selected-guest p {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.change-guest-btn {
+  background: white;
+  border: 2px solid #006B8E;
+  color: #006B8E;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.change-guest-btn:hover {
+  background: #006B8E;
+  color: white;
+}
+
+.attendance-form {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.attendance-options {
+  margin: 24px 0;
+}
+
+.attendance-options h3 {
+  color: #006B8E;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.attendance-option {
+  display: flex;
+  align-items: flex-start;
+  padding: 14px;
+  margin-bottom: 10px;
+  border: 2px solid #B2EBF2;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.attendance-option input[type="radio"] {
+  margin-right: 12px;
+  width: auto;
+  height: auto;
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+.attendance-option:hover {
+  background: rgba(0, 107, 142, 0.05);
+  border-color: #006B8E;
+}
+
+.attendance-option input[type="radio"]:checked + .option-text {
+  color: #006B8E;
+  font-weight: 600;
+}
+
+.option-text {
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.notes-field {
+  margin: 20px 0;
+}
+
+.notes-field label {
+  display: block;
+  font-weight: 600;
+  color: #006B8E;
+  margin-bottom: 8px;
+}
+
+.notes-field textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #B2EBF2;
+  border-radius: 8px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.notes-field textarea:focus {
+  border-color: #006B8E;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 107, 142, 0.1);
+}
+
+.notes-field small {
+  display: block;
+  text-align: right;
+  color: #999;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 16px;
+  margin-top: 20px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Success Modal */
+.rsvp-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 60px);
+  padding: 20px;
+}
+
+.success-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  animation: fadeInScale 0.5s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.success-modal h2 {
+  color: #006B8E;
+  font-size: 32px;
+  margin: 0 0 12px 0;
+}
+
+.success-modal p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.success-image {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 12px;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.success-text {
+  font-weight: 500;
+  color: #006B8E;
+  margin: 20px 0;
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .rsvp-header {
+    padding: 30px 16px;
+  }
+
+  .rsvp-header h1 {
+    font-size: 24px;
+  }
+
+  .selected-guest {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .success-modal {
+    padding: 30px 20px;
+  }
+
+  .success-modal h2 {
+    font-size: 28px;
+  }
+}

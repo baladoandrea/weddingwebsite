@@ -1,0 +1,37 @@
+[
+  {
+    "id": "1",
+    "name": "Juan García López",
+    "attendance": "",
+    "notes": "",
+    "image": "/assets/thank-you-1.png"
+  },
+  {
+    "id": "2",
+    "name": "María Rodríguez Martínez",
+    "attendance": "",
+    "notes": "",
+    "image": "/assets/thank-you-2.png"
+  },
+  {
+    "id": "3",
+    "name": "Carlos Fernández González",
+    "attendance": "",
+    "notes": "",
+    "image": "/assets/thank-you-3.png"
+  },
+  {
+    "id": "4",
+    "name": "Ana López Sánchez",
+    "attendance": "",
+    "notes": "",
+    "image": "/assets/thank-you-4.png"
+  },
+  {
+    "id": "5",
+    "name": "Pedro Martínez Pérez",
+    "attendance": "",
+    "notes": "",
+    "image": "/assets/thank-you-5.png"
+  }
+]
