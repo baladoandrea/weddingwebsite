@@ -396,3 +396,15 @@
     font-size: 20px;
   }
 }
+
+.coruna-section {
+  background: transparent;
+  padding: 40px 20px;
+  border-radius: 16px;
+  margin: 24px 0;
+}
+
+h1, h2, h3, strong {
+  color: #041E42 !important;
+  font-family: 'Playfair Display', serif;
+}

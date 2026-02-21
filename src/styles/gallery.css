@@ -44,6 +44,13 @@
   padding: 10px 40px 10px 14px;
   border: none;
   border-radius: 8px;
+  .recommendation-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
   font-size: 15px;
   background: #f5f5f5;
   color: #000;
@@ -56,6 +63,17 @@
   outline: none;
 }
 
+  .tag-badge {
+    background: #fff;
+    color: #041E42;
+    border-radius: 8px;
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 8px 8px 0;
+    display: inline-block;
+    border: 1px solid #e0e0e0;
+  }
 .filter-input::placeholder {
   color: #aaa;
 }

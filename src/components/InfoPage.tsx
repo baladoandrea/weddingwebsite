@@ -54,7 +54,7 @@ export default function InfoPage() {
             </p>
           </div>
 
-          <img src="/assets/imagen02.png" alt="Ubicación salida autobús" className="info-image" />
+          {/* Imagen eliminada de bus-info */}
 
             <a
               href="https://www.google.com/maps/place/Plaza+de+Pontevedra,+A+Coru%C3%B1a"
