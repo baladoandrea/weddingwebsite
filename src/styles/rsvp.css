@@ -1,14 +1,14 @@
 /* Estilos para RSVP Page */
 .rsvp-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #81d4fa 100%);
+  background: transparent;
   padding-bottom: 40px;
 }
 
 .rsvp-header {
   text-align: center;
   padding: 40px 20px;
-  background: rgba(255, 255, 255, 0.7);
+  background: transparent;
   border-bottom: 2px solid rgba(0, 107, 142, 0.2);
 }
 
@@ -34,7 +34,7 @@
 
 /* Guest Search */
 .guest-search {
-  background: white;
+  background: transparent;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -79,7 +79,7 @@
   text-align: left;
   border: none;
   border-bottom: 1px solid #E0E0E0;
-  background: white;
+  background: transparent;
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: 500;
@@ -127,7 +127,7 @@
 }
 
 .change-guest-btn {
-  background: white;
+  background: transparent;
   border: 2px solid #006B8E;
   color: #006B8E;
   padding: 6px 12px;
@@ -144,7 +144,7 @@
 }
 
 .attendance-form {
-  background: white;
+  background: transparent;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -255,7 +255,7 @@
 }
 
 .success-modal {
-  background: white;
+  background: transparent;
   border-radius: 16px;
   padding: 40px 24px;
   text-align: center;

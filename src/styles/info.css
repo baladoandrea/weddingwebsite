@@ -3,7 +3,7 @@
 /* Info Page */
 .info-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #81d4fa 100%);
+  background: transparent;
   padding-bottom: 40px;
 }
 
@@ -29,7 +29,7 @@
   max-width: 600px;
   margin: 0 auto;
   padding: 40px 20px;
-  background: rgba(255, 255, 255, 0.7);
+  background: transparent;
   border-bottom: 1px solid rgba(0, 107, 142, 0.1);
 }
 
@@ -42,7 +42,7 @@
 }
 
 .subsection {
-  background: white;
+  background: transparent;
   border-radius: 12px;
   padding: 20px;
   margin: 20px 0;
@@ -63,7 +63,7 @@
 }
 
 .bus-info {
-  background: #f0f7ff;
+  background: transparent;
   border-left: 4px solid #006B8E;
   padding: 16px;
   border-radius: 6px;
@@ -88,6 +88,14 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.section-image {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 .map-link {
   display: inline-block;
   background: #006B8E;
@@ -108,7 +116,7 @@
 
 /* Questions Section */
 .questions-content {
-  background: white;
+  background: transparent;
   border-radius: 12px;
   padding: 20px;
   margin: 20px 0;
@@ -150,11 +158,11 @@
 
 /* Gift Section */
 .gift-section {
-  background: rgba(255, 255, 255, 0.8);
+  background: transparent;
 }
 
 .gift-content {
-  background: white;
+  background: transparent;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -286,7 +294,7 @@
 }
 
 .recommendation-card {
-  background: white;
+  background: transparent;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);

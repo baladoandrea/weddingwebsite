@@ -136,7 +136,7 @@
 /* Sección de ubicación */
 .location-section {
   padding: 40px 20px;
-  background: #ffffff;
+  background: transparent;
 }
 
 .location-content {
@@ -152,7 +152,7 @@
 }
 
 .location-info {
-  background: white;
+  background: transparent;
   border-radius: 12px;
   padding: 24px;
   margin: 20px 0;

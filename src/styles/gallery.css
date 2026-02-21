@@ -1,14 +1,14 @@
 /* Estilos de Galería (Estilo iOS) */
 .gallery-page {
   min-height: 100vh;
-  background: #ffffff;
+  background: transparent;
   padding-bottom: 20px;
 }
 
 .gallery-header {
   text-align: center;
   padding: 28px 16px 20px;
-  background: #ffffff;
+  background: transparent;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -147,7 +147,7 @@
   aspect-ratio: 1 / 1;
   border-radius: 0;
   overflow: hidden;
-  background: white;
+  background: transparent;
   box-shadow: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -205,7 +205,7 @@
 .no-results {
   text-align: center;
   padding: 40px 16px;
-  background: #ffffff;
+  background: transparent;
   border-radius: 0;
   margin: 0;
   box-shadow: none;
@@ -235,7 +235,7 @@
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  background: white;
+  background: transparent;
   box-shadow: var(--shadow-md);
 }
 
@@ -263,7 +263,7 @@
 }
 
 .gallery-upload-container {
-  background: white;
+  background: transparent;
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;

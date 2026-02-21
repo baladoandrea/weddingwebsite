@@ -18,6 +18,7 @@ export default function CorunaPage() {
       {/* Where to Eat */}
       <section className="coruna-section">
         <h2>Dónde comer</h2>
+        <img src="/assets/imagen05.png" alt="Dónde comer" className="section-image" />
         <div className="content-cards">
           <article className="recommendation-card">
             <h3>A Pulpeira de Melide</h3>
@@ -42,6 +43,7 @@ export default function CorunaPage() {
       {/* Where to Drink */}
       <section className="coruna-section">
         <h2>Dónde beber</h2>
+        <img src="/assets/imagen06.png" alt="Dónde beber" className="section-image" />
         <div className="content-cards">
           <article className="recommendation-card">
             <h3>La Cervecería (La Estrella)</h3>
@@ -66,6 +68,7 @@ export default function CorunaPage() {
       {/* Where to Stay */}
       <section className="coruna-section">
         <h2>Dónde alojarse</h2>
+        <img src="/assets/alojamiento.png" alt="Dónde alojarse" className="section-image" />
         <div className="content-cards">
           <article className="recommendation-card">
             <h3>Casa Gerardo</h3>

@@ -15,11 +15,6 @@ export default function InfoPage() {
     <div className="info-page">
       <Header />
 
-      {/* Accommodation Image */}
-      <section className="accommodation-hero">
-        <img src="/assets/alojamiento.png" alt="Dónde alojarse" className="full-image" />
-      </section>
-
       {/* How to Get There */}
       <section className="info-section">
         <h2>¿Cómo llegar?</h2>
