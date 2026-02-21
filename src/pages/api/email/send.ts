@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { Resend } from 'resend';
 
 interface EmailRequest {
   to: string;
@@ -51,21 +52,8 @@ export default async function handler(
         message: 'Invalid email address',
       });
     }
-    /*import { Resend } from 'resend';
 
-    const resend = new Resend('re_9ycAzX1G_cpeGcrbHdmcLArgLBte4Rrjb');
-
-    resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: 'baladoandrea@gmail.com',
-      subject: 'Hello World',
-      html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
-    });*/
-    // IMPORTANTE: En producción, usar un servicio real de email
-    // Ejemplo con Resend (npm install resend):
-    
-    import { Resend } from 'resend';
-    
+    // Envío de email con Resend
     const resend = new Resend(process.env.RESEND_API_KEY);
     
     const data = await resend.emails.send({
@@ -78,9 +66,8 @@ export default async function handler(
     if (data.error) {
       throw new Error(data.error.message);
     }
-    
 
-    // Por ahora, simulamos el envío
+    // Log para desarrollo
     console.log(`Email sent to ${to}:`, {
       subject,
       htmlLength: html.length,
