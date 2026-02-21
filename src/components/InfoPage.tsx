@@ -15,6 +15,9 @@ export default function InfoPage() {
     <div className="info-page">
       <Header />
 
+      {/* Imagen superior */}
+      <img src="/assets/imagen02.png" alt="Cómo llegar" className="info-hero-img" style={{width:'100%',maxWidth:500,margin:'0 auto 24px',display:'block',borderRadius:'12px'}} />
+
       {/* How to Get There */}
       <section className="info-section">
         <h2>¿Cómo llegar?</h2>
@@ -61,6 +64,9 @@ export default function InfoPage() {
             >
               Ver ubicación en Maps
             </a>
+
+          {/* Imagen de mapa */}
+          <img src="/assets/mapa.png" alt="Mapa ubicación" className="info-map-img" style={{width:'100%',maxWidth:400,margin:'16px auto 0',display:'block',borderRadius:'12px'}} />
         </article>
       </section>
 

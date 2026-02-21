@@ -6,13 +6,10 @@ export default function CorunaPage() {
     <div className="coruna-page">
       <Header />
 
-      {/* Hero Image - Full Width */}
-      <section className="coruna-hero-full">
-        <img src="/assets/imagen03.png" alt="A Coruña" className="hero-image-full" />
-        <div className="hero-overlay">
-          <h1>A Coruña</h1>
-          <p>Tu guía de la ciudad mágica</p>
-        </div>
+      {/* Hero Mejorado */}
+      <section className="coruna-hero">
+        <img src="/assets/imagen03.png" alt="A Coruña" className="coruna-hero-img" />
+        <h1 className="coruna-title">A Coruña</h1>
       </section>
 
       {/* Where to Eat */}
@@ -114,15 +111,7 @@ export default function CorunaPage() {
         </div>
       </section>
 
-      {/* Curiosity Section */}
-      <section className="coruna-section curiosity-section">
-        <h2>Dato curioso</h2>
-        <p>
-          A Coruña es una ciudad costera llena de historia, tradición y magia. Es el
-          lugar donde el Atlántico abraza la tierra, donde la leyenda de Hercules se
-          mezcla con la modernidad. Es el corazón de Galicia en el océano.
-        </p>
-      </section>
+
 
       <Footer />
     </div>
