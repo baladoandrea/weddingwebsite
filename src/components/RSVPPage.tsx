@@ -284,6 +284,7 @@ export default function RSVPPage() {
       </section>
 
       <Footer />
+      <img src="/assets/imagen04.png" alt="RSVP" className="rsvp-bottom-img" style={{width:'100%',maxWidth:400,margin:'24px auto 0',display:'block',borderRadius:'12px'}} />
     </div>
   );
 }
