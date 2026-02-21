@@ -68,7 +68,7 @@ export default function CorunaPage() {
           <article className="recommendation-card">
             <h3>Casa Gerardo</h3>
             <p>
-              {getText('stay-section', 'Buen anfitrión, mejor abuelo. Un lugar acogedor donde te sentirás como en casa.')}
+              {getText('stay-section', ' Buen anfitrión, mejor abuelo. Un lugar acogedor donde te sentirás como\nen casa. Atención personalizada y un ambiente familiar.')}
             </p>
           </article>
         </div>

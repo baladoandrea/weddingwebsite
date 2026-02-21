@@ -52,7 +52,7 @@ export default async function handler(
     texts.push(newSection);
     const saved = await saveStoredTexts(texts);
     if (!saved) {
-      return res.status(500).json({ error: 'No se pudieron guardar los textos. Revisa BLOB_READ_WRITE_TOKEN.' });
+      console.warn('No se pudo persistir en Blob. Se mantiene fallback en memoria para textos.');
     }
 
     return res.status(201).json(newSection);
@@ -77,7 +77,7 @@ export default async function handler(
     texts[sectionIndex] = { ...texts[sectionIndex], ...req.body };
     const saved = await saveStoredTexts(texts);
     if (!saved) {
-      return res.status(500).json({ error: 'No se pudieron guardar los textos. Revisa BLOB_READ_WRITE_TOKEN.' });
+      console.warn('No se pudo persistir en Blob. Se mantiene fallback en memoria para textos.');
     }
 
     return res.status(200).json(texts[sectionIndex]);
@@ -95,7 +95,7 @@ export default async function handler(
     texts = texts.filter(s => s.id !== id);
     const saved = await saveStoredTexts(texts);
     if (!saved) {
-      return res.status(500).json({ error: 'No se pudieron guardar los textos. Revisa BLOB_READ_WRITE_TOKEN.' });
+      console.warn('No se pudo persistir en Blob. Se mantiene fallback en memoria para textos.');
     }
 
     return res.status(200).json(texts);

@@ -119,6 +119,33 @@ Ver `DEPLOYMENT.md` para instrucciones detalladas.
 
 ---
 
+## 9️⃣ Configurar Vercel Blob (OBLIGATORIO para panel admin)
+
+Sin esta variable no funcionará correctamente:
+- Guardar textos desde el panel admin
+- Subir fotos a la galería
+
+### En Vercel Dashboard
+1. Abre tu proyecto en Vercel
+2. Ve a `Storage` → `Blob`
+3. Crea o selecciona un Blob Store
+4. Pulsa `Connect Project` (si aún no está conectado)
+5. Ve a `Settings` → `Environment Variables`
+6. Añade:
+  - **Name**: `BLOB_READ_WRITE_TOKEN`
+  - **Value**: token generado por Vercel Blob
+  - **Environment**: `Production` (y recomendable también `Preview` + `Development`)
+7. Haz **Redeploy** del proyecto
+
+### En local (`.env.local`)
+```bash
+BLOB_READ_WRITE_TOKEN=tu_token_real_de_vercel_blob
+```
+
+Reinicia `npm run dev` después de añadir la variable.
+
+---
+
 ## 🔐 Cambiar Credenciales Admin
 
 En `src/pages/api/auth/login.ts`:
@@ -166,6 +193,12 @@ npm run dev -- -p 3001
 ### El formulario RSVP no funciona
 - F12 > Network para ver errores
 - Revisa los logs en Vercel Dashboard
+
+### "No se pudieron guardar los textos. Revisa BLOB_READ_WRITE_TOKEN"
+- Verifica que `BLOB_READ_WRITE_TOKEN` está definido en Vercel
+- Confirma que el proyecto está conectado al Blob Store
+- Haz redeploy después de guardar variables
+- En local, revisa que existe en `.env.local` y reinicia `npm run dev`
 
 ---
 

@@ -84,6 +84,18 @@
     "page": "info"
   },
   {
+    "id": "bus-out-text",
+    "title": "Cómo llegar en autobús - Salida",
+    "content": "Sábado 29 de agosto a las 12:30 desde la Avenida de Córcega.",
+    "page": "info"
+  }, 
+  {
+    "id": "bus-return-text",
+    "title": "Cómo llegar en autobús - Vuelta",
+    "content": "Se dispondrá de servicio de autobús al finalizar la boda.",
+    "page": "info"
+  },
+  {
     "id": "questions-section",
     "title": "¿Alguna duda?",
     "content": "Si tienes cualquier duda, petición o lo que sea, puedes escribirnos a Sergio o Marta.",

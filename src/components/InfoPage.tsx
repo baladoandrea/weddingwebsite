@@ -29,23 +29,21 @@ export default function InfoPage() {
         <article className="subsection">
           <h3>En autobús</h3>
           <div className="bus-info">
-            {hasSplitBusInfo ? (
-              <>
-                <p>
-                  <strong>{getText('bus-out-label', 'Salida:')}</strong>{' '}
-                  {busOutText}
-                </p>
+            <p>
+              <strong>{getText('bus-out-label', 'Salida:')}</strong>{' '}
+              {getText(
+                'bus-out-text',
+                'Sábado 29 de agosto a las 12:30 desde la Avenida de Córcega.'
+              )}
+            </p>
 
-                <p>
-                  <strong>{getText('bus-return-label', 'Servicio de vuelta:')}</strong>{' '}
-                  {busReturnText}
-                </p>
-              </>
-            ) : (
-              <p>
-                {getText('bus-section', 'Saldrá un autobús a las 11:30 desde la Plaza de Pontevedra. Habrá servicio de vuelta.')}
-              </p>
-            )}
+            <p>
+              <strong>{getText('bus-return-label', 'Servicio de vuelta:')}</strong>{' '}
+              {getText(
+                'bus-return-text',
+                'Se dispondrá de servicio de autobús al finalizar la boda.'
+              )}
+            </p>
           </div>
 
           {/* Imagen eliminada de bus-info */}
