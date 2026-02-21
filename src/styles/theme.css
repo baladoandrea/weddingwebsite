@@ -379,7 +379,6 @@
 }
 
 .header-title {
-  font-family: 'Playfair Display', serif;
   font-size: 24px;
   font-weight: 400;
   color: #E9DED0;
@@ -404,7 +403,10 @@
   margin: 24px 0;
 }
 
-h1, h2, h3, strong {
+h1{
+  color: #E9DED0;
+}
+
+h2, h3, strong {
   color: #041E42 !important;
-  font-family: 'Playfair Display', serif;
 }
