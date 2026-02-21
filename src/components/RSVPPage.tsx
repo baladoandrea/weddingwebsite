@@ -179,32 +179,33 @@ export default function RSVPPage() {
                 <input
                   type="text"
                   placeholder="Busca tu nombre..."
-                value={searchQuery}
-                onChange={e => handleSearch(e.target.value)}
-                className="search-input"
-              />
-            </div>
-
-            {matchedGuests.length > 0 && (
-              <div className="guest-list">
-                {matchedGuests.map(guest => (
-                  <button
-                    key={guest.id}
-                    className="guest-item"
-                    onClick={() => handleSelectGuest(guest)}
-                  >
-                    {guest.name}
-                  </button>
-                ))}
+                  value={searchQuery}
+                  onChange={e => handleSearch(e.target.value)}
+                  className="search-input"
+                />
               </div>
-            )}
 
-            {searchQuery && matchedGuests.length === 0 && (
-              <p className="no-results">
-                No encontramos tu nombre. ¿Contacta con Marta o Sergio?
-              </p>
-            )}
-          </div>
+              {matchedGuests.length > 0 && (
+                <div className="guest-list">
+                  {matchedGuests.map(guest => (
+                    <button
+                      key={guest.id}
+                      className="guest-item"
+                      onClick={() => handleSelectGuest(guest)}
+                    >
+                      {guest.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {searchQuery && matchedGuests.length === 0 && (
+                <p className="no-results">
+                  No encontramos tu nombre. ¿Contacta con Marta o Sergio?
+                </p>
+              )}
+            </div>
+          </>
         ) : (
           <form onSubmit={handleSubmit} className="attendance-form">
             <div className="selected-guest">
