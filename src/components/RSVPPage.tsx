@@ -173,7 +173,6 @@ export default function RSVPPage() {
       <section className="rsvp-form-section">
         {!selectedGuest ? (
           <>
-            <img src="/assets/imagen03.png" alt="RSVP" className="rsvp-hero-img" style={{width:'100%',maxWidth:400,margin:'0 auto 16px',display:'block',borderRadius:'12px'}} />
             <div className="guest-search">
               <div className="search-input-group">
                 <input
