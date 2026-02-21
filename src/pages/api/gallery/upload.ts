@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import formidable, { type Fields, type Files, type File } from 'formidable';
+import formidable from 'formidable';
 import { put } from '@vercel/blob';
 import galleryData from '../../../data/gallery.json';
 import { getStoredGallery, saveStoredGallery } from '../../../utils/blobDataStore';
@@ -10,6 +10,18 @@ interface UploadResponse {
   url: string;
   tags: string[];
 }
+
+type FormFields = Record<string, string | string[] | undefined>;
+
+interface FormFile {
+  filepath: string;
+  mimetype?: string | null;
+  originalFilename?: string | null;
+}
+
+type FormFiles = {
+  file?: FormFile | FormFile[];
+};
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -21,14 +33,14 @@ export const config = {
 
 const parseForm = async (
   req: NextApiRequest
-): Promise<{ fields: Fields; files: Files }> => {
+): Promise<{ fields: FormFields; files: FormFiles }> => {
   const form = formidable({
     multiples: false,
     maxFileSize: MAX_FILE_SIZE,
   });
 
   return new Promise((resolve, reject) => {
-    form.parse(req, (err: Error | null, fields: Fields, files: Files) => {
+    form.parse(req, (err: Error | null, fields: FormFields, files: FormFiles) => {
       if (err) {
         reject(err);
         return;
@@ -38,7 +50,7 @@ const parseForm = async (
   });
 };
 
-const getSingleFile = (files: Files): File | null => {
+const getSingleFile = (files: FormFiles): FormFile | null => {
   const fileInput = files.file;
   if (!fileInput) {
     return null;
@@ -51,7 +63,7 @@ const getSingleFile = (files: Files): File | null => {
   return fileInput;
 };
 
-const parseTags = (fields: Fields): string[] => {
+const parseTags = (fields: FormFields): string[] => {
   const rawTags = fields.tags;
   const value = Array.isArray(rawTags) ? rawTags[0] : rawTags;
 
