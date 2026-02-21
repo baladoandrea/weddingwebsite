@@ -74,7 +74,7 @@ export default function GalleryPage() {
       <Header />
 
       <section className="gallery-header">
-        <h1>Galería</h1>
+        <h2>Galería</h2>
         <p>Momentos especiales de la boda</p>
       </section>
 
