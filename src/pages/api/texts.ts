@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import textsData from '../../data/texts.json';
+import { getStoredTexts, saveStoredTexts } from '../../utils/blobDataStore';
 
 interface Section {
   id: string;
@@ -10,24 +11,28 @@ interface Section {
 
 let texts = [...textsData];
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Section[] | Section | { error: string }>
 ) {
   if (req.method === 'GET') {
+    texts = await getStoredTexts(texts);
     return res.status(200).json(texts);
   }
 
   if (req.method === 'POST') {
+    texts = await getStoredTexts(texts);
     const newSection = {
       id: Date.now().toString(),
       ...req.body,
     };
     texts.push(newSection);
+    await saveStoredTexts(texts);
     return res.status(201).json(newSection);
   }
 
   if (req.method === 'PUT') {
+    texts = await getStoredTexts(texts);
     // Allow id to be sent either as query param or in the request body
     const id = (req.query.id as string) || (req.body && req.body.id);
     if (!id) {
@@ -41,12 +46,19 @@ export default function handler(
     }
 
     texts[sectionIndex] = { ...texts[sectionIndex], ...req.body };
+    await saveStoredTexts(texts);
     return res.status(200).json(texts[sectionIndex]);
   }
 
   if (req.method === 'DELETE') {
-    const { id } = req.query;
+    texts = await getStoredTexts(texts);
+    const id = req.query.id as string;
+    if (!id) {
+      return res.status(400).json({ error: 'Missing id for delete' });
+    }
+
     texts = texts.filter(s => s.id !== id);
+    await saveStoredTexts(texts);
     return res.status(200).json(texts);
   }
 

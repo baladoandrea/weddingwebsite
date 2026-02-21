@@ -9,7 +9,7 @@ interface GalleryItem {
 }
 
 const defaultPhotos: GalleryItem[] = [
-  { id: '1', url: '/assets/foto01.png', tags: ['ceremonia', 'playa'] },
+  { id: '1', url: '/assets/foto01.png', tags: ['ceremonia', 'novios'] },
   { id: '2', url: '/assets/foto02.png', tags: ['aperitivo', 'convite'] },
   { id: '3', url: '/assets/foto03.png', tags: ['ceremonia', 'momentos'] },
 ];

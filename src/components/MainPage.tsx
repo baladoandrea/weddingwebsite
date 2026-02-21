@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import MapEmbed from './MapEmbed';
+import useWebsiteTexts from '../utils/useWebsiteTexts';
 
 export default function MainPage() {
   const [showText, setShowText] = useState(false);
+  const { getText } = useWebsiteTexts();
 
   useEffect(() => {
     setTimeout(() => setShowText(true), 500);
@@ -26,7 +28,7 @@ export default function MainPage() {
       <section className="text-section">
         <div className={`main-text ${showText ? 'visible' : ''}`}>
           <h2 className="main-quote">
-            En el Atlántico nos prometimos, y ante el mar queremos celebrar...
+            {getText('main-quote', 'En el Atlántico nos prometimos, y ante el mar queremos celebrar...')}
           </h2>
           <p className="event-date">Boda Marta & Sergio · 29 de Agosto de 2026</p>
 
@@ -48,7 +50,7 @@ export default function MainPage() {
       {/* Location Section */}
       <section className="location-section">
         <div className="location-content">
-          <h3 className="location-title">📍 Ubicación</h3>
+          <h3 className="location-title">📍 {getText('location-title', 'Ubicación')}</h3>
 
           <div className="location-info">
             <div className="info-row">

@@ -1,15 +1,9 @@
-import { useState, useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
-import MapEmbed from './MapEmbed';
+import useWebsiteTexts from '../utils/useWebsiteTexts';
 
 export default function InfoPage() {
-  const [editMode, setEditMode] = useState(false);
-
-  useEffect(() => {
-    const token = sessionStorage.getItem('adminToken');
-    setEditMode(!!token);
-  }, []);
+  const { getText } = useWebsiteTexts();
 
   return (
     <div className="info-page">
@@ -25,19 +19,7 @@ export default function InfoPage() {
         <article className="subsection">
           <h3>En coche</h3>
           <p>
-            Para llegar al Casón Amor en coche, dirígete hacia el centro de A Coruña
-            y sigue las indicaciones hacia la zona de la Ciudad Vieja o "Torre de
-            Hércules". Desde la avenida principal de acceso a la ciudad (AC-11), toma
-            la salida hacia el Paseo Marítimo en dirección norte. Continúa por el
-            Paseo Marítimo bordeando la costa durante varios kilómetros hasta
-            encontrar la señalización hacia el destino.
-          </p>
-          <p>
-            El lugar se encuentra dentro de un área peatonal y protegida, por lo que
-            el acceso directo en coche hasta la entrada no está permitido. Existen
-            zonas de aparcamiento habilitadas en las inmediaciones, a unos minutos a
-            pie. Desde allí, sigue los senderos señalizados hasta el acceso principal
-            al recinto.
+            {getText('car-section', 'Para llegar al Casón Amor en coche, dirígete hacia el centro de A Coruña y sigue las indicaciones hacia la zona de la Ciudad Vieja o Torre de Hércules. Existen zonas de aparcamiento habilitadas en las inmediaciones.')}
           </p>
         </article>
 
@@ -45,12 +27,7 @@ export default function InfoPage() {
           <h3>En autobús</h3>
           <div className="bus-info">
             <p>
-              <strong>Salida:</strong> Sábado 29 de agosto a las 12:30 desde la Avenida
-              de Córcega.
-            </p>
-            <p>
-              <strong>Servicio de vuelta:</strong> Se dispondrá de servicio de autobús
-              al finalizar la boda.
+              {getText('bus-section', 'Saldrá un autobús a las 11:30 desde la Plaza de Pontevedra. Habrá servicio de vuelta.')}
             </p>
           </div>
 
@@ -70,14 +47,19 @@ export default function InfoPage() {
         </article>
       </section>
 
+      <section className="info-section">
+        <h2>¿Alguna duda?</h2>
+        <p>
+          {getText('questions-section', 'Si tienes cualquier duda, petición o lo que sea, puedes escribirnos a Sergio o Marta.')}
+        </p>
+      </section>
+
       {/* Gift Section */}
       <section className="info-section gift-section">
         <h2>Regalo</h2>
         <div className="gift-content">
           <p>
-            Vuestra presencia es nuestro mejor regalo. Pero si queréis tener un
-            detalle con nosotros para nuestra nueva etapa, podéis hacerlo a través
-            del siguiente número de cuenta:
+            {getText('gift-section', 'Vuestra presencia es nuestro mejor regalo. Pero si queréis tener un detalle con nosotros para nuestra nueva etapa, podéis hacerlo a través del siguiente número de cuenta:')}
           </p>
           <div className="bank-info">
             <code>ES12 3456 7890 0000 0000</code>

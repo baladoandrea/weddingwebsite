@@ -1,7 +1,10 @@
 import Header from './Header';
 import Footer from './Footer';
+import useWebsiteTexts from '../utils/useWebsiteTexts';
 
 export default function CorunaPage() {
+  const { getText } = useWebsiteTexts();
+
   return (
     <div className="coruna-page">
       <Header />
@@ -9,7 +12,7 @@ export default function CorunaPage() {
       {/* Hero Mejorado */}
       <section className="coruna-hero">
         <img src="/assets/imagen03.png" alt="A Coruña" className="coruna-hero-img" />
-        <h1 className="coruna-title">A Coruña</h1>
+        <h2 className="coruna-title">A Coruña</h2>
       </section>
 
       {/* Where to Eat */}
@@ -20,7 +23,7 @@ export default function CorunaPage() {
           <article className="recommendation-card">
             <h3>A Pulpeira de Melide</h3>
             <p>
-            No puedes irte de A Coruña sin probar el pulpo a feira.
+            {getText('eat-section', 'No puedes irte de A Coruña sin probar el pulpo a feira.')}
             </p>
           </article>
 
@@ -42,8 +45,7 @@ export default function CorunaPage() {
           <article className="recommendation-card">
             <h3>La Cervecería</h3>
             <p>
-              Más conocida como "la estrella", esta cervecería es una parada
-              imprescindible en A Coruña.
+              {getText('drink-section', 'Más conocida como la estrella, esta cervecería es una parada imprescindible en A Coruña.')}
             </p>
           </article>
 
@@ -66,8 +68,7 @@ export default function CorunaPage() {
           <article className="recommendation-card">
             <h3>Casa Gerardo</h3>
             <p>
-              Buen anfitrión, mejor abuelo. Un lugar acogedor donde te sentirás como
-              en casa. Atención personalizada y un ambiente familiar.
+              {getText('stay-section', 'Buen anfitrión, mejor abuelo. Un lugar acogedor donde te sentirás como en casa.')}
             </p>
           </article>
         </div>
@@ -80,8 +81,7 @@ export default function CorunaPage() {
           <article className="recommendation-card">
             <h3>Estadio de Riazor</h3>
               <p>
-              Hogar del Deportivo de La Coruña. Si tienes la oportunidad, ve a
-              un partido del depor, derrota garantizada.
+              {getText('see-section', 'Hogar del Deportivo de La Coruña. Si tienes la oportunidad, ve a un partido del depor, derrota garantizada.')}
             </p>
           </article>
 

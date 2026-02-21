@@ -91,6 +91,9 @@ export default function AdminPanel() {
         const newItem = await response.json();
         setGallery([...gallery, newItem]);
         alert('Foto subida correctamente');
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Error al subir la foto');
       }
     } catch (error) {
       alert('Error al subir la foto');
@@ -100,7 +103,7 @@ export default function AdminPanel() {
   const handleDeleteGalleryItem = async (id: string) => {
     if (confirm('¿Eliminar esta foto?')) {
       try {
-        const response = await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
+        const response = await fetch(`/api/gallery?id=${id}`, { method: 'DELETE' });
         if (response.ok) {
           setGallery(gallery.filter(item => item.id !== id));
         }
@@ -113,7 +116,7 @@ export default function AdminPanel() {
   const handleDeleteGuest = async (id: string) => {
     if (confirm('¿Eliminar este invitado?')) {
       try {
-        const response = await fetch(`/api/guests/${id}`, { method: 'DELETE' });
+        const response = await fetch(`/api/guests?id=${id}`, { method: 'DELETE' });
         if (response.ok) {
           setGuests(guests.filter(g => g.id !== id));
         }
