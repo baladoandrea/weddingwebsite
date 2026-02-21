@@ -161,7 +161,7 @@ export default function RSVPPage() {
       <Header />
 
       <section className="rsvp-header">
-        <h1>¿Contamos contigo?</h1>
+        <h2>¿Contamos contigo?</h2>
         <p className="rsvp-subtitle">
           ¡Nos hace muchísima ilusión compartir este día contigo! Para ayudarnos
           a organizarlo todo a la perfección, por favor introduce tu nombre. Si

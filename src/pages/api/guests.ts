@@ -13,6 +13,12 @@ const GOOGLE_SHEETS_ID = process.env.GOOGLE_SHEETS_ID;
 const GOOGLE_SHEETS_API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
 const USE_GOOGLE_SHEETS = GOOGLE_SHEETS_ID && GOOGLE_SHEETS_API_KEY;
 
+// Debug logs (eliminar después de verificar)
+console.log('🔍 Google Sheets Config:');
+console.log('  GOOGLE_SHEETS_ID:', GOOGLE_SHEETS_ID ? '✅ Configurado' : '❌ No encontrado');
+console.log('  GOOGLE_SHEETS_API_KEY:', GOOGLE_SHEETS_API_KEY ? '✅ Configurado' : '❌ No encontrado');
+console.log('  USE_GOOGLE_SHEETS:', USE_GOOGLE_SHEETS ? '✅ Habilitado' : '❌ Deshabilitado');
+
 // Simulamos una base de datos en memoria para este ejemplo
 let guestsCache = [...guestsData];
 
@@ -27,20 +33,27 @@ let guestsCache = [...guestsData];
  */
 async function getGuestsFromSheets(): Promise<Guest[]> {
   if (!USE_GOOGLE_SHEETS) {
+    console.log('⚠️  Usando guests.json (Google Sheets no configurado)');
     return guestsCache;
   }
 
   try {
     const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/Invitados!A2:E?key=${GOOGLE_SHEETS_API_KEY}`;
+    console.log('📡 Intentando conectar con Google Sheets...');
+    
     const response = await fetch(sheetsUrl);
     
     if (!response.ok) {
-      console.error('Error fetching from Google Sheets:', response.statusText);
+      console.error('❌ Error fetching from Google Sheets:', response.status, response.statusText);
+      console.error('   URL:', sheetsUrl.replace(GOOGLE_SHEETS_API_KEY!, 'API_KEY_HIDDEN'));
       return guestsCache; // Fallback a datos locales
     }
 
     const data = await response.json();
     const rows = data.values || [];
+    
+    console.log('✅ Google Sheets conectado exitosamente!');
+    console.log(`   Invitados encontrados: ${rows.length}`);
 
     const guests: Guest[] = rows.map((row: string[]) => ({
       id: row[0] || '',
@@ -54,7 +67,7 @@ async function getGuestsFromSheets(): Promise<Guest[]> {
     guestsCache = guests;
     return guests;
   } catch (error) {
-    console.error('Error connecting to Google Sheets:', error);
+    console.error('❌ Error connecting to Google Sheets:', error);
     return guestsCache; // Fallback a datos locales
   }
 }
