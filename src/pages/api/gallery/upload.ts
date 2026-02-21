@@ -1,6 +1,4 @@
-import { readFile } from 'node:fs/promises';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import formidable from 'formidable';
 import { put } from '@vercel/blob';
 import galleryData from '../../../data/gallery.json';
 import { getStoredGallery, saveStoredGallery } from '../../../utils/blobDataStore';
@@ -11,78 +9,19 @@ interface UploadResponse {
   tags: string[];
 }
 
-type FormFields = Record<string, string | string[] | undefined>;
-
-interface FormFile {
-  filepath: string;
-  mimetype?: string | null;
-  originalFilename?: string | null;
+interface UploadRequestBody {
+  fileName?: string;
+  mimeType?: string;
+  base64Data?: string;
+  tags?: string[];
 }
-
-type FormFiles = {
-  file?: FormFile | FormFile[];
-};
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: {
+      sizeLimit: '12mb',
+    },
   },
-};
-
-const parseForm = async (
-  req: NextApiRequest
-): Promise<{ fields: FormFields; files: FormFiles }> => {
-  const form = formidable({
-    multiples: false,
-    maxFileSize: MAX_FILE_SIZE,
-  });
-
-  return new Promise((resolve, reject) => {
-    form.parse(req, (err: Error | null, fields: FormFields, files: FormFiles) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve({ fields, files });
-    });
-  });
-};
-
-const getSingleFile = (files: FormFiles): FormFile | null => {
-  const fileInput = files.file;
-  if (!fileInput) {
-    return null;
-  }
-
-  if (Array.isArray(fileInput)) {
-    return fileInput[0] ?? null;
-  }
-
-  return fileInput;
-};
-
-const parseTags = (fields: FormFields): string[] => {
-  const rawTags = fields.tags;
-  const value = Array.isArray(rawTags) ? rawTags[0] : rawTags;
-
-  if (!value || typeof value !== 'string') {
-    return [];
-  }
-
-  try {
-    const parsed = JSON.parse(value);
-    if (Array.isArray(parsed)) {
-      return parsed
-        .map(tag => String(tag).trim())
-        .filter(tag => tag.length > 0);
-    }
-  } catch (error) {
-    console.error('Error parsing tags:', error);
-  }
-
-  return [];
 };
 
 const sanitizeFileName = (name: string): string =>
@@ -101,31 +40,38 @@ export default async function handler(
   }
 
   try {
-    const { fields, files } = await parseForm(req);
-    const imageFile = getSingleFile(files);
+    const { fileName, mimeType, base64Data, tags } = (req.body || {}) as UploadRequestBody;
 
-    if (!imageFile) {
-      return res.status(400).json({ error: 'No se recibió ningún archivo' });
+    if (!fileName || !mimeType || !base64Data) {
+      return res.status(400).json({ error: 'Faltan datos de la imagen' });
     }
 
-    if (!imageFile.mimetype || !imageFile.mimetype.startsWith('image/')) {
+    if (!mimeType.startsWith('image/')) {
       return res.status(400).json({ error: 'Solo se permiten imágenes' });
     }
 
-    const safeFileName = sanitizeFileName(imageFile.originalFilename || 'photo.jpg');
-    const fileBuffer = await readFile(imageFile.filepath);
+    const safeFileName = sanitizeFileName(fileName || 'photo.jpg');
+    const fileBuffer = Buffer.from(base64Data, 'base64');
+
+    if (fileBuffer.length === 0) {
+      return res.status(400).json({ error: 'Archivo inválido' });
+    }
+
+    if (fileBuffer.length > 10 * 1024 * 1024) {
+      return res.status(400).json({ error: 'La imagen supera el límite de 10MB' });
+    }
 
     const uploadResult = await put(`gallery/${Date.now()}-${safeFileName}`, fileBuffer, {
       access: 'public',
-      contentType: imageFile.mimetype,
+      contentType: mimeType,
     });
-
-    const tags = parseTags(fields);
 
     const newItem: UploadResponse = {
       id: Date.now().toString(),
       url: uploadResult.url,
-      tags,
+      tags: Array.isArray(tags)
+        ? tags.map(tag => String(tag).trim()).filter(tag => tag.length > 0)
+        : [],
     };
 
     const currentGallery = await getStoredGallery([...galleryData]);

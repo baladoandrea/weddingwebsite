@@ -77,14 +77,40 @@ export default function AdminPanel() {
   };
 
   const handleGalleryUpload = async (file: File, tags: string[]) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('tags', JSON.stringify(tags));
+    const fileToBase64 = (selectedFile: File) =>
+      new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result;
+          if (typeof result !== 'string') {
+            reject(new Error('No se pudo leer la imagen'));
+            return;
+          }
+
+          const [, base64] = result.split(',');
+          if (!base64) {
+            reject(new Error('Formato de imagen inválido'));
+            return;
+          }
+
+          resolve(base64);
+        };
+        reader.onerror = () => reject(new Error('Error leyendo imagen'));
+        reader.readAsDataURL(selectedFile);
+      });
 
     try {
+      const base64Data = await fileToBase64(file);
+
       const response = await fetch('/api/gallery/upload', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: file.name,
+          mimeType: file.type,
+          base64Data,
+          tags,
+        }),
       });
 
       if (response.ok) {
@@ -92,8 +118,14 @@ export default function AdminPanel() {
         setGallery([...gallery, newItem]);
         alert('Foto subida correctamente');
       } else {
-        const data = await response.json();
-        alert(data.error || 'Error al subir la foto');
+        let serverError = 'Error al subir la foto';
+        try {
+          const data = await response.json();
+          serverError = data.error || serverError;
+        } catch {
+          serverError = `Error al subir la foto (HTTP ${response.status})`;
+        }
+        alert(serverError);
       }
     } catch (error) {
       alert('Error al subir la foto');
