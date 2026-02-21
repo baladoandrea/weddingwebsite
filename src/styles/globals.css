@@ -1,15 +1,6 @@
 /* Reset y estilos base */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Mea+Culpa&display=swap');
-
-@font-face {
-  font-family: 'Mr Blaketon Pro';
-  src: url('/assets/fonts/MrBlaketonPro.woff2') format('woff2'),
-       url('/assets/fonts/MrBlaketonPro.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=Mea+Culpa&family=Oooh+Baby&display=swap');
 
 * {
   margin: 0;
@@ -209,8 +200,10 @@ a:hover {
 /* Responsive */
 @media (max-width: 480px) {
   h1 {
-    font-family: 'Mr Blaketon Pro', cursive;
-    font-size: 32px;
+  font-family: "Oooh Baby", cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 32px;
   }
 
   h2 {
