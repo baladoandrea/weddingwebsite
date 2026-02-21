@@ -27,16 +27,6 @@ export default function GalleryUpload({ onUpload }: GalleryUploadProps) {
       return;
     }
 
-    if (!file.type.startsWith('image/')) {
-      alert('Solo se permiten imágenes');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      alert('La imagen supera el límite de 10MB');
-      return;
-    }
-
     const tagsArray = tags
       .split(',')
       .map(tag => tag.trim())
