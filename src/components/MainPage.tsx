@@ -22,7 +22,6 @@ export default function MainPage() {
         </video>
         <div className="video-overlay"></div>
       </section>
-
       {/* Text Section */}
       <section className="text-section">
         <div className={`main-text ${showText ? 'visible' : ''}`}>

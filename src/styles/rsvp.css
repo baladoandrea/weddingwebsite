@@ -14,7 +14,7 @@
 
 .rsvp-header h1 {
   font-size: 28px;
-  color: #006B8E;
+  color: #041E42;
   margin: 0 0 12px 0;
 }
 
@@ -41,7 +41,7 @@
 }
 
 .guest-search h2 {
-  color: #006B8E;
+  color: #041E42;
   margin-top: 0;
 }
 
@@ -60,7 +60,7 @@
 }
 
 .search-input:focus {
-  border-color: #006B8E;
+  border-color: #041E42;
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 107, 142, 0.1);
 }
@@ -155,7 +155,7 @@
 }
 
 .attendance-options h3 {
-  color: #006B8E;
+  color: #041E42;
   margin-top: 0;
   margin-bottom: 16px;
 }
@@ -181,11 +181,11 @@
 
 .attendance-option:hover {
   background: rgba(0, 107, 142, 0.05);
-  border-color: #006B8E;
+  border-color: #041E42;
 }
 
 .attendance-option input[type="radio"]:checked + .option-text {
-  color: #006B8E;
+  color: #041E42;
   font-weight: 600;
 }
 
@@ -202,7 +202,7 @@
 .notes-field label {
   display: block;
   font-weight: 600;
-  color: #006B8E;
+  color: #041E42;
   margin-bottom: 8px;
 }
 
@@ -219,7 +219,7 @@
 }
 
 .notes-field textarea:focus {
-  border-color: #006B8E;
+  border-color: #041E42;
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 107, 142, 0.1);
 }
@@ -277,7 +277,7 @@
 }
 
 .success-modal h2 {
-  color: #006B8E;
+  color: #041E42;
   font-size: 32px;
   margin: 0 0 12px 0;
 }

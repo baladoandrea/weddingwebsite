@@ -1,5 +1,6 @@
 /* Reset y estilos base */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mea+Culpa&display=swap');
 
 * {
   margin: 0;
@@ -21,6 +22,13 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  body {
+    background-attachment: scroll;
+    background-position: center top;
+  }
 }
 
 /* Tipografía */
@@ -191,6 +199,7 @@ a:hover {
 /* Responsive */
 @media (max-width: 480px) {
   h1 {
+    font-family: "Mea Culpa", cursive;
     font-size: 28px;
   }
 

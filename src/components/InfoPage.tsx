@@ -45,12 +45,12 @@ export default function InfoPage() {
           <h3>En autobús</h3>
           <div className="bus-info">
             <p>
-              <strong>Salida:</strong> Viernes 28 de agosto a las 11:30 desde la Plaza
-              de Pontevedra.
+              <strong>Salida:</strong> Sábado 29 de agosto a las 12:30 desde la Avenida
+              de Córcega.
             </p>
             <p>
-              <strong>Servicio de vuelta:</strong> Sábado 29 de agosto a las 02:00 y
-              04:00.
+              <strong>Servicio de vuelta:</strong> Se dispondrá de servicio de autobús
+              al finalizar la boda.
             </p>
           </div>
 
@@ -89,7 +89,6 @@ export default function InfoPage() {
       {/* Spotify Playlist */}
       <section className="info-section playlist-section">
         <h2>Ve calentando motores</h2>
-        <p>Aquí va la playlist que nos encanta:</p>
         <div className="spotify-embed">
           <iframe
             style={{ borderRadius: '12px' }}

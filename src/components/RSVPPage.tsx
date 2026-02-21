@@ -200,7 +200,7 @@ export default function RSVPPage() {
 
               {searchQuery && matchedGuests.length === 0 && (
                 <p className="no-results">
-                  No encontramos tu nombre. ¿Contacta con Marta o Sergio?
+                  No encontramos tu nombre. Contacta con Marta o Sergio
                 </p>
               )}
             </div>
@@ -259,7 +259,7 @@ export default function RSVPPage() {
             </div>
 
             <div className="notes-field">
-              <label htmlFor="notes">Déjanos una nota (máx. 240 caracteres)</label>
+              <label htmlFor="notes">Déjanos una nota</label>
               <textarea
                 id="notes"
                 placeholder="Cuéntanos algo especial..."
