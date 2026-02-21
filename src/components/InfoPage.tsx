@@ -4,6 +4,9 @@ import useWebsiteTexts from '../utils/useWebsiteTexts';
 
 export default function InfoPage() {
   const { getText } = useWebsiteTexts();
+  const busOutText = getText('bus-out-text', '');
+  const busReturnText = getText('bus-return-text', '');
+  const hasSplitBusInfo = busOutText.trim().length > 0 || busReturnText.trim().length > 0;
 
   return (
     <div className="info-page">
@@ -26,9 +29,23 @@ export default function InfoPage() {
         <article className="subsection">
           <h3>En autobús</h3>
           <div className="bus-info">
-            <p>
-              {getText('bus-section', 'Saldrá un autobús a las 11:30 desde la Plaza de Pontevedra. Habrá servicio de vuelta.')}
-            </p>
+            {hasSplitBusInfo ? (
+              <>
+                <p>
+                  <strong>{getText('bus-out-label', 'Salida:')}</strong>{' '}
+                  {busOutText}
+                </p>
+
+                <p>
+                  <strong>{getText('bus-return-label', 'Servicio de vuelta:')}</strong>{' '}
+                  {busReturnText}
+                </p>
+              </>
+            ) : (
+              <p>
+                {getText('bus-section', 'Saldrá un autobús a las 11:30 desde la Plaza de Pontevedra. Habrá servicio de vuelta.')}
+              </p>
+            )}
           </div>
 
           {/* Imagen eliminada de bus-info */}

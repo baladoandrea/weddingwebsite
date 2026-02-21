@@ -9,30 +9,51 @@ interface Section {
   page: string;
 }
 
-let texts = [...textsData];
+const defaultTexts: Section[] = [...textsData];
+let texts = [...defaultTexts];
+
+const mergeTextsWithDefaults = (storedTexts: Section[]): Section[] => {
+  const defaultIds = new Set(defaultTexts.map(section => section.id));
+  const mergedMap = new Map(defaultTexts.map(section => [section.id, section]));
+
+  for (const section of storedTexts) {
+    mergedMap.set(section.id, section);
+  }
+
+  const merged = defaultTexts.map(section => mergedMap.get(section.id) || section);
+  const customSections = storedTexts.filter(section => !defaultIds.has(section.id));
+
+  return [...merged, ...customSections];
+};
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Section[] | Section | { error: string }>
 ) {
   if (req.method === 'GET') {
-    texts = await getStoredTexts(texts);
+    const storedTexts = await getStoredTexts(defaultTexts);
+    texts = mergeTextsWithDefaults(storedTexts);
     return res.status(200).json(texts);
   }
 
   if (req.method === 'POST') {
-    texts = await getStoredTexts(texts);
+    const storedTexts = await getStoredTexts(defaultTexts);
+    texts = mergeTextsWithDefaults(storedTexts);
+
     const newSection = {
       id: Date.now().toString(),
       ...req.body,
     };
+
     texts.push(newSection);
     await saveStoredTexts(texts);
     return res.status(201).json(newSection);
   }
 
   if (req.method === 'PUT') {
-    texts = await getStoredTexts(texts);
+    const storedTexts = await getStoredTexts(defaultTexts);
+    texts = mergeTextsWithDefaults(storedTexts);
+
     // Allow id to be sent either as query param or in the request body
     const id = (req.query.id as string) || (req.body && req.body.id);
     if (!id) {
@@ -51,7 +72,9 @@ export default async function handler(
   }
 
   if (req.method === 'DELETE') {
-    texts = await getStoredTexts(texts);
+    const storedTexts = await getStoredTexts(defaultTexts);
+    texts = mergeTextsWithDefaults(storedTexts);
+
     const id = req.query.id as string;
     if (!id) {
       return res.status(400).json({ error: 'Missing id for delete' });

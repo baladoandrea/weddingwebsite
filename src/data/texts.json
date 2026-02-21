@@ -12,6 +12,66 @@
     "page": "principal"
   },
   {
+    "id": "location-city-label",
+    "title": "Ubicación - Etiqueta Ciudad",
+    "content": "Ciudad:",
+    "page": "principal"
+  },
+  {
+    "id": "location-city-value",
+    "title": "Ubicación - Valor Ciudad",
+    "content": "A Coruña",
+    "page": "principal"
+  },
+  {
+    "id": "location-date-label",
+    "title": "Ubicación - Etiqueta Fecha",
+    "content": "Fecha:",
+    "page": "principal"
+  },
+  {
+    "id": "location-date-value",
+    "title": "Ubicación - Valor Fecha",
+    "content": "29 de Agosto de 2026 (Sábado)",
+    "page": "principal"
+  },
+  {
+    "id": "location-time-label",
+    "title": "Ubicación - Etiqueta Hora",
+    "content": "Hora:",
+    "page": "principal"
+  },
+  {
+    "id": "location-time-value",
+    "title": "Ubicación - Valor Hora",
+    "content": "12:00",
+    "page": "principal"
+  },
+  {
+    "id": "location-place-label",
+    "title": "Ubicación - Etiqueta Lugar",
+    "content": "Lugar:",
+    "page": "principal"
+  },
+  {
+    "id": "location-place-value",
+    "title": "Ubicación - Valor Lugar",
+    "content": "Casón Amor",
+    "page": "principal"
+  },
+  {
+    "id": "location-address-label",
+    "title": "Ubicación - Etiqueta Dirección",
+    "content": "Dirección:",
+    "page": "principal"
+  },
+  {
+    "id": "location-address-value",
+    "title": "Ubicación - Valor Dirección",
+    "content": "Calle Vistas, 2 Villabonita, A Coruña",
+    "page": "principal"
+  },
+  {
     "id": "car-section",
     "title": "Cómo llegar en coche",
     "content": "Para llegar al Casón Amor en coche, dirígete hacia el centro de A Coruña y sigue las indicaciones hacia la zona de la Ciudad Vieja. Desde la avenida principal (AC-11), toma la salida hacia el Paseo Marítimo en dirección norte. El lugar se encuentra en un área peatonal protegida, por lo que el acceso directo no está permitido. Existen zonas de aparcamiento en las inmediaciones.",

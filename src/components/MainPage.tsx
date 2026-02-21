@@ -54,24 +54,24 @@ export default function MainPage() {
 
           <div className="location-info">
             <div className="info-row">
-              <span className="label">Ciudad:</span>
-              <span className="value">A Coruña</span>
+              <span className="label">{getText('location-city-label', 'Ciudad:')}</span>
+              <span className="value">{getText('location-city-value', 'A Coruña')}</span>
             </div>
             <div className="info-row">
-              <span className="label">Fecha:</span>
-              <span className="value">29 de Agosto de 2026 (Sábado)</span>
+              <span className="label">{getText('location-date-label', 'Fecha:')}</span>
+              <span className="value">{getText('location-date-value', '29 de Agosto de 2026 (Sábado)')}</span>
             </div>
             <div className="info-row">
-              <span className="label">Hora:</span>
-              <span className="value">12:00</span>
+              <span className="label">{getText('location-time-label', 'Hora:')}</span>
+              <span className="value">{getText('location-time-value', '12:00')}</span>
             </div>
             <div className="info-row">
-              <span className="label">Lugar:</span>
-              <span className="value">Casón Amor</span>
+              <span className="label">{getText('location-place-label', 'Lugar:')}</span>
+              <span className="value">{getText('location-place-value', 'Casón Amor')}</span>
             </div>
             <div className="info-row">
-              <span className="label">Dirección:</span>
-              <span className="value">Calle Vistas, 2 Villabonita, A Coruña</span>
+              <span className="label">{getText('location-address-label', 'Dirección:')}</span>
+              <span className="value">{getText('location-address-value', 'Calle Vistas, 2 Villabonita, A Coruña')}</span>
             </div>
           </div>
 
