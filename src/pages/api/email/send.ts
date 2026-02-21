@@ -21,6 +21,7 @@ interface EmailResponse {
  * - AWS SES
  * - Nodemailer
  */
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<EmailResponse>
@@ -50,10 +51,19 @@ export default async function handler(
         message: 'Invalid email address',
       });
     }
+    /*import { Resend } from 'resend';
 
+    const resend = new Resend('re_9ycAzX1G_cpeGcrbHdmcLArgLBte4Rrjb');
+
+    resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: 'baladoandrea@gmail.com',
+      subject: 'Hello World',
+      html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+    });*/
     // IMPORTANTE: En producción, usar un servicio real de email
     // Ejemplo con Resend (npm install resend):
-    /*
+    
     import { Resend } from 'resend';
     
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -68,7 +78,7 @@ export default async function handler(
     if (data.error) {
       throw new Error(data.error.message);
     }
-    */
+    
 
     // Por ahora, simulamos el envío
     console.log(`Email sent to ${to}:`, {

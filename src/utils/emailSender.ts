@@ -10,7 +10,7 @@ export const sendRSVPEmail = async (data: EmailData): Promise<boolean> => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        to: 'dummy@email.com',
+        to: 'baladoandrea@gmail.com',
         subject: `Confirmación de asistencia - ${data.guestName}`,
         html: `
           <h2>Nueva confirmación de asistencia</h2>
