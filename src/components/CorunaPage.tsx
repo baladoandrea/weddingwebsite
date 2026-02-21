@@ -1,13 +1,13 @@
-import SidebarMenu from './SidebarMenu';
+import Header from './Header';
 import Footer from './Footer';
 
 export default function CorunaPage() {
   return (
     <div className="coruna-page">
-      <SidebarMenu />
+      <Header />
 
-      {/* Hero Image */}
-      <section className="coruna-hero">
+      {/* Hero Image - Full Width */}
+      <section className="coruna-hero-full">
         <img src="/assets/imagen03.png" alt="A Coruña" className="hero-image-full" />
         <div className="hero-overlay">
           <h1>A Coruña</h1>

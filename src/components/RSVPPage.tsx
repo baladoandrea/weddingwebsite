@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import SidebarMenu from './SidebarMenu';
+import Header from './Header';
 import Footer from './Footer';
 
 interface Guest {
@@ -158,7 +158,7 @@ export default function RSVPPage() {
 
   return (
     <div className="rsvp-page">
-      <SidebarMenu />
+      <Header />
 
       <section className="rsvp-header">
         <h1>¿Contamos contigo?</h1>

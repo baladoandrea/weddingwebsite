@@ -1,8 +1,6 @@
 /* Menú Sidebar estilo iOS */
 .sidebar-wrapper {
-  position: fixed;
-  top: 16px;
-  right: 16px;
+  position: relative;
   z-index: 999;
 }
 
@@ -10,7 +8,7 @@
 .menu-btn {
   width: 44px;
   height: 44px;
-  background: #1a3a52;
+  background: transparent;
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -20,14 +18,11 @@
   align-items: center;
   gap: 5px;
   padding: 0;
-  box-shadow: 0 4px 12px rgba(26, 58, 82, 0.2);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-  border: none;
 }
 
 .menu-btn:active {
-  background: #0f2436;
+  background: rgba(255, 255, 255, 0.1);
   transform: scale(0.95);
 }
 
@@ -42,7 +37,7 @@
 .ios-menu-icon .bar {
   width: 20px;
   height: 2px;
-  background: #fff;
+  background: #E9DED0;
   border-radius: 2px;
   display: block;
   transition: transform 0.25s ease, opacity 0.2s ease;

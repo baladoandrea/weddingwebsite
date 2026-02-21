@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import SidebarMenu from './SidebarMenu';
+import Header from './Header';
 import Footer from './Footer';
 import MapEmbed from './MapEmbed';
 
@@ -12,7 +12,7 @@ export default function MainPage() {
 
   return (
     <div className="main-page">
-      <SidebarMenu />
+      <Header />
 
       {/* Video Hero */}
       <section className="video-section">
@@ -23,14 +23,8 @@ export default function MainPage() {
         <div className="video-overlay"></div>
       </section>
 
-      {/* Photo and Text */}
-      <section className="content-section">
-        <img
-          src="/assets/imagen01.png"
-          alt="Marta y Sergio"
-          className="main-photo fade-in"
-        />
-
+      {/* Text Section */}
+      <section className="text-section">
         <div className={`main-text ${showText ? 'visible' : ''}`}>
           <h2 className="main-quote">
             En el Atlántico nos prometimos, y ante el mar queremos celebrar...
@@ -41,6 +35,15 @@ export default function MainPage() {
             ✓ Confirmar Asistencia
           </a>
         </div>
+      </section>
+
+      {/* Photo Section */}
+      <section className="photo-section">
+        <img
+          src="/assets/imagen01.png"
+          alt="Marta y Sergio"
+          className="main-photo fade-in"
+        />
       </section>
 
       {/* Location Section */}

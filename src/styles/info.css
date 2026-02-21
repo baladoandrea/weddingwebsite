@@ -222,14 +222,14 @@
   padding-bottom: 40px;
 }
 
-.coruna-hero {
+.coruna-hero-full {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: 100vh;
   overflow: hidden;
 }
 
-.coruna-hero .hero-image-full {
+.coruna-hero-full .hero-image-full {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -336,8 +336,8 @@
     grid-template-columns: 1fr;
   }
 
-  .coruna-hero {
-    height: 300px;
+  .coruna-hero-full {
+    height: 100vh;
   }
 
   .hero-overlay {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import SidebarMenu from './SidebarMenu';
+import Header from './Header';
 import Footer from './Footer';
 
 interface GalleryItem {
@@ -71,7 +71,7 @@ export default function GalleryPage() {
 
   return (
     <div className="gallery-page">
-      <SidebarMenu />
+      <Header />
 
       <section className="gallery-header">
         <h1>Galería</h1>

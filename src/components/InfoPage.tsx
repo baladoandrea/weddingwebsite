@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import SidebarMenu from './SidebarMenu';
+import Header from './Header';
 import Footer from './Footer';
 import MapEmbed from './MapEmbed';
 
@@ -13,11 +13,11 @@ export default function InfoPage() {
 
   return (
     <div className="info-page">
-      <SidebarMenu />
+      <Header />
 
-      {/* Intro Image */}
-      <section className="hero-image">
-        <img src="/assets/imagen02.png" alt="Introducción" className="full-image" />
+      {/* Accommodation Image */}
+      <section className="accommodation-hero">
+        <img src="/assets/alojamiento.png" alt="Dónde alojarse" className="full-image" />
       </section>
 
       {/* How to Get There */}
@@ -67,35 +67,6 @@ export default function InfoPage() {
               Ver ubicación en Maps
             </a>
         </article>
-      </section>
-
-      {/* Questions */}
-      <section className="info-section">
-        <h2>¿Alguna duda?</h2>
-        <div className="questions-content">
-          <p>
-            Si tienes cualquier duda, petición o lo que sea, puedes escribirnos a
-            través de WhatsApp:
-          </p>
-          <div className="contact-buttons">
-            <a
-              href="https://wa.me/34XXXXXXXXX"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-contact"
-            >
-              Escribir a Sergio
-            </a>
-            <a
-              href="https://wa.me/34YYYYYYYYY"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-contact"
-            >
-              Escribir a Marta
-            </a>
-          </div>
-        </div>
       </section>
 
       {/* Gift Section */}
