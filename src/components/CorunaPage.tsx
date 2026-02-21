@@ -12,7 +12,7 @@ export default function CorunaPage() {
       {/* Hero Mejorado */}
       <section className="coruna-hero">
         <img src="/assets/imagen03.png" alt="A Coruña" className="coruna-hero-img" />
-        <h2 className="coruna-title">A Coruña</h2>
+        <h1 className="coruna-title">A Coruña</h1>
       </section>
 
       {/* Where to Eat */}

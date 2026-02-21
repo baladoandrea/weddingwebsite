@@ -30,19 +30,24 @@ const mergeTextsWithDefaults = (storedTexts: Section[]): Section[] => {
   return [...merged, ...customSections];
 };
 
+const loadEffectiveTexts = async (): Promise<Section[]> => {
+  const fallbackSource = texts.length > 0 ? texts : defaultTexts;
+  const storedTexts = await getStoredTexts(fallbackSource);
+  texts = mergeTextsWithDefaults(storedTexts);
+  return texts;
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Section[] | Section | ErrorResponse>
 ) {
   if (req.method === 'GET') {
-    const storedTexts = await getStoredTexts(defaultTexts);
-    texts = mergeTextsWithDefaults(storedTexts);
+    await loadEffectiveTexts();
     return res.status(200).json(texts);
   }
 
   if (req.method === 'POST') {
-    const storedTexts = await getStoredTexts(defaultTexts);
-    texts = mergeTextsWithDefaults(storedTexts);
+    await loadEffectiveTexts();
 
     const newSection = {
       id: Date.now().toString(),
@@ -59,8 +64,7 @@ export default async function handler(
   }
 
   if (req.method === 'PUT') {
-    const storedTexts = await getStoredTexts(defaultTexts);
-    texts = mergeTextsWithDefaults(storedTexts);
+    await loadEffectiveTexts();
 
     // Allow id to be sent either as query param or in the request body
     const id = (req.query.id as string) || (req.body && req.body.id);
@@ -84,8 +88,7 @@ export default async function handler(
   }
 
   if (req.method === 'DELETE') {
-    const storedTexts = await getStoredTexts(defaultTexts);
-    texts = mergeTextsWithDefaults(storedTexts);
+    await loadEffectiveTexts();
 
     const id = req.query.id as string;
     if (!id) {
