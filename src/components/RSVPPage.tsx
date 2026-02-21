@@ -128,7 +128,7 @@ export default function RSVPPage() {
   if (submitted) {
     return (
       <div className="rsvp-page">
-        <SidebarMenu />
+        <Header />
         <div className="rsvp-success">
           <div className="success-modal">
             <h2>¡Gracias!</h2>
