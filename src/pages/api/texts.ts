@@ -9,6 +9,10 @@ interface Section {
   page: string;
 }
 
+interface ErrorResponse {
+  error: string;
+}
+
 const defaultTexts: Section[] = [...textsData];
 let texts = [...defaultTexts];
 
@@ -28,7 +32,7 @@ const mergeTextsWithDefaults = (storedTexts: Section[]): Section[] => {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Section[] | Section | { error: string }>
+  res: NextApiResponse<Section[] | Section | ErrorResponse>
 ) {
   if (req.method === 'GET') {
     const storedTexts = await getStoredTexts(defaultTexts);
@@ -46,7 +50,11 @@ export default async function handler(
     };
 
     texts.push(newSection);
-    await saveStoredTexts(texts);
+    const saved = await saveStoredTexts(texts);
+    if (!saved) {
+      return res.status(500).json({ error: 'No se pudieron guardar los textos. Revisa BLOB_READ_WRITE_TOKEN.' });
+    }
+
     return res.status(201).json(newSection);
   }
 
@@ -67,7 +75,11 @@ export default async function handler(
     }
 
     texts[sectionIndex] = { ...texts[sectionIndex], ...req.body };
-    await saveStoredTexts(texts);
+    const saved = await saveStoredTexts(texts);
+    if (!saved) {
+      return res.status(500).json({ error: 'No se pudieron guardar los textos. Revisa BLOB_READ_WRITE_TOKEN.' });
+    }
+
     return res.status(200).json(texts[sectionIndex]);
   }
 
@@ -81,7 +93,11 @@ export default async function handler(
     }
 
     texts = texts.filter(s => s.id !== id);
-    await saveStoredTexts(texts);
+    const saved = await saveStoredTexts(texts);
+    if (!saved) {
+      return res.status(500).json({ error: 'No se pudieron guardar los textos. Revisa BLOB_READ_WRITE_TOKEN.' });
+    }
+
     return res.status(200).json(texts);
   }
 

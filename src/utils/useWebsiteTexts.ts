@@ -14,7 +14,9 @@ export default function useWebsiteTexts() {
   useEffect(() => {
     const loadTexts = async () => {
       try {
-        const response = await fetch('/api/texts');
+        const response = await fetch(`/api/texts?ts=${Date.now()}`, {
+          cache: 'no-store',
+        });
         if (!response.ok) {
           return;
         }

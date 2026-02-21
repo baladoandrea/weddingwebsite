@@ -67,9 +67,20 @@ export default function AdminPanel() {
       });
 
       if (response.ok) {
-        setSections(sections.map(s => s.id === section.id ? section : s));
+        const updatedSection = await response.json();
+        setSections(sections.map(s => s.id === section.id ? updatedSection : s));
+        await loadData();
         setShowEditModal(false);
         alert('Sección actualizada correctamente');
+      } else {
+        let message = 'Error al guardar la sección';
+        try {
+          const data = await response.json();
+          message = data.error || message;
+        } catch {
+          message = `Error al guardar la sección (HTTP ${response.status})`;
+        }
+        alert(message);
       }
     } catch (error) {
       alert('Error al guardar la sección');
