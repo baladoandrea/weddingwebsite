@@ -12,8 +12,21 @@ export default function CorunaPage() {
       {/* Hero Mejorado */}
       <section className="coruna-hero">
         <img src="/assets/imagen03.png" alt="A Coruña" className="coruna-hero-img" />
-        <h1 className="coruna-title" style={{ color: '#041E42' }}>A Coruña</h1>
       </section>
+      <h1
+        className="coruna-title"
+        style={{
+          position: 'static',
+          color: '#041E42',
+          textAlign: 'right',
+          margin: '12px auto 0',
+          width: 'min(100%, 1100px)',
+          textShadow: 'none',
+          padding: '0 8px',
+        }}
+      >
+        A Coruña
+      </h1>
 
       {/* Where to Eat */}
       <section className="coruna-section">
