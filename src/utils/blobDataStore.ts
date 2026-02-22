@@ -39,7 +39,17 @@ async function readLatestJson<T>(prefix: string, fallback: T): Promise<T> {
       (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
     )[0];
 
-    const response = await fetch(latestBlob.url, { cache: 'no-store' });
+    const blobUrl = (latestBlob as any).downloadUrl || latestBlob.url;
+    const headers: Record<string, string> = {};
+
+    if (BLOB_ACCESS === 'private' && process.env.BLOB_READ_WRITE_TOKEN) {
+      headers.Authorization = `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`;
+    }
+
+    const response = await fetch(blobUrl, {
+      cache: 'no-store',
+      headers,
+    });
     if (!response.ok) {
       return fallback;
     }
