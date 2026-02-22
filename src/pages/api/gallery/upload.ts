@@ -29,6 +29,14 @@ type FormFiles = {
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const BLOB_ACCESS = process.env.BLOB_OBJECT_ACCESS === 'public' ? 'public' : 'private';
 
+const getBlobImageUrl = (pathname: string): string => {
+  if (BLOB_ACCESS === 'public') {
+    return pathname;
+  }
+
+  return `/api/gallery/image?pathname=${encodeURIComponent(pathname)}`;
+};
+
 export const config = {
   api: {
     bodyParser: false,
@@ -124,7 +132,9 @@ export default async function handler(
         access: BLOB_ACCESS,
         contentType: imageFile.mimetype,
       });
-      publicUrl = uploadResult.downloadUrl || uploadResult.url;
+      publicUrl = BLOB_ACCESS === 'public'
+        ? (uploadResult.url || uploadResult.downloadUrl)
+        : getBlobImageUrl(uploadResult.pathname);
 
       const tags = parseTags(fields);
 

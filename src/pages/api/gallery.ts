@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { unlink } from 'node:fs/promises';
 import path from 'node:path';
-import { head } from '@vercel/blob';
 import galleryData from '../../data/gallery.json';
 import { getStoredGallery, saveStoredGallery } from '../../utils/blobDataStore';
 
@@ -13,6 +12,7 @@ interface GalleryItem {
 }
 
 let gallery = [...galleryData];
+const BLOB_ACCESS = process.env.BLOB_OBJECT_ACCESS === 'public' ? 'public' : 'private';
 
 const loadEffectiveGallery = async (): Promise<GalleryItem[]> => {
   const fallbackSource = gallery.length > 0 ? gallery : [...galleryData];
@@ -20,31 +20,37 @@ const loadEffectiveGallery = async (): Promise<GalleryItem[]> => {
   return gallery;
 };
 
+const getBlobPathnameFromUrl = (url: string): string | null => {
+  try {
+    const parsed = new URL(url);
+    const pathname = parsed.pathname.replace(/^\//, '');
+    if (!pathname.startsWith('gallery/')) {
+      return null;
+    }
+    return pathname;
+  } catch {
+    return null;
+  }
+};
+
 const resolveGalleryUrls = async (items: GalleryItem[]): Promise<GalleryItem[]> => {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN || BLOB_ACCESS === 'public') {
     return items;
   }
 
-  const resolved = await Promise.all(
-    items.map(async (item) => {
-      if (!item.blobPathname) {
-        return item;
-      }
+  return items.map((item) => {
+    const resolvedPathname = item.blobPathname || getBlobPathnameFromUrl(item.url);
 
-      try {
-        const blobData = await head(item.blobPathname);
-        return {
-          ...item,
-          url: blobData.downloadUrl || blobData.url || item.url,
-        };
-      } catch (error) {
-        console.warn('No se pudo resolver URL firmada para imagen de galería:', error);
-        return item;
-      }
-    })
-  );
+    if (!resolvedPathname) {
+      return item;
+    }
 
-  return resolved;
+    return {
+      ...item,
+      url: `/api/gallery/image?pathname=${encodeURIComponent(resolvedPathname)}`,
+      blobPathname: resolvedPathname,
+    };
+  });
 };
 
 const deleteLocalGalleryFile = async (url: string): Promise<void> => {
