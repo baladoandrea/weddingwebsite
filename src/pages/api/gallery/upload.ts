@@ -124,6 +124,12 @@ export default async function handler(
       });
       publicUrl = uploadResult.url;
     } else {
+      if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+        return res.status(500).json({
+          error: 'Subida no configurada en producción: define BLOB_READ_WRITE_TOKEN en variables de entorno.',
+        });
+      }
+
       const localRelativePath = path.join('uploads', 'gallery', `${timestamp}-${safeFileName}`);
       const localAbsolutePath = path.join(process.cwd(), 'public', localRelativePath);
 
@@ -148,6 +154,7 @@ export default async function handler(
     return res.status(201).json(newItem);
   } catch (error) {
     console.error('Error uploading gallery image:', error);
-    return res.status(500).json({ error: 'Error al subir la foto' });
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido al subir la foto';
+    return res.status(500).json({ error: `Error al subir la foto: ${errorMessage}` });
   }
 }

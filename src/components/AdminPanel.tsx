@@ -103,11 +103,27 @@ export default function AdminPanel() {
         setGallery([...gallery, newItem]);
         alert('Foto subida correctamente');
       } else {
-        const data = await response.json();
-        alert(data.error || 'Error al subir la foto');
+        const rawBody = await response.text();
+        let message = `Error al subir la foto (HTTP ${response.status})`;
+
+        try {
+          const parsed = JSON.parse(rawBody) as { error?: string };
+          if (parsed?.error) {
+            message = parsed.error;
+          } else if (rawBody.trim().length > 0) {
+            message = rawBody;
+          }
+        } catch {
+          if (rawBody.trim().length > 0) {
+            message = rawBody;
+          }
+        }
+
+        alert(message);
       }
     } catch (error) {
-      alert('Error al subir la foto');
+      const message = error instanceof Error ? error.message : 'Error al subir la foto';
+      alert(message);
     }
   };
 
