@@ -18,6 +18,7 @@ export default function GalleryPage() {
   const [gallery, setGallery] = useState<GalleryItem[]>(defaultPhotos);
   const [searchTag, setSearchTag] = useState('');
   const [filteredGallery, setFilteredGallery] = useState<GalleryItem[]>(defaultPhotos);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     loadGallery();
@@ -26,6 +27,58 @@ export default function GalleryPage() {
   useEffect(() => {
     filterGallery();
   }, [gallery, searchTag]);
+
+  useEffect(() => {
+    if (lightboxIndex === null) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setLightboxIndex(null);
+        return;
+      }
+
+      if (event.key === 'ArrowRight') {
+        setLightboxIndex(prev => {
+          if (prev === null || filteredGallery.length === 0) {
+            return null;
+          }
+          return (prev + 1) % filteredGallery.length;
+        });
+        return;
+      }
+
+      if (event.key === 'ArrowLeft') {
+        setLightboxIndex(prev => {
+          if (prev === null || filteredGallery.length === 0) {
+            return null;
+          }
+          return (prev - 1 + filteredGallery.length) % filteredGallery.length;
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [lightboxIndex, filteredGallery.length]);
+
+  useEffect(() => {
+    if (lightboxIndex === null) {
+      return;
+    }
+
+    if (filteredGallery.length === 0) {
+      setLightboxIndex(null);
+      return;
+    }
+
+    if (lightboxIndex >= filteredGallery.length) {
+      setLightboxIndex(0);
+    }
+  }, [filteredGallery.length, lightboxIndex]);
 
   const loadGallery = async () => {
     try {
@@ -68,6 +121,29 @@ export default function GalleryPage() {
   const allTags = Array.from(
     new Set(gallery.flatMap(item => item.tags))
   ).sort();
+
+  const closeLightbox = () => setLightboxIndex(null);
+
+  const showNextImage = () => {
+    setLightboxIndex(prev => {
+      if (prev === null || filteredGallery.length === 0) {
+        return null;
+      }
+      return (prev + 1) % filteredGallery.length;
+    });
+  };
+
+  const showPrevImage = () => {
+    setLightboxIndex(prev => {
+      if (prev === null || filteredGallery.length === 0) {
+        return null;
+      }
+      return (prev - 1 + filteredGallery.length) % filteredGallery.length;
+    });
+  };
+
+  const activeImage = lightboxIndex !== null ? filteredGallery[lightboxIndex] : null;
+  const lightboxCounter = lightboxIndex !== null ? `${lightboxIndex + 1} / ${filteredGallery.length}` : '';
 
   return (
     <div className="gallery-page">
@@ -120,16 +196,23 @@ export default function GalleryPage() {
       <section className="gallery-grid-section">
         {filteredGallery.length > 0 ? (
           <div className="gallery-grid">
-            {filteredGallery.map(item => (
+            {filteredGallery.map((item, index) => (
               <div key={item.id} className="gallery-item">
-                <img src={item.url} alt="Foto de la boda" />
+                <img
+                  src={item.url}
+                  alt="Foto de la boda"
+                  onClick={() => setLightboxIndex(index)}
+                />
                 {item.tags.length > 0 && (
                   <div className="item-tags">
                     {item.tags.map(tag => (
                       <span
                         key={tag}
                         className="tag-badge"
-                        onClick={() => setSearchTag(tag)}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setSearchTag(tag);
+                        }}
                       >
                         {tag}
                       </span>
@@ -156,6 +239,38 @@ export default function GalleryPage() {
         <section className="empty-gallery">
           <p>Pronto habrá fotos de la boda aquí</p>
         </section>
+      )}
+
+      {activeImage && (
+        <div className="lightbox-overlay" onClick={closeLightbox}>
+          <div className="lightbox-counter">{lightboxCounter}</div>
+          <button className="lightbox-close" onClick={closeLightbox} aria-label="Cerrar">
+            ×
+          </button>
+          <button
+            className="lightbox-nav lightbox-prev"
+            onClick={e => {
+              e.stopPropagation();
+              showPrevImage();
+            }}
+            aria-label="Anterior"
+          >
+            ‹
+          </button>
+          <div className="lightbox-content" onClick={e => e.stopPropagation()}>
+            <img src={activeImage.url} alt="Foto ampliada" className="lightbox-image" />
+          </div>
+          <button
+            className="lightbox-nav lightbox-next"
+            onClick={e => {
+              e.stopPropagation();
+              showNextImage();
+            }}
+            aria-label="Siguiente"
+          >
+            ›
+          </button>
+        </div>
       )}
 
       <Footer />
