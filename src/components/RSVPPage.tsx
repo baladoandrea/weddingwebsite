@@ -202,12 +202,6 @@ export default function RSVPPage() {
                 </div>
               )}
 
-              {searchQuery.trim().length > 0 && searchQuery.trim().length < MIN_SEARCH_CHARS && (
-                <p className="no-results">
-                  Escribe al menos {MIN_SEARCH_CHARS} caracteres para buscar tu nombre
-                </p>
-              )}
-
               {searchQuery.trim().length >= MIN_SEARCH_CHARS && matchedGuests.length === 0 && (
                 <p className="no-results">
                   No encontramos tu nombre. Contacta con Marta o Sergio
