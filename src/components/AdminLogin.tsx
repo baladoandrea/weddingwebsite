@@ -11,13 +11,34 @@ export default function AdminLogin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    if (user === 'admin' && pass === 'Hjk908') {
-      setLoading(true);
-      sessionStorage.setItem('adminToken', 'admin_' + Date.now());
-      router.push('/admin-panel');
-    } else {
-      setError('Usuario o contraseña incorrectos');
+
+    if (!user || !pass) {
+      setError('Introduce usuario y contraseña');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user, password: pass }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success && data.token) {
+        sessionStorage.setItem('adminToken', data.token);
+        router.push('/admin-panel');
+        return;
+      }
+
+      setError(data.error || 'Usuario o contraseña incorrectos');
+    } catch (error) {
+      setError('No se pudo iniciar sesión. Inténtalo de nuevo.');
+    } finally {
+      setLoading(false);
     }
   };
 

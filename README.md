@@ -115,11 +115,11 @@ Ver `.env.example` para más opciones.
 
 ### Cambiar Credenciales Admin
 
-En `src/pages/api/auth/login.ts`:
+Configura variables de entorno (local o Vercel):
 
-```typescript
-const ADMIN_USER = 'tuUsuario';
-const ADMIN_PASSWORD = 'tuContraseña';
+```env
+ADMIN_USER=tuUsuario
+ADMIN_PASSWORD=tuContraseña
 ```
 
 ---

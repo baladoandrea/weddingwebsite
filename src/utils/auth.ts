@@ -1,8 +1,7 @@
-const ADMIN_USER = 'admin';
-const ADMIN_PASSWORD = 'Hjk908';
-
 export const validateAdminCredentials = (user: string, password: string): boolean => {
-  return user === ADMIN_USER && password === ADMIN_PASSWORD;
+  void user;
+  void password;
+  return false;
 };
 
 export const generateAdminToken = (): string => {

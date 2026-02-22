@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-const ADMIN_USER = 'admin';
-const ADMIN_PASSWORD = 'Hjk908';
+const ADMIN_USER = process.env.ADMIN_USER;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 interface LoginRequest {
   user: string;
@@ -26,6 +26,13 @@ export default function handler(
 
   if (!user || !password) {
     return res.status(400).json({ success: false, error: 'Missing credentials' });
+  }
+
+  if (!ADMIN_USER || !ADMIN_PASSWORD) {
+    return res.status(500).json({
+      success: false,
+      error: 'Admin credentials are not configured in environment variables',
+    });
   }
 
   if (user === ADMIN_USER && password === ADMIN_PASSWORD) {
