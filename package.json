@@ -11,7 +11,7 @@
     "export": "next export"
   },
   "dependencies": {
-    "@vercel/blob": "^1.1.1",
+    "@vercel/blob": "^2.0.0",
     "formidable": "^3.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
