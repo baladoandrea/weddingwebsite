@@ -13,6 +13,7 @@ export interface GalleryItem {
   id: string;
   url: string;
   tags: string[];
+  blobPathname?: string;
 }
 
 const TEXTS_PREFIX = 'data/texts/';
@@ -56,7 +57,6 @@ async function saveJson<T>(prefix: string, data: T): Promise<boolean> {
 
   try {
     await put(`${prefix}${Date.now()}.json`, JSON.stringify(data), {
-      access: 'public',
       contentType: 'application/json',
     });
     return true;

@@ -11,6 +11,7 @@ interface UploadResponse {
   id: string;
   url: string;
   tags: string[];
+  blobPathname?: string;
 }
 
 type FormFields = Record<string, string | string[] | undefined>;
@@ -119,10 +120,24 @@ export default async function handler(
 
     if (process.env.BLOB_READ_WRITE_TOKEN) {
       const uploadResult = await put(objectName, fileBuffer, {
-        access: 'public',
         contentType: imageFile.mimetype,
       });
-      publicUrl = uploadResult.url;
+      publicUrl = uploadResult.downloadUrl || uploadResult.url;
+
+      const tags = parseTags(fields);
+
+      const newItem: UploadResponse = {
+        id: timestamp.toString(),
+        url: publicUrl,
+        tags,
+        blobPathname: uploadResult.pathname,
+      };
+
+      const currentGallery = await getStoredGallery([...galleryData]);
+      const updatedGallery = [...currentGallery, newItem];
+      await saveStoredGallery(updatedGallery);
+
+      return res.status(201).json(newItem);
     } else {
       if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
         return res.status(500).json({

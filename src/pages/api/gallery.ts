@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { unlink } from 'node:fs/promises';
 import path from 'node:path';
+import { head } from '@vercel/blob';
 import galleryData from '../../data/gallery.json';
 import { getStoredGallery, saveStoredGallery } from '../../utils/blobDataStore';
 
@@ -8,6 +9,7 @@ interface GalleryItem {
   id: string;
   url: string;
   tags: string[];
+  blobPathname?: string;
 }
 
 let gallery = [...galleryData];
@@ -16,6 +18,33 @@ const loadEffectiveGallery = async (): Promise<GalleryItem[]> => {
   const fallbackSource = gallery.length > 0 ? gallery : [...galleryData];
   gallery = await getStoredGallery(fallbackSource);
   return gallery;
+};
+
+const resolveGalleryUrls = async (items: GalleryItem[]): Promise<GalleryItem[]> => {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return items;
+  }
+
+  const resolved = await Promise.all(
+    items.map(async (item) => {
+      if (!item.blobPathname) {
+        return item;
+      }
+
+      try {
+        const blobData = await head(item.blobPathname);
+        return {
+          ...item,
+          url: blobData.downloadUrl || blobData.url || item.url,
+        };
+      } catch (error) {
+        console.warn('No se pudo resolver URL firmada para imagen de galería:', error);
+        return item;
+      }
+    })
+  );
+
+  return resolved;
 };
 
 const deleteLocalGalleryFile = async (url: string): Promise<void> => {
@@ -45,7 +74,8 @@ export default async function handler(
 ) {
   if (req.method === 'GET') {
     await loadEffectiveGallery();
-    return res.status(200).json(gallery);
+    const resolvedGallery = await resolveGalleryUrls(gallery);
+    return res.status(200).json(resolvedGallery);
   }
 
   if (req.method === 'POST') {
