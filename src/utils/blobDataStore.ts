@@ -1,4 +1,6 @@
 import { list, put } from '@vercel/blob';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 
 export interface Section {
   id: string;
@@ -15,6 +17,7 @@ export interface GalleryItem {
 
 const TEXTS_PREFIX = 'data/texts/';
 const GALLERY_PREFIX = 'data/gallery/metadata/';
+const LOCAL_GALLERY_PATH = path.join(process.cwd(), 'src', 'data', 'gallery.json');
 
 const hasBlobToken = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 
@@ -63,6 +66,31 @@ async function saveJson<T>(prefix: string, data: T): Promise<boolean> {
   }
 }
 
+async function readLocalGallery(fallback: GalleryItem[]): Promise<GalleryItem[]> {
+  try {
+    const raw = await readFile(LOCAL_GALLERY_PATH, 'utf-8');
+    const parsed = JSON.parse(raw) as GalleryItem[];
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+    return fallback;
+  } catch (error) {
+    console.error('Error reading local gallery data:', error);
+    return fallback;
+  }
+}
+
+async function saveLocalGallery(gallery: GalleryItem[]): Promise<boolean> {
+  try {
+    await mkdir(path.dirname(LOCAL_GALLERY_PATH), { recursive: true });
+    await writeFile(LOCAL_GALLERY_PATH, `${JSON.stringify(gallery, null, 2)}\n`, 'utf-8');
+    return true;
+  } catch (error) {
+    console.error('Error saving local gallery data:', error);
+    return false;
+  }
+}
+
 export async function getStoredTexts(fallback: Section[]): Promise<Section[]> {
   return readLatestJson(TEXTS_PREFIX, fallback);
 }
@@ -72,9 +100,17 @@ export async function saveStoredTexts(texts: Section[]): Promise<boolean> {
 }
 
 export async function getStoredGallery(fallback: GalleryItem[]): Promise<GalleryItem[]> {
-  return readLatestJson(GALLERY_PREFIX, fallback);
+  if (hasBlobToken()) {
+    return readLatestJson(GALLERY_PREFIX, fallback);
+  }
+
+  return readLocalGallery(fallback);
 }
 
 export async function saveStoredGallery(gallery: GalleryItem[]): Promise<boolean> {
-  return saveJson(GALLERY_PREFIX, gallery);
+  if (hasBlobToken()) {
+    return saveJson(GALLERY_PREFIX, gallery);
+  }
+
+  return saveLocalGallery(gallery);
 }

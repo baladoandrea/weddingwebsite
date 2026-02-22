@@ -1,4 +1,6 @@
 import { readFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
 import { put } from '@vercel/blob';
@@ -96,10 +98,6 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return res.status(500).json({ error: 'BLOB_READ_WRITE_TOKEN no está configurado' });
-  }
-
   try {
     const { fields, files } = await parseForm(req);
     const imageFile = getSingleFile(files);
@@ -114,17 +112,32 @@ export default async function handler(
 
     const safeFileName = sanitizeFileName(imageFile.originalFilename || 'photo.jpg');
     const fileBuffer = await readFile(imageFile.filepath);
+    const timestamp = Date.now();
+    const objectName = `gallery/${timestamp}-${safeFileName}`;
 
-    const uploadResult = await put(`gallery/${Date.now()}-${safeFileName}`, fileBuffer, {
-      access: 'public',
-      contentType: imageFile.mimetype,
-    });
+    let publicUrl: string;
+
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const uploadResult = await put(objectName, fileBuffer, {
+        access: 'public',
+        contentType: imageFile.mimetype,
+      });
+      publicUrl = uploadResult.url;
+    } else {
+      const localRelativePath = path.join('uploads', 'gallery', `${timestamp}-${safeFileName}`);
+      const localAbsolutePath = path.join(process.cwd(), 'public', localRelativePath);
+
+      await mkdir(path.dirname(localAbsolutePath), { recursive: true });
+      await writeFile(localAbsolutePath, fileBuffer);
+
+      publicUrl = `/${localRelativePath.replace(/\\/g, '/')}`;
+    }
 
     const tags = parseTags(fields);
 
     const newItem: UploadResponse = {
-      id: Date.now().toString(),
-      url: uploadResult.url,
+      id: timestamp.toString(),
+      url: publicUrl,
       tags,
     };
 
