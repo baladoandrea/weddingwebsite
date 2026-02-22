@@ -16,6 +16,8 @@ interface RSVPFormData {
   notes: string;
 }
 
+const MIN_SEARCH_CHARS = 7;
+
 export default function RSVPPage() {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,12 +50,14 @@ export default function RSVPPage() {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
 
-    if (query.trim().length === 0) {
+    const trimmedQuery = query.trim();
+
+    if (trimmedQuery.length < MIN_SEARCH_CHARS) {
       setMatchedGuests([]);
       return;
     }
 
-    const normalized = query
+    const normalized = trimmedQuery
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
@@ -198,7 +202,13 @@ export default function RSVPPage() {
                 </div>
               )}
 
-              {searchQuery && matchedGuests.length === 0 && (
+              {searchQuery.trim().length > 0 && searchQuery.trim().length < MIN_SEARCH_CHARS && (
+                <p className="no-results">
+                  Escribe al menos {MIN_SEARCH_CHARS} caracteres para buscar tu nombre
+                </p>
+              )}
+
+              {searchQuery.trim().length >= MIN_SEARCH_CHARS && matchedGuests.length === 0 && (
                 <p className="no-results">
                   No encontramos tu nombre. Contacta con Marta o Sergio
                 </p>
