@@ -19,6 +19,7 @@ export interface GalleryItem {
 const TEXTS_PREFIX = 'data/texts/';
 const GALLERY_PREFIX = 'data/gallery/metadata/';
 const LOCAL_GALLERY_PATH = path.join(process.cwd(), 'src', 'data', 'gallery.json');
+const BLOB_ACCESS = process.env.BLOB_OBJECT_ACCESS === 'public' ? 'public' : 'private';
 
 const hasBlobToken = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 
@@ -57,6 +58,7 @@ async function saveJson<T>(prefix: string, data: T): Promise<boolean> {
 
   try {
     await put(`${prefix}${Date.now()}.json`, JSON.stringify(data), {
+      access: BLOB_ACCESS,
       contentType: 'application/json',
     });
     return true;

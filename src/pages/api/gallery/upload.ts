@@ -27,6 +27,7 @@ type FormFiles = {
 };
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const BLOB_ACCESS = process.env.BLOB_OBJECT_ACCESS === 'public' ? 'public' : 'private';
 
 export const config = {
   api: {
@@ -120,6 +121,7 @@ export default async function handler(
 
     if (process.env.BLOB_READ_WRITE_TOKEN) {
       const uploadResult = await put(objectName, fileBuffer, {
+        access: BLOB_ACCESS,
         contentType: imageFile.mimetype,
       });
       publicUrl = uploadResult.downloadUrl || uploadResult.url;

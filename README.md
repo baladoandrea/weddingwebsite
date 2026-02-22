@@ -106,6 +106,9 @@ Crea archivo `.env.local`:
 ```env
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 RESEND_API_KEY=tu_clave_aqui
+BLOB_READ_WRITE_TOKEN=tu_token_blob_aqui
+# Opcional: public o private (por defecto: private)
+BLOB_OBJECT_ACCESS=private
 ```
 
 Ver `.env.example` para más opciones.
