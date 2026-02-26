@@ -6,7 +6,22 @@ import useWebsiteTexts from '../utils/useWebsiteTexts';
 
 export default function MainPage() {
   const [showText, setShowText] = useState(false);
-  const { getText } = useWebsiteTexts();
+  const { getText, getCustomSections } = useWebsiteTexts();
+  const customSections = getCustomSections('principal', [
+    'main-quote',
+    'location-title',
+    'location-city-label',
+    'location-city-value',
+    'location-date-label',
+    'location-date-value',
+    'location-time-label',
+    'location-time-value',
+    'location-place-label',
+    'location-place-value',
+    'location-address-label',
+    'location-address-value',
+    'map-embed-url',
+  ]);
 
   useEffect(() => {
     setTimeout(() => setShowText(true), 500);
@@ -75,9 +90,23 @@ export default function MainPage() {
             </div>
           </div>
 
-          <MapEmbed />
+          <MapEmbed
+            embedUrl={getText(
+              'map-embed-url',
+              'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2963.7456321!2d-8.3855!3d43.3704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s!2sCas%C3%B3n%20Amor%2C%20Calle%20Vistas%202%2C%20A%20Coru%C3%B1a!5e0!3m2!1ses!2ses!4v1629728200000'
+            )}
+          />
         </div>
       </section>
+
+      {customSections.map(section => (
+        <section key={section.id} className="location-section dynamic-section">
+          <div className="location-content">
+            <h2>{section.title}</h2>
+            <p>{section.content}</p>
+          </div>
+        </section>
+      ))}
 
       <Footer />
     </div>

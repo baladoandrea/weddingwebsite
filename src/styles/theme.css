@@ -233,6 +233,18 @@
   border-radius: 12px;
 }
 
+.dynamic-section h2 {
+  color: var(--color-primary);
+  margin-bottom: 12px;
+}
+
+.dynamic-section p {
+  color: #666;
+  line-height: 1.75;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
 /* Footer: fixed at bottom without extra background */
 .footer {
   position: fixed;

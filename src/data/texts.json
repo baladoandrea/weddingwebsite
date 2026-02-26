@@ -72,15 +72,27 @@
     "page": "principal"
   },
   {
+    "id": "map-embed-url",
+    "title": "Ubicación - URL Mapa Embebido",
+    "content": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2963.7456321!2d-8.3855!3d43.3704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s!2sCas%C3%B3n%20Amor%2C%20Calle%20Vistas%202%2C%20A%20Coru%C3%B1a!5e0!3m2!1ses!2ses!4v1629728200000",
+    "page": "principal"
+  },
+  {
     "id": "car-section",
     "title": "Cómo llegar en coche",
     "content": "Para llegar al Casón Amor en coche, dirígete hacia el centro de A Coruña y sigue las indicaciones hacia la zona de la Ciudad Vieja. Desde la avenida principal (AC-11), toma la salida hacia el Paseo Marítimo en dirección norte. El lugar se encuentra en un área peatonal protegida, por lo que el acceso directo no está permitido. Existen zonas de aparcamiento en las inmediaciones.",
     "page": "info"
   },
   {
-    "id": "bus-section",
-    "title": "Cómo llegar en autobús",
-    "content": "Saldrá un autobús a las 11:30 desde la Plaza de Pontevedra. Habrá servicio de vuelta.",
+    "id": "map-directions-url",
+    "title": "Cómo llegar - URL Google Maps",
+    "content": "https://www.google.com/maps/place/Plaza+de+Pontevedra,+A+Coru%C3%B1a",
+    "page": "info"
+  },
+  {
+    "id": "bus-out-label",
+    "title": "Cómo llegar en autobús - Etiqueta Salida",
+    "content": "Salida:",
     "page": "info"
   },
   {
@@ -89,6 +101,12 @@
     "content": "Sábado 29 de agosto a las 12:30 desde la Avenida de Córcega.",
     "page": "info"
   }, 
+  {
+    "id": "bus-return-label",
+    "title": "Cómo llegar en autobús - Etiqueta Vuelta",
+    "content": "Servicio de vuelta:",
+    "page": "info"
+  },
   {
     "id": "bus-return-text",
     "title": "Cómo llegar en autobús - Vuelta",
@@ -105,6 +123,12 @@
     "id": "gift-section",
     "title": "Regalo",
     "content": "Vuestra presencia es nuestro mejor regalo. Pero si queréis tener un detalle con nosotros para nuestra nueva etapa, podéis hacerlo a través del siguiente número de cuenta: ES00 0000 0000 0000 0000 (Banco Ejemplo).",
+    "page": "info"
+  },
+  {
+    "id": "spotify-playlist-url",
+    "title": "Spotify - URL Playlist Embed",
+    "content": "https://open.spotify.com/embed/playlist/37i9dQZEVXbJwoKy8qKpHG?utm_source=generator",
     "page": "info"
   },
   {

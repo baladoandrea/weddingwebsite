@@ -3,7 +3,13 @@ import Footer from './Footer';
 import useWebsiteTexts from '../utils/useWebsiteTexts';
 
 export default function CorunaPage() {
-  const { getText } = useWebsiteTexts();
+  const { getText, getCustomSections } = useWebsiteTexts();
+  const customSections = getCustomSections('coruna', [
+    'eat-section',
+    'drink-section',
+    'stay-section',
+    'see-section',
+  ]);
 
   return (
     <div className="coruna-page">
@@ -115,6 +121,13 @@ export default function CorunaPage() {
           </article>
         </div>
       </section>
+
+      {customSections.map(section => (
+        <section key={section.id} className="coruna-section dynamic-section">
+          <h2>{section.title}</h2>
+          <p>{section.content}</p>
+        </section>
+      ))}
 
 
 

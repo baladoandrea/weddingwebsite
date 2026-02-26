@@ -38,5 +38,11 @@ export default function useWebsiteTexts() {
     return section?.content || fallback;
   };
 
-  return { getText };
+  const getCustomSections = (page: string, excludedIds: string[] = []): Section[] => {
+    const excludedSet = new Set(excludedIds);
+
+    return sections.filter(section => section.page === page && !excludedSet.has(section.id));
+  };
+
+  return { getText, getCustomSections };
 }
