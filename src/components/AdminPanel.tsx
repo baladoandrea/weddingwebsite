@@ -1,11 +1,20 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import GalleryUpload from './GalleryUpload';
+import textsData from '../data/texts.json';
 
 interface Section {
   id: string;
   title: string;
   content: string;
   page: string;
+  order?: number;
+}
+
+interface Guest {
+  id: string;
+  name: string;
+  attendance?: string;
+  notes?: string;
 }
 
 interface GalleryItem {
@@ -19,7 +28,6 @@ interface PreviewItem {
   label: string;
   page: string;
   kind?: 'text' | 'url';
-  helper?: string;
 }
 
 const PREVIEW_ITEMS: PreviewItem[] = [
@@ -35,20 +43,8 @@ const PREVIEW_ITEMS: PreviewItem[] = [
   { id: 'location-place-value', label: 'Valor lugar', page: 'principal' },
   { id: 'location-address-label', label: 'Etiqueta dirección', page: 'principal' },
   { id: 'location-address-value', label: 'Valor dirección', page: 'principal' },
-  {
-    id: 'map-embed-url',
-    label: 'URL embebida de Google Maps',
-    page: 'principal',
-    kind: 'url',
-    helper: 'Pega una URL de Google Maps para iframe (https://www.google.com/maps/embed?...).',
-  },
-  {
-    id: 'map-directions-url',
-    label: 'URL de Google Maps (botón “Ver ubicación”)',
-    page: 'info',
-    kind: 'url',
-    helper: 'Pega una URL de Google Maps normal para abrir en nueva pestaña.',
-  },
+  { id: 'map-embed-url', label: 'URL embebida de Google Maps', page: 'principal', kind: 'url' },
+  { id: 'map-directions-url', label: 'URL de Google Maps (botón)', page: 'info', kind: 'url' },
   { id: 'car-section', label: 'Cómo llegar en coche', page: 'info' },
   { id: 'bus-out-label', label: 'Etiqueta salida bus', page: 'info' },
   { id: 'bus-out-text', label: 'Texto salida bus', page: 'info' },
@@ -56,20 +52,12 @@ const PREVIEW_ITEMS: PreviewItem[] = [
   { id: 'bus-return-text', label: 'Texto vuelta bus', page: 'info' },
   { id: 'questions-section', label: 'Sección dudas', page: 'info' },
   { id: 'gift-section', label: 'Sección regalo', page: 'info' },
-  {
-    id: 'spotify-playlist-url',
-    label: 'URL embed de Spotify',
-    page: 'info',
-    kind: 'url',
-    helper: 'Pega una URL de embed de Spotify (https://open.spotify.com/embed/playlist/...).',
-  },
+  { id: 'spotify-playlist-url', label: 'URL embed de Spotify', page: 'info', kind: 'url' },
   { id: 'eat-section', label: 'Dónde comer', page: 'coruna' },
   { id: 'drink-section', label: 'Dónde beber', page: 'coruna' },
   { id: 'stay-section', label: 'Dónde alojarse', page: 'coruna' },
   { id: 'see-section', label: 'Qué ver', page: 'coruna' },
 ];
-
-const FIXED_PREVIEW_IDS = new Set(PREVIEW_ITEMS.map(item => item.id));
 
 const PAGE_LABELS: Record<string, string> = {
   principal: 'Página Principal',
@@ -77,7 +65,23 @@ const PAGE_LABELS: Record<string, string> = {
   coruna: 'Página A Coruña',
 };
 
-const DEFAULT_BY_ID: Record<string, string> = {
+const FIXED_IDS = new Set(PREVIEW_ITEMS.map(item => item.id));
+const FIXED_ORDER_BY_ID = PREVIEW_ITEMS.reduce((acc, item, index) => {
+  acc[item.id] = index * 10;
+  return acc;
+}, {} as Record<string, number>);
+
+const DEFAULT_TITLE_BY_ID = textsData.reduce((acc, section) => {
+  acc[section.id] = section.title;
+  return acc;
+}, {} as Record<string, string>);
+
+const DEFAULT_CONTENT_BY_ID = textsData.reduce((acc, section) => {
+  acc[section.id] = section.content;
+  return acc;
+}, {} as Record<string, string>);
+
+const URL_DEFAULTS: Record<string, string> = {
   'map-embed-url': 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2963.7456321!2d-8.3855!3d43.3704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s!2sCas%C3%B3n%20Amor%2C%20Calle%20Vistas%202%2C%20A%20Coru%C3%B1a!5e0!3m2!1ses!2ses!4v1629728200000',
   'map-directions-url': 'https://www.google.com/maps/place/Plaza+de+Pontevedra,+A+Coru%C3%B1a',
   'spotify-playlist-url': 'https://open.spotify.com/embed/playlist/37i9dQZEVXbJwoKy8qKpHG?utm_source=generator',
@@ -98,13 +102,7 @@ const normalizeAndParseUrl = (value: string): URL | null => {
   }
 
   const collapsedSpaces = trimmed.replace(/\s+/g, '');
-  let parsed = parseUrl(collapsedSpaces);
-  if (parsed) {
-    return parsed;
-  }
-
-  parsed = parseUrl(encodeURI(collapsedSpaces));
-  return parsed;
+  return parseUrl(collapsedSpaces) || parseUrl(encodeURI(collapsedSpaces));
 };
 
 const normalizeGoogleMapsEmbedUrl = (value: string): string | null => {
@@ -113,11 +111,10 @@ const normalizeGoogleMapsEmbedUrl = (value: string): string | null => {
     return null;
   }
 
-  const pathname = parsed.pathname.toLowerCase();
   if (
     parsed.protocol !== 'https:'
     || !parsed.hostname.includes('google.')
-    || !pathname.includes('/maps/embed')
+    || !parsed.pathname.toLowerCase().includes('/maps/embed')
   ) {
     return null;
   }
@@ -133,10 +130,7 @@ const normalizeGoogleMapsUrl = (value: string): string | null => {
 
   if (
     parsed.protocol !== 'https:'
-    || (
-      !parsed.hostname.includes('google.')
-      && parsed.hostname !== 'maps.app.goo.gl'
-    )
+    || (!parsed.hostname.includes('google.') && parsed.hostname !== 'maps.app.goo.gl')
   ) {
     return null;
   }
@@ -146,11 +140,7 @@ const normalizeGoogleMapsUrl = (value: string): string | null => {
 
 const normalizeSpotifyEmbedUrl = (value: string): string | null => {
   const parsed = normalizeAndParseUrl(value);
-  if (!parsed) {
-    return null;
-  }
-
-  if (parsed.protocol !== 'https:' || parsed.hostname !== 'open.spotify.com') {
+  if (!parsed || parsed.protocol !== 'https:' || parsed.hostname !== 'open.spotify.com') {
     return null;
   }
 
@@ -168,20 +158,19 @@ const normalizeSpotifyEmbedUrl = (value: string): string | null => {
 };
 
 export default function AdminPanel() {
+  const menuRef = useRef<HTMLDivElement>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'texts' | 'gallery' | 'guests'>('texts');
+  const [selectedPage, setSelectedPage] = useState<'all' | 'principal' | 'info' | 'coruna'>('all');
+
   const [sections, setSections] = useState<Section[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
-  const [guests, setGuests] = useState<any[]>([]);
-  const [selectedPage, setSelectedPage] = useState<'all' | string>('all');
-  const [editorMode, setEditorMode] = useState<'edit' | 'create' | null>(null);
-  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
-  const [originalSection, setOriginalSection] = useState<Section | null>(null);
-  const [draftTitle, setDraftTitle] = useState('');
-  const [draftContent, setDraftContent] = useState('');
-  const [draftPage, setDraftPage] = useState('principal');
-  const [savingText, setSavingText] = useState(false);
+  const [guests, setGuests] = useState<Guest[]>([]);
+
   const [loading, setLoading] = useState(true);
+  const [savingText, setSavingText] = useState(false);
+  const [editingField, setEditingField] = useState<{ id: string; field: 'title' | 'content' } | null>(null);
 
   useEffect(() => {
     const token = sessionStorage.getItem('adminToken');
@@ -189,9 +178,52 @@ export default function AdminPanel() {
       window.location.href = '/admin';
       return;
     }
+
     setIsAuthenticated(true);
     loadData();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsAdminMenuOpen(false);
+      }
+    };
+
+    if (isAdminMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAdminMenuOpen]);
+
+  useEffect(() => {
+    if (!editingField) {
+      return;
+    }
+
+    const target = document.querySelector(
+      `[data-edit-key="${editingField.id}-${editingField.field}"]`
+    ) as HTMLElement | null;
+
+    if (!target) {
+      return;
+    }
+
+    target.focus();
+    const selection = window.getSelection();
+    if (!selection) {
+      return;
+    }
+
+    const range = document.createRange();
+    range.selectNodeContents(target);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }, [editingField]);
 
   const loadData = async () => {
     try {
@@ -202,11 +234,14 @@ export default function AdminPanel() {
       ]);
 
       if (textsRes.ok) {
-        const loadedSections = await textsRes.json();
-        setSections(loadedSections);
+        setSections(await textsRes.json());
       }
-      if (galleryRes.ok) setGallery(await galleryRes.json());
-      if (guestsRes.ok) setGuests(await guestsRes.json());
+      if (galleryRes.ok) {
+        setGallery(await galleryRes.json());
+      }
+      if (guestsRes.ok) {
+        setGuests(await guestsRes.json());
+      }
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -219,69 +254,145 @@ export default function AdminPanel() {
     [sections]
   );
 
-  const visiblePreviewItems = useMemo(() => {
-    const customItems: PreviewItem[] = sections
-      .filter(section => !FIXED_PREVIEW_IDS.has(section.id))
-      .map(section => ({
-        id: section.id,
-        label: section.title || 'Sección personalizada',
-        page: section.page,
-        kind: 'text',
-      }));
+  const allDisplaySections = useMemo(() => {
+    const fixedSections = PREVIEW_ITEMS.map(item => {
+      const existing = sectionById.get(item.id);
+      return existing || {
+        id: item.id,
+        title: DEFAULT_TITLE_BY_ID[item.id] || item.label,
+        content: DEFAULT_CONTENT_BY_ID[item.id] || URL_DEFAULTS[item.id] || '',
+        page: item.page,
+        order: FIXED_ORDER_BY_ID[item.id],
+      };
+    });
 
-    const allItems = [...PREVIEW_ITEMS, ...customItems];
+    const customSections = sections.filter(section => !FIXED_IDS.has(section.id));
+    return [...fixedSections, ...customSections];
+  }, [sections, sectionById]);
 
-    if (selectedPage === 'all') {
-      return allItems;
+  const groupedSections = useMemo(() => {
+    const groups = new Map<string, Section[]>();
+    const filtered = selectedPage === 'all'
+      ? allDisplaySections
+      : allDisplaySections.filter(section => section.page === selectedPage);
+
+    for (const section of filtered) {
+      if (!groups.has(section.page)) {
+        groups.set(section.page, []);
+      }
+      groups.get(section.page)?.push(section);
     }
 
-    return allItems.filter(item => item.page === selectedPage);
-  }, [selectedPage, sections]);
-
-  const groupedItems = useMemo(() => {
-    const groups = new Map<string, PreviewItem[]>();
-
-    for (const item of visiblePreviewItems) {
-      if (!groups.has(item.page)) {
-        groups.set(item.page, []);
-      }
-      groups.get(item.page)?.push(item);
+    for (const [pageId, pageSections] of groups.entries()) {
+      pageSections.sort((left, right) => {
+        const leftOrder = typeof left.order === 'number'
+          ? left.order
+          : (FIXED_ORDER_BY_ID[left.id] ?? 1000);
+        const rightOrder = typeof right.order === 'number'
+          ? right.order
+          : (FIXED_ORDER_BY_ID[right.id] ?? 1000);
+        return leftOrder - rightOrder;
+      });
+      groups.set(pageId, pageSections);
     }
 
     return groups;
-  }, [visiblePreviewItems]);
+  }, [allDisplaySections, selectedPage]);
 
-  const getDisplaySection = (item: PreviewItem): Section => {
-    const existing = sectionById.get(item.id);
-    if (existing) {
-      return existing;
+  const upsertSection = async (payload: Partial<Section>, allowCreateFallback: boolean): Promise<Section | null> => {
+    let response = await fetch('/api/texts', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (allowCreateFallback && response.status === 404) {
+      response = await fetch('/api/texts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
     }
 
-    return {
-      id: item.id,
-      title: item.label,
-      content: DEFAULT_BY_ID[item.id] || '',
-      page: item.page,
-    };
+    if (!response.ok) {
+      let message = 'Error al guardar la sección';
+      try {
+        const data = await response.json();
+        message = data.error || message;
+      } catch {
+        message = `${message} (HTTP ${response.status})`;
+      }
+      alert(message);
+      return null;
+    }
+
+    const updated = await response.json() as Section;
+    setSections(current => {
+      const exists = current.some(section => section.id === updated.id);
+      if (!exists) {
+        return [...current, updated];
+      }
+      return current.map(section => (section.id === updated.id ? updated : section));
+    });
+
+    return updated;
   };
 
-  const handleEditSection = (item: PreviewItem) => {
-    const section = getDisplaySection(item);
-    setEditorMode('edit');
-    setEditingSectionId(section.id);
-    setOriginalSection({ ...section });
-    setDraftTitle(section.title);
-    setDraftContent(section.content);
-    setDraftPage(section.page);
+  const normalizeFieldValue = (section: Section, field: 'title' | 'content', value: string): string | null => {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    if (field !== 'content') {
+      return trimmed;
+    }
+
+    if (section.id === 'map-embed-url') {
+      return normalizeGoogleMapsEmbedUrl(trimmed);
+    }
+
+    if (section.id === 'map-directions-url') {
+      return normalizeGoogleMapsUrl(trimmed);
+    }
+
+    if (section.id === 'spotify-playlist-url') {
+      return normalizeSpotifyEmbedUrl(trimmed);
+    }
+
+    return trimmed;
   };
 
-  const handleDeleteTextSection = async (sectionId: string) => {
-    if (FIXED_PREVIEW_IDS.has(sectionId)) {
-      alert('Esta sección es parte de la estructura base y no se puede eliminar.');
+  const startInlineEdit = (sectionId: string, field: 'title' | 'content') => {
+    setEditingField({ id: sectionId, field });
+  };
+
+  const cancelInlineEdit = () => {
+    setEditingField(null);
+  };
+
+  const saveInlineEdit = async (section: Section, field: 'title' | 'content', value: string) => {
+    const normalized = normalizeFieldValue(section, field, value);
+    if (!normalized) {
+      alert('El valor no es válido para este campo.');
+      cancelInlineEdit();
       return;
     }
 
-    if (!confirm('¿Eliminar esta sección personalizada?')) {
+    const currentValue = field === 'title' ? section.title : section.content;
+    if (currentValue === normalized) {
+      cancelInlineEdit();
+      return;
+    }
+
+    setSavingText(true);
+    await upsertSection({ ...section, [field]: normalized }, true);
+    setSavingText(false);
+    cancelInlineEdit();
+  };
+
+  const deleteCustomSection = async (sectionId: string) => {
+    if (!confirm('¿Eliminar esta sección?')) {
       return;
     }
 
@@ -291,194 +402,69 @@ export default function AdminPanel() {
       });
 
       if (!response.ok) {
-        let message = 'No se pudo eliminar la sección';
-        try {
-          const data = await response.json();
-          message = data.error || message;
-        } catch {
-          message = `${message} (HTTP ${response.status})`;
-        }
-        alert(message);
+        alert('No se pudo eliminar la sección');
         return;
       }
 
-      setSections(currentSections => currentSections.filter(section => section.id !== sectionId));
-
-      if (editingSectionId === sectionId) {
-        closeEditor();
-      }
+      setSections(current => current.filter(section => section.id !== sectionId));
+      cancelInlineEdit();
     } catch {
       alert('Error al eliminar la sección');
     }
   };
 
-  const handleCreateSection = () => {
-    setEditorMode('create');
-    setEditingSectionId(null);
-    setOriginalSection(null);
-    setDraftTitle('');
-    setDraftContent('');
-    setDraftPage(selectedPage !== 'all' ? selectedPage : 'principal');
-  };
-
-  useEffect(() => {
-    if (editorMode !== 'edit' || !editingSectionId) {
+  const handleTrashField = async (section: Section, field: 'title' | 'content') => {
+    if (!FIXED_IDS.has(section.id)) {
+      await deleteCustomSection(section.id);
       return;
     }
 
-    setSections(currentSections => {
-      const exists = currentSections.some(section => section.id === editingSectionId);
+    const defaultValue = field === 'title'
+      ? (DEFAULT_TITLE_BY_ID[section.id] || section.title)
+      : (DEFAULT_CONTENT_BY_ID[section.id] || URL_DEFAULTS[section.id] || section.content);
 
-      if (!exists) {
-        return [
-          ...currentSections,
-          {
-            id: editingSectionId,
-            title: draftTitle,
-            content: draftContent,
-            page: draftPage,
-          },
-        ];
-      }
+    setSavingText(true);
+    await upsertSection({ ...section, [field]: defaultValue }, true);
+    setSavingText(false);
+    cancelInlineEdit();
+  };
 
-      return currentSections.map(section =>
-        section.id === editingSectionId
-          ? { ...section, title: draftTitle, content: draftContent, page: draftPage }
-          : section
-      );
+  const createSectionBetween = async (pageId: string, afterSectionId?: string) => {
+    const pageSections = groupedSections.get(pageId) || [];
+    const afterIndex = afterSectionId
+      ? pageSections.findIndex(section => section.id === afterSectionId)
+      : -1;
+
+    const prev = afterIndex >= 0 ? pageSections[afterIndex] : undefined;
+    const next = afterIndex >= 0 ? pageSections[afterIndex + 1] : pageSections[0];
+
+    const prevOrder = prev?.order ?? FIXED_ORDER_BY_ID[prev?.id || ''] ?? 0;
+    const nextOrder = next?.order ?? FIXED_ORDER_BY_ID[next?.id || ''] ?? (prevOrder + 20);
+
+    let order = (prevOrder + nextOrder) / 2;
+    if (!Number.isFinite(order) || prevOrder === nextOrder) {
+      order = (pageSections.length + 1) * 10;
+    }
+
+    const response = await fetch('/api/texts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: 'Nuevo título',
+        content: 'Nuevo contenido',
+        page: pageId,
+        order,
+      }),
     });
-  }, [editorMode, editingSectionId, draftTitle, draftContent, draftPage]);
 
-  const closeEditor = () => {
-    if (editingSectionId && originalSection) {
-      setSections(currentSections => {
-        const exists = currentSections.some(section => section.id === editingSectionId);
-        if (!exists) {
-          return currentSections;
-        }
-
-        return currentSections.map(section =>
-          section.id === editingSectionId ? originalSection : section
-        );
-      });
-    }
-
-    setEditingSectionId(null);
-    setEditorMode(null);
-    setOriginalSection(null);
-    setDraftTitle('');
-    setDraftContent('');
-    setDraftPage('principal');
-  };
-
-  const handleSaveSection = async () => {
-    if (editorMode === 'edit' && !editingSectionId) {
+    if (!response.ok) {
+      alert('No se pudo crear la nueva sección');
       return;
     }
 
-    const trimmedTitle = draftTitle.trim();
-    if (!trimmedTitle) {
-      alert('El título no puede estar vacío.');
-      return;
-    }
-
-    const trimmedContent = draftContent.trim();
-    if (!trimmedContent) {
-      alert('El contenido no puede estar vacío.');
-      return;
-    }
-
-    let normalizedContent = trimmedContent;
-
-    if (editingSectionId === 'map-embed-url') {
-      const normalized = normalizeGoogleMapsEmbedUrl(trimmedContent);
-      if (!normalized) {
-        alert('La URL del mapa embebido debe ser un enlace HTTPS de Google Maps Embed.');
-        return;
-      }
-      normalizedContent = normalized;
-    }
-
-    if (editingSectionId === 'map-directions-url') {
-      const normalized = normalizeGoogleMapsUrl(trimmedContent);
-      if (!normalized) {
-        alert('La URL de ubicación debe ser un enlace HTTPS válido de Google Maps.');
-        return;
-      }
-      normalizedContent = normalized;
-    }
-
-    if (editingSectionId === 'spotify-playlist-url') {
-      const normalized = normalizeSpotifyEmbedUrl(trimmedContent);
-      if (!normalized) {
-        alert('La URL de Spotify debe ser un enlace embed válido de open.spotify.com.');
-        return;
-      }
-      normalizedContent = normalized;
-    }
-
-    const sectionToSave: Partial<Section> = {
-      title: trimmedTitle,
-      content: normalizedContent,
-      page: draftPage,
-    };
-
-    if (editorMode === 'edit' && editingSectionId) {
-      sectionToSave.id = editingSectionId;
-    }
-
-    try {
-      setSavingText(true);
-      const method = editorMode === 'create' ? 'POST' : 'PUT';
-      let response = await fetch('/api/texts', {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sectionToSave),
-      });
-
-      if (editorMode === 'edit' && response.status === 404) {
-        response = await fetch('/api/texts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(sectionToSave),
-        });
-      }
-
-      if (response.ok) {
-        const updatedSection = await response.json() as Section;
-
-        if (editorMode === 'create') {
-          setSections(currentSections => [...currentSections, updatedSection]);
-        } else {
-          setSections(currentSections =>
-            currentSections.map(section =>
-              section.id === updatedSection.id ? updatedSection : section
-            )
-          );
-        }
-
-        setEditorMode(null);
-        setEditingSectionId(null);
-        setOriginalSection(null);
-        setDraftTitle('');
-        setDraftContent('');
-        setDraftPage('principal');
-        alert(editorMode === 'create' ? 'Sección creada correctamente' : 'Sección actualizada correctamente');
-      } else {
-        let message = 'Error al guardar la sección';
-        try {
-          const data = await response.json();
-          message = data.error || message;
-        } catch {
-          message = `Error al guardar la sección (HTTP ${response.status})`;
-        }
-        alert(message);
-      }
-    } catch (error) {
-      alert('Error al guardar la sección');
-    } finally {
-      setSavingText(false);
-    }
+    const created = await response.json() as Section;
+    setSections(current => [...current, created]);
+    startInlineEdit(created.id, 'title');
   };
 
   const handleGalleryUpload = async (file: File, tags: string[]) => {
@@ -497,54 +483,130 @@ export default function AdminPanel() {
         setGallery([...gallery, newItem]);
         alert('Foto subida correctamente');
       } else {
-        const rawBody = await response.text();
-        let message = `Error al subir la foto (HTTP ${response.status})`;
-
-        try {
-          const parsed = JSON.parse(rawBody) as { error?: string };
-          if (parsed?.error) {
-            message = parsed.error;
-          } else if (rawBody.trim().length > 0) {
-            message = rawBody;
-          }
-        } catch {
-          if (rawBody.trim().length > 0) {
-            message = rawBody;
-          }
-        }
-
-        alert(message);
+        alert('Error al subir la foto');
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Error al subir la foto';
-      alert(message);
+    } catch {
+      alert('Error al subir la foto');
     }
   };
 
   const handleDeleteGalleryItem = async (id: string) => {
-    if (confirm('¿Eliminar esta foto?')) {
-      try {
-        const response = await fetch(`/api/gallery?id=${id}`, { method: 'DELETE' });
-        if (response.ok) {
-          setGallery(gallery.filter(item => item.id !== id));
-        }
-      } catch (error) {
-        alert('Error al eliminar la foto');
+    if (!confirm('¿Eliminar esta foto?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/gallery?id=${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        setGallery(gallery.filter(item => item.id !== id));
       }
+    } catch {
+      alert('Error al eliminar la foto');
     }
   };
 
   const handleDeleteGuest = async (id: string) => {
-    if (confirm('¿Eliminar este invitado?')) {
-      try {
-        const response = await fetch(`/api/guests?id=${id}`, { method: 'DELETE' });
-        if (response.ok) {
-          setGuests(guests.filter(g => g.id !== id));
-        }
-      } catch (error) {
-        alert('Error al eliminar el invitado');
-      }
+    if (!confirm('¿Eliminar este invitado?')) {
+      return;
     }
+
+    try {
+      const response = await fetch(`/api/guests?id=${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        setGuests(guests.filter(guest => guest.id !== id));
+      }
+    } catch {
+      alert('Error al eliminar el invitado');
+    }
+  };
+
+  const renderEditableTitle = (section: Section) => {
+    const titleEditKey = `${section.id}-title`;
+    const isTitleEditing = editingField?.id === section.id && editingField.field === 'title';
+
+    return (
+      <div className="inline-title-row">
+        <h2
+          className={`inline-editable-title ${isTitleEditing ? 'is-editing' : ''}`}
+          data-edit-key={titleEditKey}
+          contentEditable={isTitleEditing}
+          suppressContentEditableWarning
+          onBlur={event => saveInlineEdit(section, 'title', event.currentTarget.innerText)}
+          onKeyDown={event => {
+            if (event.key === 'Escape') {
+              event.preventDefault();
+              cancelInlineEdit();
+            }
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              (event.currentTarget as HTMLElement).blur();
+            }
+          }}
+        >
+          {section.title}
+        </h2>
+        <div className="inline-actions">
+          <button className="inline-icon-btn" onClick={() => startInlineEdit(section.id, 'title')} title="Editar título">✏️</button>
+          <button className="inline-icon-btn danger" onClick={() => handleTrashField(section, 'title')} title="Eliminar/restablecer título">🗑️</button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderEditableContent = (section: Section) => {
+    const contentEditKey = `${section.id}-content`;
+    const isContentEditing = editingField?.id === section.id && editingField.field === 'content';
+
+    return (
+      <div className="inline-content-row">
+        <p
+          className={`inline-editable-content ${isContentEditing ? 'is-editing' : ''}`}
+          data-edit-key={contentEditKey}
+          contentEditable={isContentEditing}
+          suppressContentEditableWarning
+          onBlur={event => saveInlineEdit(section, 'content', event.currentTarget.innerText)}
+          onKeyDown={event => {
+            if (event.key === 'Escape') {
+              event.preventDefault();
+              cancelInlineEdit();
+            }
+          }}
+        >
+          {section.content}
+        </p>
+        <div className="inline-actions">
+          <button className="inline-icon-btn" onClick={() => startInlineEdit(section.id, 'content')} title="Editar contenido">✏️</button>
+          <button className="inline-icon-btn danger" onClick={() => handleTrashField(section, 'content')} title="Eliminar/restablecer contenido">🗑️</button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSectionInline = (pageId: string, section: Section) => {
+    const wrapperClass = pageId === 'coruna'
+      ? 'coruna-section admin-mirror-section'
+      : pageId === 'info'
+        ? 'info-section admin-mirror-section'
+        : 'location-section admin-mirror-section';
+
+    return (
+      <div key={section.id} className="inline-section-block">
+        <section className={wrapperClass}>
+          {renderEditableTitle(section)}
+          {renderEditableContent(section)}
+        </section>
+
+        <div className="inline-add-row">
+          <button
+            className="inline-add-btn"
+            onClick={() => createSectionBetween(pageId, section.id)}
+            title="Añadir sección aquí"
+          >
+            +
+          </button>
+        </div>
+      </div>
+    );
   };
 
   if (!isAuthenticated || loading) {
@@ -555,191 +617,84 @@ export default function AdminPanel() {
     <div className="admin-panel">
       <header className="admin-header">
         <h1>Panel Administrativo</h1>
-        <button onClick={() => {
-          sessionStorage.removeItem('adminToken');
-          window.location.href = '/';
-        }} className="logout-btn">
-          Cerrar sesión
-        </button>
-      </header>
+        <div className="admin-header-actions" ref={menuRef}>
+          <button
+            className="menu-btn"
+            onClick={() => setIsAdminMenuOpen(current => !current)}
+            title="Menú admin"
+            aria-label="Abrir menú de administración"
+          >
+            <span className={`ios-menu-icon ${isAdminMenuOpen ? 'open' : ''}`} aria-hidden>
+              <span className="bar" />
+              <span className="bar" />
+              <span className="bar" />
+            </span>
+          </button>
 
-      <div className="admin-tabs">
-        <button
-          className={`tab ${activeTab === 'texts' ? 'active' : ''}`}
-          onClick={() => setActiveTab('texts')}
-        >
-          Textos
-        </button>
-        <button
-          className={`tab ${activeTab === 'gallery' ? 'active' : ''}`}
-          onClick={() => setActiveTab('gallery')}
-        >
-          Galería
-        </button>
-        <button
-          className={`tab ${activeTab === 'guests' ? 'active' : ''}`}
-          onClick={() => setActiveTab('guests')}
-        >
-          Invitados
-        </button>
-      </div>
+          {isAdminMenuOpen && (
+            <nav className="admin-sidebar" aria-label="Navegación de admin">
+              <button className={`admin-sidebar-link ${activeTab === 'texts' ? 'active' : ''}`} onClick={() => { setActiveTab('texts'); setIsAdminMenuOpen(false); }}>
+                Textos
+              </button>
+              <button className={`admin-sidebar-link ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => { setActiveTab('gallery'); setIsAdminMenuOpen(false); }}>
+                Galería
+              </button>
+              <button className={`admin-sidebar-link ${activeTab === 'guests' ? 'active' : ''}`} onClick={() => { setActiveTab('guests'); setIsAdminMenuOpen(false); }}>
+                Invitados
+              </button>
+              <button
+                className="admin-sidebar-link admin-sidebar-danger"
+                onClick={() => {
+                  sessionStorage.removeItem('adminToken');
+                  window.location.href = '/';
+                }}
+              >
+                Cerrar sesión
+              </button>
+            </nav>
+          )}
+        </div>
+      </header>
 
       <div className="admin-content">
         {activeTab === 'texts' && (
-          <div className="admin-section visual-admin-section">
-            <div className="visual-editor-header">
-              <h2>Editor visual de textos</h2>
-              <p>
-                Haz clic en el lápiz de cada bloque para editarlo. Verás el cambio al instante en esta vista previa.
-              </p>
-              <button className="edit-btn" onClick={handleCreateSection}>
-                + Nueva sección (H2 + contenido)
-              </button>
-            </div>
-
+          <div className="admin-section admin-inline-editor">
             <div className="page-filter-tabs">
-              <button
-                className={`page-filter-btn ${selectedPage === 'all' ? 'active' : ''}`}
-                onClick={() => setSelectedPage('all')}
-              >
+              <button className={`page-filter-btn ${selectedPage === 'all' ? 'active' : ''}`} onClick={() => setSelectedPage('all')}>
                 Todas
               </button>
-              {Object.entries(PAGE_LABELS).map(([pageId, pageLabel]) => (
-                <button
-                  key={pageId}
-                  className={`page-filter-btn ${selectedPage === pageId ? 'active' : ''}`}
-                  onClick={() => setSelectedPage(pageId)}
-                >
-                  {pageLabel}
-                </button>
-              ))}
+              <button className={`page-filter-btn ${selectedPage === 'principal' ? 'active' : ''}`} onClick={() => setSelectedPage('principal')}>
+                Principal
+              </button>
+              <button className={`page-filter-btn ${selectedPage === 'info' ? 'active' : ''}`} onClick={() => setSelectedPage('info')}>
+                Información
+              </button>
+              <button className={`page-filter-btn ${selectedPage === 'coruna' ? 'active' : ''}`} onClick={() => setSelectedPage('coruna')}>
+                A Coruña
+              </button>
             </div>
 
-            <div className="visual-editor-layout">
-              <div className="visual-preview">
-                {Array.from(groupedItems.entries()).map(([pageId, items]) => (
-                  <section key={pageId} className="preview-page-block">
-                    <h3>{PAGE_LABELS[pageId] || pageId}</h3>
+            {Array.from(groupedSections.entries()).map(([pageId, pageSections]) => (
+              <section key={pageId} className={`admin-live-page admin-mirror-page ${pageId}-mirror`}>
+                <h3 className="admin-live-page-title">{PAGE_LABELS[pageId] || pageId}</h3>
 
-                    <div className="preview-items-grid">
-                      {items.map(item => {
-                        const section = getDisplaySection(item);
-                        const isEditing = editingSectionId === item.id;
-                        const isCustomSection = !FIXED_PREVIEW_IDS.has(item.id);
+                {pageId === 'principal' && <div className="video-section admin-mirror-hero" />}
+                {pageId === 'info' && <img src="/assets/imagen02.png" alt="Info" className="info-hero-img" />}
+                {pageId === 'coruna' && <div className="coruna-hero"><img src="/assets/imagen03.png" alt="A Coruña" className="coruna-hero-img" /></div>}
 
-                        return (
-                          <article
-                            key={item.id}
-                            className={`preview-item ${isEditing ? 'editing' : ''}`}
-                          >
-                            <div className="preview-item-top">
-                              <h4>{section.title || item.label}</h4>
-                              <button
-                                className="icon-edit-btn"
-                                onClick={() => handleEditSection(item)}
-                                title="Editar"
-                                aria-label={`Editar ${section.title || item.label}`}
-                              >
-                                ✏️
-                              </button>
-                              {isCustomSection && (
-                                <button
-                                  className="icon-delete-btn"
-                                  onClick={() => handleDeleteTextSection(item.id)}
-                                  title="Eliminar"
-                                  aria-label={`Eliminar ${section.title || item.label}`}
-                                >
-                                  🗑️
-                                </button>
-                              )}
-                            </div>
-
-                            <p className="preview-item-label">{item.label}</p>
-                            <p className={`preview-item-content ${item.kind === 'url' ? 'is-url' : ''}`}>
-                              {section.content || 'Sin contenido'}
-                            </p>
-                          </article>
-                        );
-                      })}
-                    </div>
-                  </section>
-                ))}
-              </div>
-
-              <aside className="visual-editor-panel">
-                {editorMode ? (
-                  <>
-                    <h3>{editorMode === 'create' ? 'Nueva sección' : 'Editar bloque'}</h3>
-
-                    <div className="form-group">
-                      <label>Título</label>
-                      <input
-                        type="text"
-                        value={draftTitle}
-                        onChange={event => setDraftTitle(event.target.value)}
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Contenido</label>
-                      <textarea
-                        value={draftContent}
-                        onChange={event => setDraftContent(event.target.value)}
-                        rows={editingSectionId?.includes('url') ? 4 : 8}
-                      />
-                    </div>
-
-                    {PREVIEW_ITEMS.find(item => item.id === editingSectionId)?.helper && (
-                      <p className="editor-helper">
-                        {PREVIEW_ITEMS.find(item => item.id === editingSectionId)?.helper}
-                      </p>
-                    )}
-
-                    <div className="form-group">
-                      <label>Página</label>
-                      <select
-                        value={draftPage}
-                        onChange={event => setDraftPage(event.target.value)}
-                      >
-                        <option value="principal">Principal</option>
-                        <option value="info">Información</option>
-                        <option value="coruna">Sobre A Coruña</option>
-                      </select>
-                    </div>
-
-                    <div className="modal-actions">
-                      <button type="button" className="btn-cancel" onClick={closeEditor}>
-                        Cancelar
-                      </button>
-                      {editorMode === 'edit' && editingSectionId && !FIXED_PREVIEW_IDS.has(editingSectionId) && (
-                        <button
-                          type="button"
-                          className="delete-btn"
-                          onClick={() => handleDeleteTextSection(editingSectionId)}
-                        >
-                          Eliminar
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        className="btn-save"
-                        onClick={handleSaveSection}
-                        disabled={savingText}
-                      >
-                        {savingText ? 'Guardando...' : 'Guardar'}
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="editor-empty">
-                    <h3>Selecciona un bloque</h3>
-                    <p>
-                      Pulsa el botón de lápiz de cualquier título o sección para empezar a editar.
-                    </p>
+                {pageSections.length === 0 && (
+                  <div className="inline-add-row empty">
+                    <button className="inline-add-btn" onClick={() => createSectionBetween(pageId)} title="Añadir sección">
+                      +
+                    </button>
                   </div>
                 )}
-              </aside>
-            </div>
+
+                {pageSections.map(section => renderSectionInline(pageId, section))}
+              </section>
+            ))}
+
+            {savingText && <p className="inline-saving">Guardando cambios…</p>}
           </div>
         )}
 
@@ -756,10 +711,7 @@ export default function AdminPanel() {
                       <span key={tag} className="tag">{tag}</span>
                     ))}
                   </div>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDeleteGalleryItem(item.id)}
-                  >
+                  <button className="delete-btn" onClick={() => handleDeleteGalleryItem(item.id)}>
                     Eliminar
                   </button>
                 </div>
@@ -788,10 +740,7 @@ export default function AdminPanel() {
                       <td>{guest.attendance || 'Pendiente'}</td>
                       <td>{guest.notes || '-'}</td>
                       <td>
-                        <button
-                          className="delete-btn"
-                          onClick={() => handleDeleteGuest(guest.id)}
-                        >
+                        <button className="delete-btn" onClick={() => handleDeleteGuest(guest.id)}>
                           Eliminar
                         </button>
                       </td>
@@ -803,7 +752,6 @@ export default function AdminPanel() {
           </div>
         )}
       </div>
-
     </div>
   );
 }
