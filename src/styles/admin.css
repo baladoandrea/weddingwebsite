@@ -280,6 +280,54 @@
 .admin-mirror-section {
   border-bottom: 1px solid rgba(0, 107, 142, 0.12);
 }
+.inline-content-row .label,
+.inline-content-row .value {
+  display: inline-block;
+  min-width: unset;
+}
+.info-row .inline-content-row {
+  margin-top: 0;
+  width: 100%;
+  justify-content: space-between;
+}
+.info-row .inline-content-row .inline-actions {
+  margin-left: 6px;
+}
+.admin-mirror-page .inline-title-row h2,
+.admin-mirror-page .inline-content-row p,
+.admin-mirror-page .inline-content-row span,
+.admin-mirror-page .inline-content-row h3 {
+  margin: 0;
+}
+.admin-mirror-page .map-container iframe,
+.admin-mirror-page .spotify-embed iframe {
+  border: 0;
+  border-radius: 12px;
+}
+
+.inline-editable-url {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  word-break: break-all;
+  background: rgba(0, 107, 142, 0.05);
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.admin-inline-link-block {
+  margin-top: 10px;
+}
+
+.admin-bus-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.admin-inline-url-row {
+  margin-top: 8px;
+}
 
 .admin-live-page-title {
   color: #006B8E;

@@ -299,6 +299,37 @@ export default function AdminPanel() {
     return groups;
   }, [allDisplaySections, selectedPage]);
 
+  const customSectionsByPage = useMemo(() => {
+    const grouped = new Map<string, Section[]>();
+    const custom = sections
+      .filter(section => !FIXED_IDS.has(section.id))
+      .sort((left, right) => (left.order ?? 1000) - (right.order ?? 1000));
+
+    for (const section of custom) {
+      if (!grouped.has(section.page)) {
+        grouped.set(section.page, []);
+      }
+      grouped.get(section.page)?.push(section);
+    }
+
+    return grouped;
+  }, [sections]);
+
+  const getSection = (id: string, page: string): Section => {
+    const existing = sectionById.get(id);
+    if (existing) {
+      return existing;
+    }
+
+    return {
+      id,
+      page,
+      title: DEFAULT_TITLE_BY_ID[id] || id,
+      content: DEFAULT_CONTENT_BY_ID[id] || URL_DEFAULTS[id] || '',
+      order: FIXED_ORDER_BY_ID[id],
+    };
+  };
+
   const upsertSection = async (payload: Partial<Section>, allowCreateFallback: boolean): Promise<Section | null> => {
     let response = await fetch('/api/texts', {
       method: 'PUT',
@@ -520,93 +551,72 @@ export default function AdminPanel() {
     }
   };
 
-  const renderEditableTitle = (section: Section) => {
-    const titleEditKey = `${section.id}-title`;
-    const isTitleEditing = editingField?.id === section.id && editingField.field === 'title';
+  const renderEditableField = (
+    section: Section,
+    field: 'title' | 'content',
+    options?: { as?: 'span' | 'p' | 'h2' | 'h3'; className?: string; allowEnter?: boolean }
+  ) => {
+    const editKey = `${section.id}-${field}`;
+    const isEditing = editingField?.id === section.id && editingField.field === field;
+    const Element = options?.as || 'p';
+    const className = options?.className || 'inline-editable-content';
+    const allowEnter = options?.allowEnter ?? true;
+    const value = field === 'title' ? section.title : section.content;
 
     return (
-      <div className="inline-title-row">
-        <h2
-          className={`inline-editable-title ${isTitleEditing ? 'is-editing' : ''}`}
-          data-edit-key={titleEditKey}
-          contentEditable={isTitleEditing}
+      <div className="inline-content-row">
+        <Element
+          className={`${className} ${isEditing ? 'is-editing' : ''}`}
+          data-edit-key={editKey}
+          contentEditable={isEditing}
           suppressContentEditableWarning
-          onBlur={event => saveInlineEdit(section, 'title', event.currentTarget.innerText)}
+          onBlur={event => saveInlineEdit(section, field, event.currentTarget.innerText)}
           onKeyDown={event => {
             if (event.key === 'Escape') {
               event.preventDefault();
               cancelInlineEdit();
             }
-            if (event.key === 'Enter') {
+            if (!allowEnter && event.key === 'Enter') {
               event.preventDefault();
               (event.currentTarget as HTMLElement).blur();
             }
           }}
         >
-          {section.title}
-        </h2>
+          {value}
+        </Element>
         <div className="inline-actions">
-          <button className="inline-icon-btn" onClick={() => startInlineEdit(section.id, 'title')} title="Editar título">✏️</button>
-          <button className="inline-icon-btn danger" onClick={() => handleTrashField(section, 'title')} title="Eliminar/restablecer título">🗑️</button>
-        </div>
-      </div>
-    );
-  };
-
-  const renderEditableContent = (section: Section) => {
-    const contentEditKey = `${section.id}-content`;
-    const isContentEditing = editingField?.id === section.id && editingField.field === 'content';
-
-    return (
-      <div className="inline-content-row">
-        <p
-          className={`inline-editable-content ${isContentEditing ? 'is-editing' : ''}`}
-          data-edit-key={contentEditKey}
-          contentEditable={isContentEditing}
-          suppressContentEditableWarning
-          onBlur={event => saveInlineEdit(section, 'content', event.currentTarget.innerText)}
-          onKeyDown={event => {
-            if (event.key === 'Escape') {
-              event.preventDefault();
-              cancelInlineEdit();
-            }
-          }}
-        >
-          {section.content}
-        </p>
-        <div className="inline-actions">
-          <button className="inline-icon-btn" onClick={() => startInlineEdit(section.id, 'content')} title="Editar contenido">✏️</button>
-          <button className="inline-icon-btn danger" onClick={() => handleTrashField(section, 'content')} title="Eliminar/restablecer contenido">🗑️</button>
-        </div>
-      </div>
-    );
-  };
-
-  const renderSectionInline = (pageId: string, section: Section) => {
-    const wrapperClass = pageId === 'coruna'
-      ? 'coruna-section admin-mirror-section'
-      : pageId === 'info'
-        ? 'info-section admin-mirror-section'
-        : 'location-section admin-mirror-section';
-
-    return (
-      <div key={section.id} className="inline-section-block">
-        <section className={wrapperClass}>
-          {renderEditableTitle(section)}
-          {renderEditableContent(section)}
-        </section>
-
-        <div className="inline-add-row">
           <button
-            className="inline-add-btn"
-            onClick={() => createSectionBetween(pageId, section.id)}
-            title="Añadir sección aquí"
+            className="inline-icon-btn"
+            onClick={() => startInlineEdit(section.id, field)}
+            title={field === 'title' ? 'Editar título' : 'Editar contenido'}
           >
-            +
+            ✏️
+          </button>
+          <button
+            className="inline-icon-btn danger"
+            onClick={() => handleTrashField(section, field)}
+            title={field === 'title' ? 'Eliminar/restablecer título' : 'Eliminar/restablecer contenido'}
+          >
+            🗑️
           </button>
         </div>
       </div>
     );
+  };
+
+  const renderCustomSections = (pageId: string) => {
+    const custom = customSectionsByPage.get(pageId) || [];
+    return custom.map(section => (
+      <div key={section.id} className="inline-section-block">
+        <section className="admin-mirror-section info-section">
+          {renderEditableField(section, 'title', { as: 'h2', className: 'inline-editable-title', allowEnter: false })}
+          {renderEditableField(section, 'content')}
+        </section>
+        <div className="inline-add-row">
+          <button className="inline-add-btn" onClick={() => createSectionBetween(pageId, section.id)} title="Añadir sección aquí">+</button>
+        </div>
+      </div>
+    ));
   };
 
   if (!isAuthenticated || loading) {
@@ -674,25 +684,126 @@ export default function AdminPanel() {
               </button>
             </div>
 
-            {Array.from(groupedSections.entries()).map(([pageId, pageSections]) => (
-              <section key={pageId} className={`admin-live-page admin-mirror-page ${pageId}-mirror`}>
-                <h3 className="admin-live-page-title">{PAGE_LABELS[pageId] || pageId}</h3>
+            {(selectedPage === 'all' || selectedPage === 'principal') && (
+              <section className="admin-live-page admin-mirror-page principal-mirror">
+                <h3 className="admin-live-page-title">{PAGE_LABELS.principal}</h3>
+                <div className="video-section admin-mirror-hero" />
 
-                {pageId === 'principal' && <div className="video-section admin-mirror-hero" />}
-                {pageId === 'info' && <img src="/assets/imagen02.png" alt="Info" className="info-hero-img" />}
-                {pageId === 'coruna' && <div className="coruna-hero"><img src="/assets/imagen03.png" alt="A Coruña" className="coruna-hero-img" /></div>}
+                <section className="text-section admin-mirror-section">
+                  {renderEditableField(getSection('main-quote', 'principal'), 'content', { as: 'h2', className: 'main-quote', allowEnter: true })}
+                </section>
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('principal', 'main-quote')}>+</button></div>
 
-                {pageSections.length === 0 && (
-                  <div className="inline-add-row empty">
-                    <button className="inline-add-btn" onClick={() => createSectionBetween(pageId)} title="Añadir sección">
-                      +
-                    </button>
+                <section className="location-section admin-mirror-section">
+                  {renderEditableField(getSection('location-title', 'principal'), 'content', { as: 'h3', className: 'location-title', allowEnter: false })}
+                  <div className="location-info">
+                    <div className="info-row">
+                      {renderEditableField(getSection('location-city-label', 'principal'), 'content', { as: 'span', className: 'label', allowEnter: false })}
+                      {renderEditableField(getSection('location-city-value', 'principal'), 'content', { as: 'span', className: 'value', allowEnter: false })}
+                    </div>
+                    <div className="info-row">
+                      {renderEditableField(getSection('location-date-label', 'principal'), 'content', { as: 'span', className: 'label', allowEnter: false })}
+                      {renderEditableField(getSection('location-date-value', 'principal'), 'content', { as: 'span', className: 'value', allowEnter: false })}
+                    </div>
+                    <div className="info-row">
+                      {renderEditableField(getSection('location-time-label', 'principal'), 'content', { as: 'span', className: 'label', allowEnter: false })}
+                      {renderEditableField(getSection('location-time-value', 'principal'), 'content', { as: 'span', className: 'value', allowEnter: false })}
+                    </div>
+                    <div className="info-row">
+                      {renderEditableField(getSection('location-place-label', 'principal'), 'content', { as: 'span', className: 'label', allowEnter: false })}
+                      {renderEditableField(getSection('location-place-value', 'principal'), 'content', { as: 'span', className: 'value', allowEnter: false })}
+                    </div>
+                    <div className="info-row">
+                      {renderEditableField(getSection('location-address-label', 'principal'), 'content', { as: 'span', className: 'label', allowEnter: false })}
+                      {renderEditableField(getSection('location-address-value', 'principal'), 'content', { as: 'span', className: 'value', allowEnter: false })}
+                    </div>
                   </div>
-                )}
+                  <div className="map-container">
+                    <iframe src={getSection('map-embed-url', 'principal').content} title="Mapa principal" width="100%" height="260" />
+                  </div>
+                  <div className="admin-inline-url-row">
+                    {renderEditableField(getSection('map-embed-url', 'principal'), 'content', { as: 'p', className: 'inline-editable-url', allowEnter: false })}
+                  </div>
+                </section>
 
-                {pageSections.map(section => renderSectionInline(pageId, section))}
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('principal', 'map-embed-url')}>+</button></div>
+
+                {renderCustomSections('principal')}
               </section>
-            ))}
+            )}
+
+            {(selectedPage === 'all' || selectedPage === 'info') && (
+              <section className="admin-live-page admin-mirror-page info-mirror">
+                <h3 className="admin-live-page-title">{PAGE_LABELS.info}</h3>
+                <img src="/assets/imagen02.png" alt="Info" className="info-hero-img" />
+
+                <section className="info-section admin-mirror-section">
+                  <h2>¿Cómo llegar?</h2>
+                  <article className="subsection">{renderEditableField(getSection('car-section', 'info'), 'content')}</article>
+                  <article className="subsection">
+                    <div className="bus-info">
+                      <div className="admin-bus-row">
+                        {renderEditableField(getSection('bus-out-label', 'info'), 'content', { as: 'span', allowEnter: false })}
+                        {renderEditableField(getSection('bus-out-text', 'info'), 'content', { as: 'span', allowEnter: true })}
+                      </div>
+                      <div className="admin-bus-row">
+                        {renderEditableField(getSection('bus-return-label', 'info'), 'content', { as: 'span', allowEnter: false })}
+                        {renderEditableField(getSection('bus-return-text', 'info'), 'content', { as: 'span', allowEnter: true })}
+                      </div>
+                    </div>
+                    <div className="map-link admin-inline-link-block">{renderEditableField(getSection('map-directions-url', 'info'), 'content', { as: 'span', allowEnter: false })}</div>
+                  </article>
+                </section>
+
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'bus-return-text')}>+</button></div>
+
+                <section className="info-section admin-mirror-section">
+                  <h2>¿Alguna duda?</h2>
+                  {renderEditableField(getSection('questions-section', 'info'), 'content')}
+                </section>
+
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'questions-section')}>+</button></div>
+
+                <section className="info-section gift-section admin-mirror-section">
+                  <h2>Regalo</h2>
+                  {renderEditableField(getSection('gift-section', 'info'), 'content')}
+                </section>
+
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'gift-section')}>+</button></div>
+
+                <section className="info-section playlist-section admin-mirror-section">
+                  <h2>Ve calentando motores</h2>
+                  <div className="spotify-embed">
+                    <iframe src={getSection('spotify-playlist-url', 'info').content} width="100%" height="300" title="Spotify playlist" />
+                  </div>
+                  <div className="admin-inline-url-row">
+                    {renderEditableField(getSection('spotify-playlist-url', 'info'), 'content', { as: 'p', className: 'inline-editable-url', allowEnter: false })}
+                  </div>
+                </section>
+
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'spotify-playlist-url')}>+</button></div>
+
+                {renderCustomSections('info')}
+              </section>
+            )}
+
+            {(selectedPage === 'all' || selectedPage === 'coruna') && (
+              <section className="admin-live-page admin-mirror-page coruna-mirror">
+                <h3 className="admin-live-page-title">{PAGE_LABELS.coruna}</h3>
+                <div className="coruna-hero"><img src="/assets/imagen03.png" alt="A Coruña" className="coruna-hero-img" /></div>
+
+                <section className="coruna-section admin-mirror-section"><h2>Dónde comer</h2>{renderEditableField(getSection('eat-section', 'coruna'), 'content')}</section>
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'eat-section')}>+</button></div>
+                <section className="coruna-section admin-mirror-section"><h2>Dónde beber</h2>{renderEditableField(getSection('drink-section', 'coruna'), 'content')}</section>
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'drink-section')}>+</button></div>
+                <section className="coruna-section admin-mirror-section"><h2>Dónde alojarse</h2>{renderEditableField(getSection('stay-section', 'coruna'), 'content')}</section>
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'stay-section')}>+</button></div>
+                <section className="coruna-section admin-mirror-section"><h2>Qué ver</h2>{renderEditableField(getSection('see-section', 'coruna'), 'content')}</section>
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'see-section')}>+</button></div>
+
+                {renderCustomSections('coruna')}
+              </section>
+            )}
 
             {savingText && <p className="inline-saving">Guardando cambios…</p>}
           </div>
