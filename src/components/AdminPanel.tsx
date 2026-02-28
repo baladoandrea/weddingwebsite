@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import GalleryUpload from './GalleryUpload';
 import textsData from '../data/texts.json';
 import { ADMIN_PREVIEW_ITEMS, PAGE_LABELS, shouldHideInfoDynamicSection } from '../utils/textSyncConfig';
+import { parseCorunaCards } from '../utils/corunaContentParser';
 
 interface Section {
   id: string;
@@ -22,6 +23,12 @@ interface GalleryItem {
   id: string;
   url: string;
   tags: string[];
+}
+
+interface AdminToast {
+  type: 'success' | 'error' | 'info';
+  message: string;
+  durationMs: number;
 }
 
 const FIXED_IDS = new Set(ADMIN_PREVIEW_ITEMS.map(item => item.id));
@@ -118,6 +125,8 @@ const normalizeSpotifyEmbedUrl = (value: string): string | null => {
 
 export default function AdminPanel() {
   const menuRef = useRef<HTMLDivElement>(null);
+  const saveStatusTimeoutRef = useRef<number | null>(null);
+  const toastTimeoutRef = useRef<number | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'texts' | 'gallery' | 'guests'>('texts');
@@ -128,8 +137,16 @@ export default function AdminPanel() {
   const [guests, setGuests] = useState<Guest[]>([]);
 
   const [loading, setLoading] = useState(true);
-  const [savingText, setSavingText] = useState(false);
   const [editingField, setEditingField] = useState<{ id: string; field: 'title' | 'content' } | null>(null);
+  const [savingField, setSavingField] = useState<{ id: string; field: 'title' | 'content' } | null>(null);
+  const [justSavedField, setJustSavedField] = useState<{ id: string; field: 'title' | 'content' } | null>(null);
+  const [toast, setToast] = useState<AdminToast | null>(null);
+
+  const toastIconByType: Record<AdminToast['type'], string> = {
+    success: '✅',
+    error: '⚠️',
+    info: 'ℹ️',
+  };
 
   useEffect(() => {
     const token = sessionStorage.getItem('adminToken');
@@ -183,6 +200,46 @@ export default function AdminPanel() {
     selection.removeAllRanges();
     selection.addRange(range);
   }, [editingField]);
+
+  useEffect(() => {
+    return () => {
+      if (saveStatusTimeoutRef.current !== null) {
+        window.clearTimeout(saveStatusTimeoutRef.current);
+      }
+      if (toastTimeoutRef.current !== null) {
+        window.clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const showToast = (type: AdminToast['type'], message: string, duration = 2600) => {
+    setToast({ type, message, durationMs: duration });
+
+    if (toastTimeoutRef.current !== null) {
+      window.clearTimeout(toastTimeoutRef.current);
+    }
+
+    toastTimeoutRef.current = window.setTimeout(() => {
+      setToast(null);
+      toastTimeoutRef.current = null;
+    }, duration);
+  };
+
+  const showSavedStatus = (field: { id: string; field: 'title' | 'content' }) => {
+    setJustSavedField(field);
+    if (saveStatusTimeoutRef.current !== null) {
+      window.clearTimeout(saveStatusTimeoutRef.current);
+    }
+    saveStatusTimeoutRef.current = window.setTimeout(() => {
+      setJustSavedField(current => {
+        if (current?.id === field.id && current.field === field.field) {
+          return null;
+        }
+        return current;
+      });
+      saveStatusTimeoutRef.current = null;
+    }, 1400);
+  };
 
   const loadData = async () => {
     try {
@@ -312,7 +369,7 @@ export default function AdminPanel() {
       } catch {
         message = `${message} (HTTP ${response.status})`;
       }
-      alert(message);
+      showToast('error', message);
       return null;
     }
 
@@ -364,7 +421,7 @@ export default function AdminPanel() {
   const saveInlineEdit = async (section: Section, field: 'title' | 'content', value: string) => {
     const normalized = normalizeFieldValue(section, field, value);
     if (!normalized) {
-      alert('El valor no es válido para este campo.');
+      showToast('info', 'El valor no es válido para este campo.');
       cancelInlineEdit();
       return;
     }
@@ -375,9 +432,10 @@ export default function AdminPanel() {
       return;
     }
 
-    setSavingText(true);
+    setSavingField({ id: section.id, field });
     await upsertSection({ ...section, [field]: normalized }, true);
-    setSavingText(false);
+    setSavingField(null);
+    showSavedStatus({ id: section.id, field });
     cancelInlineEdit();
   };
 
@@ -392,14 +450,15 @@ export default function AdminPanel() {
       });
 
       if (!response.ok) {
-        alert('No se pudo eliminar la sección');
+        showToast('error', 'No se pudo eliminar la sección.');
         return;
       }
 
       setSections(current => current.filter(section => section.id !== sectionId));
       cancelInlineEdit();
+      showToast('success', 'Sección eliminada correctamente.');
     } catch {
-      alert('Error al eliminar la sección');
+      showToast('error', 'Error al eliminar la sección.');
     }
   };
 
@@ -413,9 +472,10 @@ export default function AdminPanel() {
       ? (DEFAULT_TITLE_BY_ID[section.id] || section.title)
       : (DEFAULT_CONTENT_BY_ID[section.id] || URL_DEFAULTS[section.id] || section.content);
 
-    setSavingText(true);
+    setSavingField({ id: section.id, field });
     await upsertSection({ ...section, [field]: defaultValue }, true);
-    setSavingText(false);
+    setSavingField(null);
+    showSavedStatus({ id: section.id, field });
     cancelInlineEdit();
   };
 
@@ -448,13 +508,14 @@ export default function AdminPanel() {
     });
 
     if (!response.ok) {
-      alert('No se pudo crear la nueva sección');
+      showToast('error', 'No se pudo crear la nueva sección.');
       return;
     }
 
     const created = await response.json() as Section;
     setSections(current => [...current, created]);
     startInlineEdit(created.id, 'title');
+    showToast('success', 'Sección creada. Ya puedes editar su título.');
   };
 
   const handleGalleryUpload = async (file: File, tags: string[]) => {
@@ -517,6 +578,8 @@ export default function AdminPanel() {
   ) => {
     const editKey = `${section.id}-${field}`;
     const isEditing = editingField?.id === section.id && editingField.field === field;
+    const isSaving = savingField?.id === section.id && savingField.field === field;
+    const isSaved = justSavedField?.id === section.id && justSavedField.field === field;
     const Element = options?.as || 'p';
     const className = options?.className || 'inline-editable-content';
     const allowEnter = options?.allowEnter ?? true;
@@ -548,6 +611,7 @@ export default function AdminPanel() {
             className="inline-icon-btn"
             onClick={() => startInlineEdit(section.id, field)}
             title={field === 'title' ? 'Editar título' : 'Editar contenido'}
+            disabled={isSaving}
           >
             ✏️
           </button>
@@ -555,9 +619,12 @@ export default function AdminPanel() {
             className="inline-icon-btn danger"
             onClick={() => handleTrashField(section, field)}
             title={field === 'title' ? 'Eliminar/restablecer título' : 'Eliminar/restablecer contenido'}
+            disabled={isSaving}
           >
             🗑️
           </button>
+          {isSaving && <span className="inline-field-status saving">Guardando…</span>}
+          {!isSaving && isSaved && <span className="inline-field-status saved">Guardado</span>}
         </div>
       </div>
     );
@@ -584,12 +651,76 @@ export default function AdminPanel() {
     ));
   };
 
+  const renderCorunaSectionEditor = (sectionId: string) => {
+    const section = getSection(sectionId, 'coruna');
+    const cards = parseCorunaCards(section.content, section.title);
+
+    return (
+      <section className="coruna-section admin-mirror-section">
+        {renderEditableField(section, 'title', { as: 'h2', allowEnter: false })}
+        <p className="admin-inline-help">
+          Formato recomendado: una tarjeta por línea usando “Subtítulo: descripción”.
+        </p>
+        {renderEditableField(section, 'content')}
+        <div className="content-cards admin-structured-preview">
+          {cards.map((card, index) => (
+            <article key={`${section.id}-preview-${index}`} className="recommendation-card">
+              <h3>{card.title}</h3>
+              <p>{card.content}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  const renderMultilinePreview = (content: string) => {
+    const paragraphs = content
+      .split(/\n+/)
+      .map(text => text.trim())
+      .filter(Boolean);
+
+    if (paragraphs.length === 0) {
+      return <p className="admin-preview-empty">Sin contenido</p>;
+    }
+
+    return paragraphs.map((paragraph, index) => (
+      <p key={`${paragraph}-${index}`}>{paragraph}</p>
+    ));
+  };
+
+  const renderGuidedLongTextField = (
+    section: Section,
+    hint = 'Consejo: usa saltos de línea para separar párrafos y mejorar la lectura.'
+  ) => (
+    <>
+      {renderEditableField(section, 'content')}
+      <p className="admin-inline-help">{hint}</p>
+      <div className="admin-text-preview">
+        {renderMultilinePreview(section.content)}
+      </div>
+    </>
+  );
+
   if (!isAuthenticated || loading) {
     return <div className="admin-loading">Cargando...</div>;
   }
 
   return (
     <div className="admin-panel">
+      {toast && (
+        <div className={`admin-toast ${toast.type}`} role="status" aria-live="polite">
+          <span className="admin-toast-icon" aria-hidden>{toastIconByType[toast.type]}</span>
+          <span className="admin-toast-message">{toast.message}</span>
+          <span className="admin-toast-progress" aria-hidden>
+            <span
+              className="admin-toast-progress-bar"
+              style={{ animationDuration: `${toast.durationMs}ms` }}
+            />
+          </span>
+        </div>
+      )}
+
       <header className="admin-header">
         <h1>Panel Administrativo</h1>
         <div className="admin-header-actions" ref={menuRef}>
@@ -634,6 +765,9 @@ export default function AdminPanel() {
       <div className="admin-content">
         {activeTab === 'texts' && (
           <div className="admin-section admin-inline-editor">
+            <p className="admin-editor-note">
+              Edición en vivo: usa ✏️ para editar y 🗑️ para restablecer/eliminar. Los cambios se guardan automáticamente al salir del campo.
+            </p>
             <div className="page-filter-tabs">
               <button className={`page-filter-btn ${selectedPage === 'all' ? 'active' : ''}`} onClick={() => setSelectedPage('all')}>
                 Todas
@@ -709,7 +843,10 @@ export default function AdminPanel() {
                   <h2>¿Cómo llegar?</h2>
                   <article className="subsection">
                     {renderEditableField(getSection('car-section', 'info'), 'title', { as: 'h3', allowEnter: false })}
-                    {renderEditableField(getSection('car-section', 'info'), 'content')}
+                    {renderGuidedLongTextField(
+                      getSection('car-section', 'info'),
+                      'Consejo: describe la ruta en pasos cortos para que sea más clara.'
+                    )}
                   </article>
                   <article className="subsection">
                     <div className="bus-info">
@@ -730,14 +867,17 @@ export default function AdminPanel() {
 
                 <section className="info-section admin-mirror-section">
                   {renderEditableField(getSection('questions-section', 'info'), 'title', { as: 'h2', allowEnter: false })}
-                  {renderEditableField(getSection('questions-section', 'info'), 'content')}
+                  {renderGuidedLongTextField(getSection('questions-section', 'info'))}
                 </section>
 
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'questions-section')}>+</button></div>
 
                 <section className="info-section gift-section admin-mirror-section">
                   {renderEditableField(getSection('gift-section', 'info'), 'title', { as: 'h2', allowEnter: false })}
-                  {renderEditableField(getSection('gift-section', 'info'), 'content')}
+                  {renderGuidedLongTextField(
+                    getSection('gift-section', 'info'),
+                    'Consejo: puedes separar mensaje emocional y datos prácticos en líneas distintas.'
+                  )}
                 </section>
 
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'gift-section')}>+</button></div>
@@ -763,25 +903,13 @@ export default function AdminPanel() {
                 <h3 className="admin-live-page-title">{PAGE_LABELS.coruna}</h3>
                 <div className="coruna-hero"><img src="/assets/imagen03.png" alt="A Coruña" className="coruna-hero-img" /></div>
 
-                <section className="coruna-section admin-mirror-section">
-                  {renderEditableField(getSection('eat-section', 'coruna'), 'title', { as: 'h2', allowEnter: false })}
-                  {renderEditableField(getSection('eat-section', 'coruna'), 'content')}
-                </section>
+                {renderCorunaSectionEditor('eat-section')}
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'eat-section')}>+</button></div>
-                <section className="coruna-section admin-mirror-section">
-                  {renderEditableField(getSection('drink-section', 'coruna'), 'title', { as: 'h2', allowEnter: false })}
-                  {renderEditableField(getSection('drink-section', 'coruna'), 'content')}
-                </section>
+                {renderCorunaSectionEditor('drink-section')}
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'drink-section')}>+</button></div>
-                <section className="coruna-section admin-mirror-section">
-                  {renderEditableField(getSection('stay-section', 'coruna'), 'title', { as: 'h2', allowEnter: false })}
-                  {renderEditableField(getSection('stay-section', 'coruna'), 'content')}
-                </section>
+                {renderCorunaSectionEditor('stay-section')}
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'stay-section')}>+</button></div>
-                <section className="coruna-section admin-mirror-section">
-                  {renderEditableField(getSection('see-section', 'coruna'), 'title', { as: 'h2', allowEnter: false })}
-                  {renderEditableField(getSection('see-section', 'coruna'), 'content')}
-                </section>
+                {renderCorunaSectionEditor('see-section')}
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'see-section')}>+</button></div>
 
                 {renderCustomSections('coruna')}
@@ -794,7 +922,10 @@ export default function AdminPanel() {
 
                 <section className="rsvp-header admin-mirror-section">
                   {renderEditableField(getSection('rsvp-intro-title', 'rsvp'), 'content', { as: 'h2', allowEnter: false })}
-                  {renderEditableField(getSection('rsvp-intro-text', 'rsvp'), 'content')}
+                  {renderGuidedLongTextField(
+                    getSection('rsvp-intro-text', 'rsvp'),
+                    'Consejo: usa un tono cercano y párrafos breves para facilitar lectura móvil.'
+                  )}
                 </section>
 
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('rsvp', 'rsvp-intro-text')}>+</button></div>
@@ -848,8 +979,8 @@ export default function AdminPanel() {
                 <section className="rsvp-success admin-mirror-section">
                   <div className="success-modal">
                     {renderEditableField(getSection('rsvp-success-title', 'rsvp'), 'content', { as: 'h2', allowEnter: false })}
-                    {renderEditableField(getSection('rsvp-success-text', 'rsvp'), 'content')}
-                    {renderEditableField(getSection('rsvp-success-closing', 'rsvp'), 'content')}
+                    {renderGuidedLongTextField(getSection('rsvp-success-text', 'rsvp'))}
+                    {renderGuidedLongTextField(getSection('rsvp-success-closing', 'rsvp'))}
                     {renderEditableField(getSection('rsvp-success-button', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
                   </div>
                 </section>
@@ -860,7 +991,6 @@ export default function AdminPanel() {
               </section>
             )}
 
-            {savingText && <p className="inline-saving">Guardando cambios…</p>}
           </div>
         )}
 

@@ -121,6 +121,108 @@
   padding-bottom: 40px;
 }
 
+.admin-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 1400;
+  min-width: 260px;
+  max-width: min(92vw, 560px);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  overflow: hidden;
+  animation: adminToastIn 220ms ease-out;
+}
+
+.admin-toast-icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.admin-toast-message {
+  line-height: 1.35;
+}
+
+.admin-toast-progress {
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.admin-toast-progress-bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  opacity: 0.35;
+  transform-origin: left;
+  animation-name: adminToastProgress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.admin-toast.success {
+  color: #1f7a3f;
+  background: #eaf7ee;
+  border-color: #b7e1c3;
+}
+
+.admin-toast.error {
+  color: #a12626;
+  background: #fdecec;
+  border-color: #f3b8b8;
+}
+
+.admin-toast.info {
+  color: #0f5f78;
+  background: #eaf6fb;
+  border-color: #b5d9e7;
+}
+
+@keyframes adminToastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes adminToastProgress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-toast {
+    animation: none;
+  }
+
+  .admin-toast-progress-bar {
+    animation: none;
+    transform: scaleX(0);
+  }
+}
+
 .admin-header {
   background: #000;
   color: white;
@@ -263,6 +365,13 @@
   padding: 8px 0 0;
 }
 
+.admin-editor-note {
+  margin: 2px 0 12px;
+  color: #4b5a64;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .admin-live-page {
   max-width: 760px;
   margin: 0 auto 24px;
@@ -334,6 +443,44 @@
   margin: 8px 0 16px;
 }
 
+.admin-inline-help {
+  margin: 6px 0 10px;
+  font-size: 13px;
+  color: #666;
+}
+
+.admin-structured-preview {
+  margin-top: 10px;
+}
+
+.admin-structured-preview .recommendation-card {
+  margin-top: 10px;
+}
+
+.admin-text-preview {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px dashed rgba(0, 107, 142, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 107, 142, 0.04);
+}
+
+.admin-text-preview p {
+  margin: 0 0 8px;
+  color: #333;
+  line-height: 1.55;
+}
+
+.admin-text-preview p:last-child {
+  margin-bottom: 0;
+}
+
+.admin-preview-empty {
+  margin: 0;
+  color: #777;
+  font-style: italic;
+}
+
 .inline-section-block {
   padding: 4px 0;
 }
@@ -391,6 +538,11 @@
   padding: 0;
 }
 
+.inline-icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .inline-icon-btn:hover {
   background: #f4f4f4;
 }
@@ -433,6 +585,24 @@
   text-align: center;
   color: #006B8E;
   font-size: 13px;
+}
+
+.inline-field-status {
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 3px 8px;
+  align-self: center;
+}
+
+.inline-field-status.saving {
+  color: #006B8E;
+  background: rgba(0, 107, 142, 0.11);
+}
+
+.inline-field-status.saved {
+  color: #1f7a3f;
+  background: rgba(31, 122, 63, 0.12);
 }
 
 .visual-admin-section {

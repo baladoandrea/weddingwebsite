@@ -2,63 +2,7 @@ import Header from './Header';
 import Footer from './Footer';
 import useWebsiteTexts from '../utils/useWebsiteTexts';
 import { getReservedSectionIds } from '../utils/textSyncConfig';
-
-interface CorunaCard {
-  title: string;
-  content: string;
-}
-
-const splitCardCandidates = (rawContent: string): string[] => {
-  const normalized = rawContent.replace(/\r/g, '').trim();
-  if (!normalized) {
-    return [];
-  }
-
-  const lines = normalized
-    .split('\n')
-    .map(line => line.trim())
-    .filter(Boolean);
-
-  if (lines.length > 1) {
-    return lines;
-  }
-
-  return normalized
-    .split(/(?<=\.)\s+(?=[^:\n]+:\s*)/)
-    .map(part => part.trim())
-    .filter(Boolean);
-};
-
-const parseCardsFromSection = (rawContent: string, fallbackTitle: string): CorunaCard[] => {
-  const candidates = splitCardCandidates(rawContent);
-  const cards = candidates
-    .map(candidate => {
-      const parts = candidate.split(/:(.+)/).map(value => value.trim());
-      if (parts.length < 2 || !parts[0] || !parts[1]) {
-        return null;
-      }
-
-      return {
-        title: parts[0],
-        content: parts[1],
-      };
-    })
-    .filter((card): card is CorunaCard => card !== null);
-
-  if (cards.length > 0) {
-    return cards;
-  }
-
-  const fallbackContent = rawContent.trim();
-  if (!fallbackContent) {
-    return [];
-  }
-
-  return [{
-    title: fallbackTitle,
-    content: fallbackContent,
-  }];
-};
+import { parseCorunaCards } from '../utils/corunaContentParser';
 
 export default function CorunaPage() {
   const { getSection, getCustomSections } = useWebsiteTexts();
@@ -83,10 +27,10 @@ export default function CorunaPage() {
     page: 'coruna',
   });
   const customSections = getCustomSections('coruna', getReservedSectionIds('coruna'));
-  const eatCards = parseCardsFromSection(eatSection.content, eatSection.title);
-  const drinkCards = parseCardsFromSection(drinkSection.content, drinkSection.title);
-  const stayCards = parseCardsFromSection(staySection.content, staySection.title);
-  const seeCards = parseCardsFromSection(seeSection.content, seeSection.title);
+  const eatCards = parseCorunaCards(eatSection.content, eatSection.title);
+  const drinkCards = parseCorunaCards(drinkSection.content, drinkSection.title);
+  const stayCards = parseCorunaCards(staySection.content, staySection.title);
+  const seeCards = parseCorunaCards(seeSection.content, seeSection.title);
 
   return (
     <div className="coruna-page">
