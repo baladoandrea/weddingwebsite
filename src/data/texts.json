@@ -152,7 +152,7 @@
   {
     "id": "see-section",
     "title": "Qué ver",
-    "content": "Un partido del Depor en Riazor, derrota garantizada.",
+    "content": "Estadio de Riazor: Hogar del Deportivo de La Coruña. Si tienes la oportunidad, ve a un partido del depor, derrota garantizada.\nTorre de Hércules: El faro más antiguo del mundo en funcionamiento. Vistas espectaculares del Atlántico.\nPaseo Marítimo: Camina por el hermoso paseo marítimo, respira el aire del mar y disfruta de las vistas.",
     "page": "coruna"
   },
   {
@@ -207,6 +207,66 @@
     "id": "rsvp-attendance-option-no-value",
     "title": "RSVP - Opción no (valor)",
     "content": "No puedo",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-search-placeholder",
+    "title": "RSVP - Placeholder búsqueda",
+    "content": "Busca tu nombre...",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-no-results-text",
+    "title": "RSVP - Texto sin resultados",
+    "content": "No encontramos tu nombre. Contacta con Marta o Sergio",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-selected-guest-label",
+    "title": "RSVP - Etiqueta invitado seleccionado",
+    "content": "Invitado:",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-change-guest-button",
+    "title": "RSVP - Botón cambiar invitado",
+    "content": "Cambiar",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-notes-label",
+    "title": "RSVP - Etiqueta notas",
+    "content": "Déjanos una nota",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-notes-placeholder",
+    "title": "RSVP - Placeholder notas",
+    "content": "Cuéntanos algo especial...",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-submit-button",
+    "title": "RSVP - Botón enviar",
+    "content": "Enviar Confirmación",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-submitting-button",
+    "title": "RSVP - Botón enviando",
+    "content": "Enviando...",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-validation-alert",
+    "title": "RSVP - Alerta validación",
+    "content": "Por favor selecciona tu nombre y una opción de asistencia",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-submit-error-alert",
+    "title": "RSVP - Alerta error envío",
+    "content": "Error al enviar la confirmación",
     "page": "rsvp"
   },
   {

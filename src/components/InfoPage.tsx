@@ -1,6 +1,7 @@
 import Header from './Header';
 import Footer from './Footer';
 import useWebsiteTexts from '../utils/useWebsiteTexts';
+import { getReservedSectionIds, shouldHideInfoDynamicSection } from '../utils/textSyncConfig';
 
 const DEFAULT_MAPS_DIRECTIONS_URL = 'https://www.google.com/maps/place/Plaza+de+Pontevedra,+A+Coru%C3%B1a';
 const DEFAULT_SPOTIFY_EMBED_URL = 'https://open.spotify.com/embed/playlist/37i9dQZEVXbJwoKy8qKpHG?utm_source=generator';
@@ -62,17 +63,8 @@ export default function InfoPage() {
   const safeSpotifyEmbedUrl = isValidSpotifyEmbedUrl(spotifyEmbedUrl)
     ? spotifyEmbedUrl
     : DEFAULT_SPOTIFY_EMBED_URL;
-  const customSections = getCustomSections('info', [
-    'car-section',
-    'map-directions-url',
-    'bus-out-label',
-    'bus-out-text',
-    'bus-return-label',
-    'bus-return-text',
-    'questions-section',
-    'gift-section',
-    'spotify-playlist-url',
-  ]);
+  const customSections = getCustomSections('info', getReservedSectionIds('info'))
+    .filter(section => !shouldHideInfoDynamicSection(section.title));
 
   return (
     <div className="info-page">

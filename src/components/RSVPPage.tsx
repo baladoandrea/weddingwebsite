@@ -20,7 +20,7 @@ interface RSVPFormData {
 const MIN_SEARCH_CHARS = 7;
 
 export default function RSVPPage() {
-  const { getSection } = useWebsiteTexts();
+  const { getSection, getText } = useWebsiteTexts();
   const introTitle = getSection('rsvp-intro-title', {
     title: 'RSVP - Título inicial',
     content: '¿Contamos contigo?',
@@ -86,6 +86,16 @@ export default function RSVPPage() {
     content: 'Volver al inicio',
     page: 'rsvp',
   });
+  const searchPlaceholder = getText('rsvp-search-placeholder', 'Busca tu nombre...');
+  const noResultsText = getText('rsvp-no-results-text', 'No encontramos tu nombre. Contacta con Marta o Sergio');
+  const selectedGuestLabel = getText('rsvp-selected-guest-label', 'Invitado:');
+  const changeGuestButton = getText('rsvp-change-guest-button', 'Cambiar');
+  const notesLabel = getText('rsvp-notes-label', 'Déjanos una nota');
+  const notesPlaceholder = getText('rsvp-notes-placeholder', 'Cuéntanos algo especial...');
+  const submitButton = getText('rsvp-submit-button', 'Enviar Confirmación');
+  const submittingButton = getText('rsvp-submitting-button', 'Enviando...');
+  const validationAlert = getText('rsvp-validation-alert', 'Por favor selecciona tu nombre y una opción de asistencia');
+  const submitErrorAlert = getText('rsvp-submit-error-alert', 'Error al enviar la confirmación');
 
   const [guests, setGuests] = useState<Guest[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -166,7 +176,7 @@ export default function RSVPPage() {
     e.preventDefault();
 
     if (!selectedGuest || !formData.attendance) {
-      alert('Por favor selecciona tu nombre y una opción de asistencia');
+      alert(validationAlert);
       return;
     }
 
@@ -191,7 +201,7 @@ export default function RSVPPage() {
       }
     } catch (error) {
       console.error('Error submitting RSVP:', error);
-      alert('Error al enviar la confirmación');
+      alert(submitErrorAlert);
     } finally {
       setLoading(false);
     }
@@ -242,7 +252,7 @@ export default function RSVPPage() {
               <div className="search-input-group">
                 <input
                   type="text"
-                  placeholder="Busca tu nombre..."
+                  placeholder={searchPlaceholder}
                   value={searchQuery}
                   onChange={e => handleSearch(e.target.value)}
                   className="search-input"
@@ -264,16 +274,14 @@ export default function RSVPPage() {
               )}
 
               {searchQuery.trim().length >= MIN_SEARCH_CHARS && matchedGuests.length === 0 && (
-                <p className="no-results">
-                  No encontramos tu nombre. Contacta con Marta o Sergio
-                </p>
+                <p className="no-results">{noResultsText}</p>
               )}
             </div>
           </>
         ) : (
           <form onSubmit={handleSubmit} className="attendance-form">
             <div className="selected-guest">
-              <p>Invitado: <strong>{selectedGuest.name}</strong></p>
+              <p>{selectedGuestLabel} <strong>{selectedGuest.name}</strong></p>
               <button
                 type="button"
                 className="change-guest-btn"
@@ -282,7 +290,7 @@ export default function RSVPPage() {
                   setFormData({ guestName: '', attendance: '', notes: '' });
                 }}
               >
-                Cambiar
+                {changeGuestButton}
               </button>
             </div>
 
@@ -324,10 +332,10 @@ export default function RSVPPage() {
             </div>
 
             <div className="notes-field">
-              <label htmlFor="notes">Déjanos una nota</label>
+              <label htmlFor="notes">{notesLabel}</label>
               <textarea
                 id="notes"
-                placeholder="Cuéntanos algo especial..."
+                placeholder={notesPlaceholder}
                 value={formData.notes}
                 onChange={e => handleNotesChange(e.target.value)}
                 maxLength={240}
@@ -341,7 +349,7 @@ export default function RSVPPage() {
               className="btn-primary btn-submit"
               disabled={loading}
             >
-              {loading ? 'Enviando...' : 'Enviar Confirmación'}
+              {loading ? submittingButton : submitButton}
             </button>
           </form>
         )}

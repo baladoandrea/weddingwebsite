@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import GalleryUpload from './GalleryUpload';
 import textsData from '../data/texts.json';
+import { ADMIN_PREVIEW_ITEMS, PAGE_LABELS, shouldHideInfoDynamicSection } from '../utils/textSyncConfig';
 
 interface Section {
   id: string;
@@ -23,64 +24,8 @@ interface GalleryItem {
   tags: string[];
 }
 
-interface PreviewItem {
-  id: string;
-  label: string;
-  page: string;
-  kind?: 'text' | 'url';
-}
-
-const PREVIEW_ITEMS: PreviewItem[] = [
-  { id: 'main-quote', label: 'Frase principal', page: 'principal' },
-  { id: 'location-title', label: 'Título de ubicación', page: 'principal' },
-  { id: 'location-city-label', label: 'Etiqueta ciudad', page: 'principal' },
-  { id: 'location-city-value', label: 'Valor ciudad', page: 'principal' },
-  { id: 'location-date-label', label: 'Etiqueta fecha', page: 'principal' },
-  { id: 'location-date-value', label: 'Valor fecha', page: 'principal' },
-  { id: 'location-time-label', label: 'Etiqueta hora', page: 'principal' },
-  { id: 'location-time-value', label: 'Valor hora', page: 'principal' },
-  { id: 'location-place-label', label: 'Etiqueta lugar', page: 'principal' },
-  { id: 'location-place-value', label: 'Valor lugar', page: 'principal' },
-  { id: 'location-address-label', label: 'Etiqueta dirección', page: 'principal' },
-  { id: 'location-address-value', label: 'Valor dirección', page: 'principal' },
-  { id: 'map-embed-url', label: 'URL embebida de Google Maps', page: 'principal', kind: 'url' },
-  { id: 'map-directions-url', label: 'URL de Google Maps (botón)', page: 'info', kind: 'url' },
-  { id: 'car-section', label: 'Cómo llegar en coche', page: 'info' },
-  { id: 'bus-out-label', label: 'Etiqueta salida bus', page: 'info' },
-  { id: 'bus-out-text', label: 'Texto salida bus', page: 'info' },
-  { id: 'bus-return-label', label: 'Etiqueta vuelta bus', page: 'info' },
-  { id: 'bus-return-text', label: 'Texto vuelta bus', page: 'info' },
-  { id: 'questions-section', label: 'Sección dudas', page: 'info' },
-  { id: 'gift-section', label: 'Sección regalo', page: 'info' },
-  { id: 'spotify-playlist-url', label: 'URL embed de Spotify', page: 'info', kind: 'url' },
-  { id: 'eat-section', label: 'Dónde comer', page: 'coruna' },
-  { id: 'drink-section', label: 'Dónde beber', page: 'coruna' },
-  { id: 'stay-section', label: 'Dónde alojarse', page: 'coruna' },
-  { id: 'see-section', label: 'Qué ver', page: 'coruna' },
-  { id: 'rsvp-intro-title', label: 'RSVP - Título inicial', page: 'rsvp' },
-  { id: 'rsvp-intro-text', label: 'RSVP - Texto inicial', page: 'rsvp' },
-  { id: 'rsvp-attendance-title', label: 'RSVP - Título asistencia', page: 'rsvp' },
-  { id: 'rsvp-attendance-option-yes-label', label: 'RSVP - Opción sí (texto visible)', page: 'rsvp' },
-  { id: 'rsvp-attendance-option-yes-value', label: 'RSVP - Opción sí (valor)', page: 'rsvp' },
-  { id: 'rsvp-attendance-option-kids-label', label: 'RSVP - Opción con niños (texto visible)', page: 'rsvp' },
-  { id: 'rsvp-attendance-option-kids-value', label: 'RSVP - Opción con niños (valor)', page: 'rsvp' },
-  { id: 'rsvp-attendance-option-no-label', label: 'RSVP - Opción no (texto visible)', page: 'rsvp' },
-  { id: 'rsvp-attendance-option-no-value', label: 'RSVP - Opción no (valor)', page: 'rsvp' },
-  { id: 'rsvp-success-title', label: 'RSVP - Título éxito', page: 'rsvp' },
-  { id: 'rsvp-success-text', label: 'RSVP - Texto éxito', page: 'rsvp' },
-  { id: 'rsvp-success-closing', label: 'RSVP - Cierre éxito', page: 'rsvp' },
-  { id: 'rsvp-success-button', label: 'RSVP - Texto botón éxito', page: 'rsvp' },
-];
-
-const PAGE_LABELS: Record<string, string> = {
-  principal: 'Página Principal',
-  info: 'Página Información',
-  coruna: 'Página A Coruña',
-  rsvp: 'Página RSVP',
-};
-
-const FIXED_IDS = new Set(PREVIEW_ITEMS.map(item => item.id));
-const FIXED_ORDER_BY_ID = PREVIEW_ITEMS.reduce((acc, item, index) => {
+const FIXED_IDS = new Set(ADMIN_PREVIEW_ITEMS.map(item => item.id));
+const FIXED_ORDER_BY_ID = ADMIN_PREVIEW_ITEMS.reduce((acc, item, index) => {
   acc[item.id] = index * 10;
   return acc;
 }, {} as Record<string, number>);
@@ -269,7 +214,7 @@ export default function AdminPanel() {
   );
 
   const allDisplaySections = useMemo(() => {
-    const fixedSections = PREVIEW_ITEMS.map(item => {
+    const fixedSections = ADMIN_PREVIEW_ITEMS.map(item => {
       const existing = sectionById.get(item.id);
       return existing || {
         id: item.id,
@@ -619,7 +564,13 @@ export default function AdminPanel() {
   };
 
   const renderCustomSections = (pageId: string) => {
-    const custom = customSectionsByPage.get(pageId) || [];
+    const custom = (customSectionsByPage.get(pageId) || []).filter(section => {
+      if (pageId !== 'info') {
+        return true;
+      }
+
+      return !shouldHideInfoDynamicSection(section.title);
+    });
     return custom.map(section => (
       <div key={section.id} className="inline-section-block">
         <section className="admin-mirror-section info-section">
@@ -852,6 +803,16 @@ export default function AdminPanel() {
                   {renderEditableField(getSection('rsvp-attendance-title', 'rsvp'), 'content', { as: 'h3', allowEnter: false })}
 
                   <div className="admin-bus-row">
+                    {renderEditableField(getSection('rsvp-search-placeholder', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-no-results-text', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+
+                  <div className="admin-bus-row">
+                    {renderEditableField(getSection('rsvp-selected-guest-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-change-guest-button', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+
+                  <div className="admin-bus-row">
                     {renderEditableField(getSection('rsvp-attendance-option-yes-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
                     {renderEditableField(getSection('rsvp-attendance-option-yes-value', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
                   </div>
@@ -864,6 +825,21 @@ export default function AdminPanel() {
                   <div className="admin-bus-row">
                     {renderEditableField(getSection('rsvp-attendance-option-no-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
                     {renderEditableField(getSection('rsvp-attendance-option-no-value', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+
+                  <div className="admin-bus-row">
+                    {renderEditableField(getSection('rsvp-notes-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-notes-placeholder', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+
+                  <div className="admin-bus-row">
+                    {renderEditableField(getSection('rsvp-submit-button', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-submitting-button', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+
+                  <div className="admin-bus-row">
+                    {renderEditableField(getSection('rsvp-validation-alert', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-submit-error-alert', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
                   </div>
                 </section>
 

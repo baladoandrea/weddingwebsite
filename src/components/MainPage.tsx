@@ -3,25 +3,12 @@ import Header from './Header';
 import Footer from './Footer';
 import MapEmbed from './MapEmbed';
 import useWebsiteTexts from '../utils/useWebsiteTexts';
+import { getReservedSectionIds } from '../utils/textSyncConfig';
 
 export default function MainPage() {
   const [showText, setShowText] = useState(false);
   const { getText, getCustomSections } = useWebsiteTexts();
-  const customSections = getCustomSections('principal', [
-    'main-quote',
-    'location-title',
-    'location-city-label',
-    'location-city-value',
-    'location-date-label',
-    'location-date-value',
-    'location-time-label',
-    'location-time-value',
-    'location-place-label',
-    'location-place-value',
-    'location-address-label',
-    'location-address-value',
-    'map-embed-url',
-  ]);
+  const customSections = getCustomSections('principal', getReservedSectionIds('principal'));
 
   useEffect(() => {
     setTimeout(() => setShowText(true), 500);
