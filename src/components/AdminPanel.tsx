@@ -1304,16 +1304,6 @@ export default function AdminPanel() {
                   {renderEditableField(getSection('rsvp-attendance-title', 'rsvp'), 'content', { as: 'h3', allowEnter: false })}
 
                   <div className="admin-bus-row">
-                    {renderEditableField(getSection('rsvp-search-placeholder', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
-                    {renderEditableField(getSection('rsvp-no-results-text', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
-                  </div>
-
-                  <div className="admin-bus-row">
-                    {renderEditableField(getSection('rsvp-selected-guest-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
-                    {renderEditableField(getSection('rsvp-change-guest-button', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
-                  </div>
-
-                  <div className="admin-bus-row">
                     {renderEditableField(getSection('rsvp-attendance-option-yes-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
                     {renderEditableField(getSection('rsvp-attendance-option-yes-value', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
                   </div>
@@ -1326,6 +1316,20 @@ export default function AdminPanel() {
                   <div className="admin-bus-row">
                     {renderEditableField(getSection('rsvp-attendance-option-no-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
                     {renderEditableField(getSection('rsvp-attendance-option-no-value', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+                </section>
+
+                <section className="attendance-options admin-mirror-section">
+                  <h3>Textos del formulario</h3>
+
+                  <div className="admin-bus-row">
+                    {renderEditableField(getSection('rsvp-search-placeholder', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-no-results-text', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+
+                  <div className="admin-bus-row">
+                    {renderEditableField(getSection('rsvp-selected-guest-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-change-guest-button', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
                   </div>
 
                   <div className="admin-bus-row">
