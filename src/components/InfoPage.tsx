@@ -38,17 +38,24 @@ const isValidSpotifyEmbedUrl = (value: string): boolean => {
 };
 
 export default function InfoPage() {
-  const { getText, getCustomSections } = useWebsiteTexts();
-  const busOutText = getText('bus-out-text', '');
-  const busReturnText = getText('bus-return-text', '');
-  const mapsDirectionsUrl = getText(
-    'map-directions-url',
-    DEFAULT_MAPS_DIRECTIONS_URL
-  );
-  const spotifyEmbedUrl = getText(
-    'spotify-playlist-url',
-    DEFAULT_SPOTIFY_EMBED_URL
-  );
+  const { getSection, getText, getCustomSections } = useWebsiteTexts();
+  const carSection = getSection('car-section', {
+    title: 'Cómo llegar en coche',
+    content: 'Para llegar al Casón Amor en coche, dirígete hacia el centro de A Coruña y sigue las indicaciones hacia la zona de la Ciudad Vieja o Torre de Hércules. Existen zonas de aparcamiento habilitadas en las inmediaciones.',
+    page: 'info',
+  });
+  const questionsSection = getSection('questions-section', {
+    title: '¿Alguna duda?',
+    content: 'Si tienes cualquier duda, petición o lo que sea, puedes escribirnos a Sergio o Marta.',
+    page: 'info',
+  });
+  const giftSection = getSection('gift-section', {
+    title: 'Regalo',
+    content: 'Vuestra presencia es nuestro mejor regalo. Pero si queréis tener un detalle con nosotros para nuestra nueva etapa, podéis hacerlo a través del siguiente número de cuenta:',
+    page: 'info',
+  });
+  const mapsDirectionsUrl = getText('map-directions-url', DEFAULT_MAPS_DIRECTIONS_URL);
+  const spotifyEmbedUrl = getText('spotify-playlist-url', DEFAULT_SPOTIFY_EMBED_URL);
   const safeMapsDirectionsUrl = isValidGoogleMapsUrl(mapsDirectionsUrl)
     ? mapsDirectionsUrl
     : DEFAULT_MAPS_DIRECTIONS_URL;
@@ -79,10 +86,8 @@ export default function InfoPage() {
         <h2>¿Cómo llegar?</h2>
 
         <article className="subsection">
-          <h3>En coche</h3>
-          <p>
-            {getText('car-section', 'Para llegar al Casón Amor en coche, dirígete hacia el centro de A Coruña y sigue las indicaciones hacia la zona de la Ciudad Vieja o Torre de Hércules. Existen zonas de aparcamiento habilitadas en las inmediaciones.')}
-          </p>
+          <h3>{carSection.title}</h3>
+          <p>{carSection.content}</p>
         </article>
 
         <article className="subsection">
@@ -122,23 +127,15 @@ export default function InfoPage() {
       </section>
 
       <section className="info-section">
-        <h2>¿Alguna duda?</h2>
-        <p>
-          {getText('questions-section', 'Si tienes cualquier duda, petición o lo que sea, puedes escribirnos a Sergio o Marta.')}
-        </p>
+        <h2>{questionsSection.title}</h2>
+        <p>{questionsSection.content}</p>
       </section>
 
       {/* Gift Section */}
       <section className="info-section gift-section">
-        <h2>Regalo</h2>
+        <h2>{giftSection.title}</h2>
         <div className="gift-content">
-          <p>
-            {getText('gift-section', 'Vuestra presencia es nuestro mejor regalo. Pero si queréis tener un detalle con nosotros para nuestra nueva etapa, podéis hacerlo a través del siguiente número de cuenta:')}
-          </p>
-          <div className="bank-info">
-            <code>ES12 3456 7890 0000 0000</code>
-            <span className="bank-name">Banco Ejemplo</span>
-          </div>
+          <p>{giftSection.content}</p>
         </div>
       </section>
 

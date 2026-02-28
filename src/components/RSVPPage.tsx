@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import useWebsiteTexts from '../utils/useWebsiteTexts';
 
 interface Guest {
   id: string;
@@ -19,6 +20,73 @@ interface RSVPFormData {
 const MIN_SEARCH_CHARS = 7;
 
 export default function RSVPPage() {
+  const { getSection } = useWebsiteTexts();
+  const introTitle = getSection('rsvp-intro-title', {
+    title: 'RSVP - Título inicial',
+    content: '¿Contamos contigo?',
+    page: 'rsvp',
+  });
+  const introText = getSection('rsvp-intro-text', {
+    title: 'RSVP - Texto inicial',
+    content: '¡Nos hace muchísima ilusión compartir este día contigo! Para ayudarnos a organizarlo todo a la perfección, por favor introduce tu nombre. Si estás en la lista, podrás confirmarnos si vienes y puedes dejarnos un mensajito en las notas. ¡Estamos deseando leerte!',
+    page: 'rsvp',
+  });
+  const attendanceTitle = getSection('rsvp-attendance-title', {
+    title: 'RSVP - Título asistencia',
+    content: '¿Vas a asistir?',
+    page: 'rsvp',
+  });
+  const optionYesLabel = getSection('rsvp-attendance-option-yes-label', {
+    title: 'RSVP - Opción sí (texto visible)',
+    content: 'Sí, allí estaré. Contad conmigo.',
+    page: 'rsvp',
+  });
+  const optionYesValue = getSection('rsvp-attendance-option-yes-value', {
+    title: 'RSVP - Opción sí (valor)',
+    content: 'Sí, allí estaré',
+    page: 'rsvp',
+  });
+  const optionKidsLabel = getSection('rsvp-attendance-option-kids-label', {
+    title: 'RSVP - Opción con niños (texto visible)',
+    content: 'Sí, asistiré con niños.',
+    page: 'rsvp',
+  });
+  const optionKidsValue = getSection('rsvp-attendance-option-kids-value', {
+    title: 'RSVP - Opción con niños (valor)',
+    content: 'Con niños',
+    page: 'rsvp',
+  });
+  const optionNoLabel = getSection('rsvp-attendance-option-no-label', {
+    title: 'RSVP - Opción no (texto visible)',
+    content: 'Me encantaría, pero no puedo ir.',
+    page: 'rsvp',
+  });
+  const optionNoValue = getSection('rsvp-attendance-option-no-value', {
+    title: 'RSVP - Opción no (valor)',
+    content: 'No puedo',
+    page: 'rsvp',
+  });
+  const successTitle = getSection('rsvp-success-title', {
+    title: 'RSVP - Título éxito',
+    content: '¡Gracias!',
+    page: 'rsvp',
+  });
+  const successText = getSection('rsvp-success-text', {
+    title: 'RSVP - Texto éxito',
+    content: 'Nos hace muchísima ilusión que confirmes tu asistencia.',
+    page: 'rsvp',
+  });
+  const successClosing = getSection('rsvp-success-closing', {
+    title: 'RSVP - Cierre éxito',
+    content: 'Te esperamos el 29 de agosto en A Coruña. ¡Será un día inolvidable!',
+    page: 'rsvp',
+  });
+  const successButton = getSection('rsvp-success-button', {
+    title: 'RSVP - Texto botón éxito',
+    content: 'Volver al inicio',
+    page: 'rsvp',
+  });
+
   const [guests, setGuests] = useState<Guest[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [matchedGuests, setMatchedGuests] = useState<Guest[]>([]);
@@ -135,8 +203,8 @@ export default function RSVPPage() {
         <Header />
         <div className="rsvp-success">
           <div className="success-modal">
-            <h2>¡Gracias!</h2>
-            <p>Nos hace muchísima ilusión que confirmes tu asistencia.</p>
+            <h2>{successTitle.content}</h2>
+            <p>{successText.content}</p>
 
             {successImage && (
               <img
@@ -146,12 +214,10 @@ export default function RSVPPage() {
               />
             )}
 
-            <p className="success-text">
-              Te esperamos el 29 de agosto en A Coruña. ¡Será un día inolvidable!
-            </p>
+            <p className="success-text">{successClosing.content}</p>
 
             <a href="/" className="btn-primary">
-              Volver al inicio
+              {successButton.content}
             </a>
           </div>
         </div>
@@ -165,13 +231,8 @@ export default function RSVPPage() {
       <Header />
 
       <section className="rsvp-header">
-        <h2>¿Contamos contigo?</h2>
-        <p className="rsvp-subtitle">
-          ¡Nos hace muchísima ilusión compartir este día contigo! Para ayudarnos
-          a organizarlo todo a la perfección, por favor introduce tu nombre. Si
-          estás en la lista, podrás confirmarnos si vienes y puedes dejarnos un
-          mensajito en las notas. ¡Estamos deseando leerte!
-        </p>
+        <h2>{introTitle.content}</h2>
+        <p className="rsvp-subtitle">{introText.content}</p>
       </section>
 
       <section className="rsvp-form-section">
@@ -226,39 +287,39 @@ export default function RSVPPage() {
             </div>
 
             <div className="attendance-options">
-              <h3>¿Vas a asistir?</h3>
+              <h3>{attendanceTitle.content}</h3>
 
                 <label className="attendance-option">
                 <input
                   type="radio"
                   name="attendance"
-                  value="Sí, allí estaré"
-                  checked={formData.attendance === 'Sí, allí estaré'}
+                  value={optionYesValue.content}
+                  checked={formData.attendance === optionYesValue.content}
                   onChange={e => handleAttendanceChange(e.target.value)}
                 />
-                <span className="option-text">Sí, allí estaré. Contad conmigo.</span>
+                <span className="option-text">{optionYesLabel.content}</span>
               </label>
 
               <label className="attendance-option">
                 <input
                   type="radio"
                   name="attendance"
-                  value="Con niños"
-                  checked={formData.attendance === 'Con niños'}
+                  value={optionKidsValue.content}
+                  checked={formData.attendance === optionKidsValue.content}
                   onChange={e => handleAttendanceChange(e.target.value)}
                 />
-                <span className="option-text">Sí, asistiré con niños.</span>
+                <span className="option-text">{optionKidsLabel.content}</span>
               </label>
 
               <label className="attendance-option">
                 <input
                   type="radio"
                   name="attendance"
-                  value="No puedo"
-                  checked={formData.attendance === 'No puedo'}
+                  value={optionNoValue.content}
+                  checked={formData.attendance === optionNoValue.content}
                   onChange={e => handleAttendanceChange(e.target.value)}
                 />
-                <span className="option-text">Me encantaría, pero no puedo ir.</span>
+                <span className="option-text">{optionNoLabel.content}</span>
               </label>
             </div>
 

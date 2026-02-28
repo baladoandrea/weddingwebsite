@@ -57,12 +57,26 @@ const PREVIEW_ITEMS: PreviewItem[] = [
   { id: 'drink-section', label: 'Dónde beber', page: 'coruna' },
   { id: 'stay-section', label: 'Dónde alojarse', page: 'coruna' },
   { id: 'see-section', label: 'Qué ver', page: 'coruna' },
+  { id: 'rsvp-intro-title', label: 'RSVP - Título inicial', page: 'rsvp' },
+  { id: 'rsvp-intro-text', label: 'RSVP - Texto inicial', page: 'rsvp' },
+  { id: 'rsvp-attendance-title', label: 'RSVP - Título asistencia', page: 'rsvp' },
+  { id: 'rsvp-attendance-option-yes-label', label: 'RSVP - Opción sí (texto visible)', page: 'rsvp' },
+  { id: 'rsvp-attendance-option-yes-value', label: 'RSVP - Opción sí (valor)', page: 'rsvp' },
+  { id: 'rsvp-attendance-option-kids-label', label: 'RSVP - Opción con niños (texto visible)', page: 'rsvp' },
+  { id: 'rsvp-attendance-option-kids-value', label: 'RSVP - Opción con niños (valor)', page: 'rsvp' },
+  { id: 'rsvp-attendance-option-no-label', label: 'RSVP - Opción no (texto visible)', page: 'rsvp' },
+  { id: 'rsvp-attendance-option-no-value', label: 'RSVP - Opción no (valor)', page: 'rsvp' },
+  { id: 'rsvp-success-title', label: 'RSVP - Título éxito', page: 'rsvp' },
+  { id: 'rsvp-success-text', label: 'RSVP - Texto éxito', page: 'rsvp' },
+  { id: 'rsvp-success-closing', label: 'RSVP - Cierre éxito', page: 'rsvp' },
+  { id: 'rsvp-success-button', label: 'RSVP - Texto botón éxito', page: 'rsvp' },
 ];
 
 const PAGE_LABELS: Record<string, string> = {
   principal: 'Página Principal',
   info: 'Página Información',
   coruna: 'Página A Coruña',
+  rsvp: 'Página RSVP',
 };
 
 const FIXED_IDS = new Set(PREVIEW_ITEMS.map(item => item.id));
@@ -162,7 +176,7 @@ export default function AdminPanel() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'texts' | 'gallery' | 'guests'>('texts');
-  const [selectedPage, setSelectedPage] = useState<'all' | 'principal' | 'info' | 'coruna'>('all');
+  const [selectedPage, setSelectedPage] = useState<'all' | 'principal' | 'info' | 'coruna' | 'rsvp'>('all');
 
   const [sections, setSections] = useState<Section[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
@@ -682,6 +696,9 @@ export default function AdminPanel() {
               <button className={`page-filter-btn ${selectedPage === 'coruna' ? 'active' : ''}`} onClick={() => setSelectedPage('coruna')}>
                 A Coruña
               </button>
+              <button className={`page-filter-btn ${selectedPage === 'rsvp' ? 'active' : ''}`} onClick={() => setSelectedPage('rsvp')}>
+                RSVP
+              </button>
             </div>
 
             {(selectedPage === 'all' || selectedPage === 'principal') && (
@@ -739,7 +756,10 @@ export default function AdminPanel() {
 
                 <section className="info-section admin-mirror-section">
                   <h2>¿Cómo llegar?</h2>
-                  <article className="subsection">{renderEditableField(getSection('car-section', 'info'), 'content')}</article>
+                  <article className="subsection">
+                    {renderEditableField(getSection('car-section', 'info'), 'title', { as: 'h3', allowEnter: false })}
+                    {renderEditableField(getSection('car-section', 'info'), 'content')}
+                  </article>
                   <article className="subsection">
                     <div className="bus-info">
                       <div className="admin-bus-row">
@@ -758,14 +778,14 @@ export default function AdminPanel() {
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'bus-return-text')}>+</button></div>
 
                 <section className="info-section admin-mirror-section">
-                  <h2>¿Alguna duda?</h2>
+                  {renderEditableField(getSection('questions-section', 'info'), 'title', { as: 'h2', allowEnter: false })}
                   {renderEditableField(getSection('questions-section', 'info'), 'content')}
                 </section>
 
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'questions-section')}>+</button></div>
 
                 <section className="info-section gift-section admin-mirror-section">
-                  <h2>Regalo</h2>
+                  {renderEditableField(getSection('gift-section', 'info'), 'title', { as: 'h2', allowEnter: false })}
                   {renderEditableField(getSection('gift-section', 'info'), 'content')}
                 </section>
 
@@ -792,16 +812,75 @@ export default function AdminPanel() {
                 <h3 className="admin-live-page-title">{PAGE_LABELS.coruna}</h3>
                 <div className="coruna-hero"><img src="/assets/imagen03.png" alt="A Coruña" className="coruna-hero-img" /></div>
 
-                <section className="coruna-section admin-mirror-section"><h2>Dónde comer</h2>{renderEditableField(getSection('eat-section', 'coruna'), 'content')}</section>
+                <section className="coruna-section admin-mirror-section">
+                  {renderEditableField(getSection('eat-section', 'coruna'), 'title', { as: 'h2', allowEnter: false })}
+                  {renderEditableField(getSection('eat-section', 'coruna'), 'content')}
+                </section>
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'eat-section')}>+</button></div>
-                <section className="coruna-section admin-mirror-section"><h2>Dónde beber</h2>{renderEditableField(getSection('drink-section', 'coruna'), 'content')}</section>
+                <section className="coruna-section admin-mirror-section">
+                  {renderEditableField(getSection('drink-section', 'coruna'), 'title', { as: 'h2', allowEnter: false })}
+                  {renderEditableField(getSection('drink-section', 'coruna'), 'content')}
+                </section>
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'drink-section')}>+</button></div>
-                <section className="coruna-section admin-mirror-section"><h2>Dónde alojarse</h2>{renderEditableField(getSection('stay-section', 'coruna'), 'content')}</section>
+                <section className="coruna-section admin-mirror-section">
+                  {renderEditableField(getSection('stay-section', 'coruna'), 'title', { as: 'h2', allowEnter: false })}
+                  {renderEditableField(getSection('stay-section', 'coruna'), 'content')}
+                </section>
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'stay-section')}>+</button></div>
-                <section className="coruna-section admin-mirror-section"><h2>Qué ver</h2>{renderEditableField(getSection('see-section', 'coruna'), 'content')}</section>
+                <section className="coruna-section admin-mirror-section">
+                  {renderEditableField(getSection('see-section', 'coruna'), 'title', { as: 'h2', allowEnter: false })}
+                  {renderEditableField(getSection('see-section', 'coruna'), 'content')}
+                </section>
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'see-section')}>+</button></div>
 
                 {renderCustomSections('coruna')}
+              </section>
+            )}
+
+            {(selectedPage === 'all' || selectedPage === 'rsvp') && (
+              <section className="admin-live-page admin-mirror-page rsvp-mirror">
+                <h3 className="admin-live-page-title">{PAGE_LABELS.rsvp}</h3>
+
+                <section className="rsvp-header admin-mirror-section">
+                  {renderEditableField(getSection('rsvp-intro-title', 'rsvp'), 'content', { as: 'h2', allowEnter: false })}
+                  {renderEditableField(getSection('rsvp-intro-text', 'rsvp'), 'content')}
+                </section>
+
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('rsvp', 'rsvp-intro-text')}>+</button></div>
+
+                <section className="attendance-options admin-mirror-section">
+                  {renderEditableField(getSection('rsvp-attendance-title', 'rsvp'), 'content', { as: 'h3', allowEnter: false })}
+
+                  <div className="admin-bus-row">
+                    {renderEditableField(getSection('rsvp-attendance-option-yes-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-attendance-option-yes-value', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+
+                  <div className="admin-bus-row">
+                    {renderEditableField(getSection('rsvp-attendance-option-kids-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-attendance-option-kids-value', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+
+                  <div className="admin-bus-row">
+                    {renderEditableField(getSection('rsvp-attendance-option-no-label', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-attendance-option-no-value', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+                </section>
+
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('rsvp', 'rsvp-attendance-option-no-value')}>+</button></div>
+
+                <section className="rsvp-success admin-mirror-section">
+                  <div className="success-modal">
+                    {renderEditableField(getSection('rsvp-success-title', 'rsvp'), 'content', { as: 'h2', allowEnter: false })}
+                    {renderEditableField(getSection('rsvp-success-text', 'rsvp'), 'content')}
+                    {renderEditableField(getSection('rsvp-success-closing', 'rsvp'), 'content')}
+                    {renderEditableField(getSection('rsvp-success-button', 'rsvp'), 'content', { as: 'span', allowEnter: false })}
+                  </div>
+                </section>
+
+                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('rsvp', 'rsvp-success-button')}>+</button></div>
+
+                {renderCustomSections('rsvp')}
               </section>
             )}
 

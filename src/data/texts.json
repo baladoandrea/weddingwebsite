@@ -154,5 +154,83 @@
     "title": "Qué ver",
     "content": "Un partido del Depor en Riazor, derrota garantizada.",
     "page": "coruna"
+  },
+  {
+    "id": "rsvp-intro-title",
+    "title": "RSVP - Título inicial",
+    "content": "¿Contamos contigo?",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-intro-text",
+    "title": "RSVP - Texto inicial",
+    "content": "¡Nos hace muchísima ilusión compartir este día contigo! Para ayudarnos a organizarlo todo a la perfección, por favor introduce tu nombre. Si estás en la lista, podrás confirmarnos si vienes y puedes dejarnos un mensajito en las notas. ¡Estamos deseando leerte!",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-attendance-title",
+    "title": "RSVP - Título asistencia",
+    "content": "¿Vas a asistir?",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-attendance-option-yes-label",
+    "title": "RSVP - Opción sí (texto visible)",
+    "content": "Sí, allí estaré. Contad conmigo.",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-attendance-option-yes-value",
+    "title": "RSVP - Opción sí (valor)",
+    "content": "Sí, allí estaré",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-attendance-option-kids-label",
+    "title": "RSVP - Opción con niños (texto visible)",
+    "content": "Sí, asistiré con niños.",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-attendance-option-kids-value",
+    "title": "RSVP - Opción con niños (valor)",
+    "content": "Con niños",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-attendance-option-no-label",
+    "title": "RSVP - Opción no (texto visible)",
+    "content": "Me encantaría, pero no puedo ir.",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-attendance-option-no-value",
+    "title": "RSVP - Opción no (valor)",
+    "content": "No puedo",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-success-title",
+    "title": "RSVP - Título éxito",
+    "content": "¡Gracias!",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-success-text",
+    "title": "RSVP - Texto éxito",
+    "content": "Nos hace muchísima ilusión que confirmes tu asistencia.",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-success-closing",
+    "title": "RSVP - Cierre éxito",
+    "content": "Te esperamos el 29 de agosto en A Coruña. ¡Será un día inolvidable!",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-success-button",
+    "title": "RSVP - Texto botón éxito",
+    "content": "Volver al inicio",
+    "page": "rsvp"
   }
 ]

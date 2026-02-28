@@ -3,7 +3,27 @@ import Footer from './Footer';
 import useWebsiteTexts from '../utils/useWebsiteTexts';
 
 export default function CorunaPage() {
-  const { getText, getCustomSections } = useWebsiteTexts();
+  const { getSection, getCustomSections } = useWebsiteTexts();
+  const eatSection = getSection('eat-section', {
+    title: 'Dónde comer',
+    content: 'No puedes irte de A Coruña sin probar el pulpo a feira.',
+    page: 'coruna',
+  });
+  const drinkSection = getSection('drink-section', {
+    title: 'Dónde beber',
+    content: 'Más conocida como la estrella, esta cervecería es una parada imprescindible en A Coruña.',
+    page: 'coruna',
+  });
+  const staySection = getSection('stay-section', {
+    title: 'Dónde alojarse',
+    content: 'Buen anfitrión, mejor abuelo. Un lugar acogedor donde te sentirás como en casa. Atención personalizada y un ambiente familiar.',
+    page: 'coruna',
+  });
+  const seeSection = getSection('see-section', {
+    title: 'Qué ver',
+    content: 'Hogar del Deportivo de La Coruña. Si tienes la oportunidad, ve a un partido del depor, derrota garantizada.',
+    page: 'coruna',
+  });
   const customSections = getCustomSections('coruna', [
     'eat-section',
     'drink-section',
@@ -36,88 +56,43 @@ export default function CorunaPage() {
 
       {/* Where to Eat */}
       <section className="coruna-section">
-        <h2>Dónde comer</h2>
+        <h2>{eatSection.title}</h2>
         <img src="/assets/imagen05.png" alt="Dónde comer" className="section-image" />
         <div className="content-cards">
           <article className="recommendation-card">
-            <h3>A Pulpeira de Melide</h3>
-            <p>
-            {getText('eat-section', 'No puedes irte de A Coruña sin probar el pulpo a feira.')}
-            </p>
-          </article>
-
-          <article className="recommendation-card">
-            <h3>Casa Virginia</h3>
-            <p>
-              Cocina de la mejor calidad. Recomendado el caldo gallego y
-              las filloas, todo hecho con amor y dedicación.
-            </p>
+            <p>{eatSection.content}</p>
           </article>
         </div>
       </section>
 
       {/* Where to Drink */}
       <section className="coruna-section">
-        <h2>Dónde beber</h2>
+        <h2>{drinkSection.title}</h2>
         <img src="/assets/imagen06.png" alt="Dónde beber" className="section-image" />
         <div className="content-cards">
           <article className="recommendation-card">
-            <h3>La Cervecería</h3>
-            <p>
-              {getText('drink-section', 'Más conocida como la estrella, esta cervecería es una parada imprescindible en A Coruña.')}
-            </p>
-          </article>
-
-          <article className="recommendation-card">
-            <h3>Calle Galera</h3>
-            <p>
-              Repleta de buenos bares y establecimientos con auténtico ambiente
-              coruñés. Ideal para disfrutar de la noche en compañía y probar la
-              gastronomía local.
-            </p>
+            <p>{drinkSection.content}</p>
           </article>
         </div>
       </section>
 
       {/* Where to Stay */}
       <section className="coruna-section">
-        <h2>Dónde alojarse</h2>
+        <h2>{staySection.title}</h2>
         <img src="/assets/alojamiento.png" alt="Dónde alojarse" className="section-image" />
         <div className="content-cards">
           <article className="recommendation-card">
-            <h3>Casa Gerardo</h3>
-            <p>
-              {getText('stay-section', ' Buen anfitrión, mejor abuelo. Un lugar acogedor donde te sentirás como\nen casa. Atención personalizada y un ambiente familiar.')}
-            </p>
+            <p>{staySection.content}</p>
           </article>
         </div>
       </section>
 
       {/* What to See */}
       <section className="coruna-section">
-        <h2>Qué ver</h2>
+        <h2>{seeSection.title}</h2>
         <div className="content-cards">
           <article className="recommendation-card">
-            <h3>Estadio de Riazor</h3>
-              <p>
-              {getText('see-section', 'Hogar del Deportivo de La Coruña. Si tienes la oportunidad, ve a un partido del depor, derrota garantizada.')}
-            </p>
-          </article>
-
-          <article className="recommendation-card">
-            <h3>Torre de Hércules</h3>
-            <p>
-              El faro más antiguo del mundo en funcionamiento. Vistas
-              espectaculares del Atlántico.
-            </p>
-          </article>
-
-          <article className="recommendation-card">
-            <h3>Paseo Marítimo</h3>
-            <p>
-              Camina por el hermoso paseo marítimo, respira el aire del mar y
-              disfruta de las vistas.
-            </p>
+            <p>{seeSection.content}</p>
           </article>
         </div>
       </section>

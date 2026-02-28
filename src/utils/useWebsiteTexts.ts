@@ -6,6 +6,7 @@ interface Section {
   title: string;
   content: string;
   page: string;
+  order?: number;
 }
 
 export default function useWebsiteTexts() {
@@ -38,11 +39,33 @@ export default function useWebsiteTexts() {
     return section?.content || fallback;
   };
 
+  const getSection = (
+    id: string,
+    fallback: Pick<Section, 'title' | 'content' | 'page'>
+  ): Section => {
+    const section = sections.find(item => item.id === id);
+    if (section) {
+      return section;
+    }
+
+    return {
+      id,
+      title: fallback.title,
+      content: fallback.content,
+      page: fallback.page,
+    };
+  };
+
+  const getTitle = (id: string, fallback: string): string => {
+    const section = sections.find(item => item.id === id);
+    return section?.title || fallback;
+  };
+
   const getCustomSections = (page: string, excludedIds: string[] = []): Section[] => {
     const excludedSet = new Set(excludedIds);
 
     return sections.filter(section => section.page === page && !excludedSet.has(section.id));
   };
 
-  return { getText, getCustomSections };
+  return { getText, getTitle, getSection, getCustomSections };
 }
