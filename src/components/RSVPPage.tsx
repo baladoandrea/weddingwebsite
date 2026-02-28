@@ -96,6 +96,7 @@ export default function RSVPPage() {
   const submittingButton = getText('rsvp-submitting-button', 'Enviando...');
   const validationAlert = getText('rsvp-validation-alert', 'Por favor selecciona tu nombre y una opción de asistencia');
   const submitErrorAlert = getText('rsvp-submit-error-alert', 'Error al enviar la confirmación');
+  const bottomImageUrl = getText('rsvp-bottom-image-url', '/assets/imagen04.png');
 
   const [guests, setGuests] = useState<Guest[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -356,7 +357,7 @@ export default function RSVPPage() {
       </section>
 
       <Footer />
-      <img src="/assets/imagen04.png" alt="RSVP" className="rsvp-bottom-img" style={{width:'100%',maxWidth:400,margin:'24px auto 0',display:'block',borderRadius:'12px'}} />
+      <img src={bottomImageUrl} alt="RSVP" className="rsvp-bottom-img" style={{width:'100%',maxWidth:400,margin:'24px auto 0',display:'block',borderRadius:'12px'}} />
     </div>
   );
 }

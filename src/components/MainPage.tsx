@@ -9,6 +9,9 @@ export default function MainPage() {
   const [showText, setShowText] = useState(false);
   const { getText, getCustomSections } = useWebsiteTexts();
   const customSections = getCustomSections('principal', getReservedSectionIds('principal'));
+  const mainPhotoUrl = getText('main-photo-image-url', '/assets/imagen01.png');
+  const eventDateText = getText('main-event-date-text', 'Boda Marta & Sergio · 29 de Agosto de 2026');
+  const ctaButtonText = getText('main-cta-button-text', '✓ Confirmar Asistencia');
 
   useEffect(() => {
     setTimeout(() => setShowText(true), 500);
@@ -32,10 +35,10 @@ export default function MainPage() {
           <h2 className="main-quote">
             {getText('main-quote', 'En el Atlántico nos prometimos, y ante el mar queremos celebrar...')}
           </h2>
-          <p className="event-date">Boda Marta & Sergio · 29 de Agosto de 2026</p>
+          <p className="event-date">{eventDateText}</p>
 
           <a href="/rsvp" className="btn-primary">
-            ✓ Confirmar Asistencia
+            {ctaButtonText}
           </a>
         </div>
       </section>
@@ -43,7 +46,7 @@ export default function MainPage() {
       {/* Photo Section */}
       <section className="photo-section">
         <img
-          src="/assets/imagen01.png"
+          src={mainPhotoUrl}
           alt="Marta y Sergio"
           className="main-photo fade-in"
         />

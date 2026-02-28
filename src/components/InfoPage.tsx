@@ -57,6 +57,12 @@ export default function InfoPage() {
   });
   const mapsDirectionsUrl = getText('map-directions-url', DEFAULT_MAPS_DIRECTIONS_URL);
   const spotifyEmbedUrl = getText('spotify-playlist-url', DEFAULT_SPOTIFY_EMBED_URL);
+  const infoHeroImageUrl = getText('info-hero-image-url', '/assets/imagen02.png');
+  const infoMapImageUrl = getText('info-map-image-url', '/assets/mapa.png');
+  const howToTitle = getText('info-howto-title', '¿Cómo llegar?');
+  const busTitle = getText('info-bus-title', 'En autobús');
+  const mapLinkText = getText('info-map-link-text', 'Ver ubicación en Maps');
+  const playlistTitle = getText('info-playlist-title', 'Ve calentando motores');
   const safeMapsDirectionsUrl = isValidGoogleMapsUrl(mapsDirectionsUrl)
     ? mapsDirectionsUrl
     : DEFAULT_MAPS_DIRECTIONS_URL;
@@ -71,11 +77,11 @@ export default function InfoPage() {
       <Header />
 
       {/* Imagen superior */}
-      <img src="/assets/imagen02.png" alt="Cómo llegar" className="info-hero-img" style={{width:'100%',maxWidth:500,margin:'0 auto 24px',display:'block',borderRadius:'12px'}} />
+      <img src={infoHeroImageUrl} alt="Cómo llegar" className="info-hero-img" style={{width:'100%',maxWidth:500,margin:'0 auto 24px',display:'block',borderRadius:'12px'}} />
 
       {/* How to Get There */}
       <section className="info-section">
-        <h2>¿Cómo llegar?</h2>
+        <h2>{howToTitle}</h2>
 
         <article className="subsection">
           <h3>{carSection.title}</h3>
@@ -83,7 +89,7 @@ export default function InfoPage() {
         </article>
 
         <article className="subsection">
-          <h3>En autobús</h3>
+          <h3>{busTitle}</h3>
           <div className="bus-info">
             <p>
               <strong>{getText('bus-out-label', 'Salida:')}</strong>{' '}
@@ -110,11 +116,11 @@ export default function InfoPage() {
               rel="noopener noreferrer"
               className="map-link"
             >
-              Ver ubicación en Maps
+              {mapLinkText}
             </a>
 
           {/* Imagen de mapa */}
-          <img src="/assets/mapa.png" alt="Mapa ubicación" className="info-map-img" style={{width:'100%',maxWidth:400,margin:'16px auto 0',display:'block',borderRadius:'12px'}} />
+          <img src={infoMapImageUrl} alt="Mapa ubicación" className="info-map-img" style={{width:'100%',maxWidth:400,margin:'16px auto 0',display:'block',borderRadius:'12px'}} />
         </article>
       </section>
 
@@ -133,7 +139,7 @@ export default function InfoPage() {
 
       {/* Spotify Playlist */}
       <section className="info-section playlist-section">
-        <h2>Ve calentando motores</h2>
+        <h2>{playlistTitle}</h2>
         <div className="spotify-embed">
           <iframe
             style={{ borderRadius: '12px' }}

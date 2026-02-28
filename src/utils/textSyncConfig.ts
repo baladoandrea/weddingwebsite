@@ -8,7 +8,12 @@ export interface PreviewItem {
 }
 
 export const ADMIN_PREVIEW_ITEMS: PreviewItem[] = [
+  { id: 'site-header-title', label: 'Global - Título cabecera', page: 'principal' },
+  { id: 'site-footer-text', label: 'Global - Texto pie de página', page: 'principal' },
   { id: 'main-quote', label: 'Frase principal', page: 'principal' },
+  { id: 'main-event-date-text', label: 'Principal - Fecha evento', page: 'principal' },
+  { id: 'main-cta-button-text', label: 'Principal - Botón confirmar', page: 'principal' },
+  { id: 'main-photo-image-url', label: 'Imagen principal', page: 'principal', kind: 'url' },
   { id: 'location-title', label: 'Título de ubicación', page: 'principal' },
   { id: 'location-city-label', label: 'Etiqueta ciudad', page: 'principal' },
   { id: 'location-city-value', label: 'Valor ciudad', page: 'principal' },
@@ -21,6 +26,12 @@ export const ADMIN_PREVIEW_ITEMS: PreviewItem[] = [
   { id: 'location-address-label', label: 'Etiqueta dirección', page: 'principal' },
   { id: 'location-address-value', label: 'Valor dirección', page: 'principal' },
   { id: 'map-embed-url', label: 'URL embebida de Google Maps', page: 'principal', kind: 'url' },
+  { id: 'info-hero-image-url', label: 'Info - Imagen superior', page: 'info', kind: 'url' },
+  { id: 'info-map-image-url', label: 'Info - Imagen mapa', page: 'info', kind: 'url' },
+  { id: 'info-howto-title', label: 'Info - Título cómo llegar', page: 'info' },
+  { id: 'info-bus-title', label: 'Info - Título autobús', page: 'info' },
+  { id: 'info-map-link-text', label: 'Info - Texto botón Maps', page: 'info' },
+  { id: 'info-playlist-title', label: 'Info - Título playlist', page: 'info' },
   { id: 'map-directions-url', label: 'URL de Google Maps (botón)', page: 'info', kind: 'url' },
   { id: 'car-section', label: 'Cómo llegar en coche', page: 'info' },
   { id: 'bus-out-label', label: 'Etiqueta salida bus', page: 'info' },
@@ -30,10 +41,31 @@ export const ADMIN_PREVIEW_ITEMS: PreviewItem[] = [
   { id: 'questions-section', label: 'Sección dudas', page: 'info' },
   { id: 'gift-section', label: 'Sección regalo', page: 'info' },
   { id: 'spotify-playlist-url', label: 'URL embed de Spotify', page: 'info', kind: 'url' },
+  { id: 'coruna-hero-image-url', label: 'Coruña - Imagen cabecera', page: 'coruna', kind: 'url' },
+  { id: 'coruna-page-title', label: 'Coruña - Título principal', page: 'coruna' },
   { id: 'eat-section', label: 'Dónde comer', page: 'coruna' },
+  { id: 'eat-section-image-url', label: 'Comer - Imagen sección', page: 'coruna', kind: 'url' },
+  { id: 'eat-card-1-title', label: 'Comer - Tarjeta 1 título', page: 'coruna' },
+  { id: 'eat-card-1-content', label: 'Comer - Tarjeta 1 texto', page: 'coruna' },
+  { id: 'eat-card-2-title', label: 'Comer - Tarjeta 2 título', page: 'coruna' },
+  { id: 'eat-card-2-content', label: 'Comer - Tarjeta 2 texto', page: 'coruna' },
   { id: 'drink-section', label: 'Dónde beber', page: 'coruna' },
+  { id: 'drink-section-image-url', label: 'Beber - Imagen sección', page: 'coruna', kind: 'url' },
+  { id: 'drink-card-1-title', label: 'Beber - Tarjeta 1 título', page: 'coruna' },
+  { id: 'drink-card-1-content', label: 'Beber - Tarjeta 1 texto', page: 'coruna' },
+  { id: 'drink-card-2-title', label: 'Beber - Tarjeta 2 título', page: 'coruna' },
+  { id: 'drink-card-2-content', label: 'Beber - Tarjeta 2 texto', page: 'coruna' },
   { id: 'stay-section', label: 'Dónde alojarse', page: 'coruna' },
+  { id: 'stay-section-image-url', label: 'Alojarse - Imagen sección', page: 'coruna', kind: 'url' },
+  { id: 'stay-card-1-title', label: 'Alojarse - Tarjeta 1 título', page: 'coruna' },
+  { id: 'stay-card-1-content', label: 'Alojarse - Tarjeta 1 texto', page: 'coruna' },
   { id: 'see-section', label: 'Qué ver', page: 'coruna' },
+  { id: 'see-card-1-title', label: 'Qué ver - Tarjeta 1 título', page: 'coruna' },
+  { id: 'see-card-1-content', label: 'Qué ver - Tarjeta 1 texto', page: 'coruna' },
+  { id: 'see-card-2-title', label: 'Qué ver - Tarjeta 2 título', page: 'coruna' },
+  { id: 'see-card-2-content', label: 'Qué ver - Tarjeta 2 texto', page: 'coruna' },
+  { id: 'see-card-3-title', label: 'Qué ver - Tarjeta 3 título', page: 'coruna' },
+  { id: 'see-card-3-content', label: 'Qué ver - Tarjeta 3 texto', page: 'coruna' },
   { id: 'rsvp-intro-title', label: 'RSVP - Título inicial', page: 'rsvp' },
   { id: 'rsvp-intro-text', label: 'RSVP - Texto inicial', page: 'rsvp' },
   { id: 'rsvp-attendance-title', label: 'RSVP - Título asistencia', page: 'rsvp' },
@@ -57,6 +89,7 @@ export const ADMIN_PREVIEW_ITEMS: PreviewItem[] = [
   { id: 'rsvp-success-text', label: 'RSVP - Texto éxito', page: 'rsvp' },
   { id: 'rsvp-success-closing', label: 'RSVP - Cierre éxito', page: 'rsvp' },
   { id: 'rsvp-success-button', label: 'RSVP - Texto botón éxito', page: 'rsvp' },
+  { id: 'rsvp-bottom-image-url', label: 'RSVP - Imagen inferior', page: 'rsvp', kind: 'url' },
 ];
 
 export const PAGE_LABELS: Record<WebsitePageId, string> = {
@@ -90,4 +123,8 @@ const INFO_HIDDEN_DYNAMIC_TITLES = new Set([
 
 export const shouldHideInfoDynamicSection = (title: string): boolean => {
   return INFO_HIDDEN_DYNAMIC_TITLES.has(title.trim().toLowerCase());
+};
+
+export const isCorunaCardSectionId = (id: string): boolean => {
+  return /^(eat|drink|stay|see)-card-[^-]+-(title|content)$/.test(id);
 };

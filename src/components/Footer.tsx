@@ -1,8 +1,13 @@
+import useWebsiteTexts from '../utils/useWebsiteTexts';
+
 export default function Footer() {
+  const { getText } = useWebsiteTexts();
+  const footerText = getText('site-footer-text', 'Te esperamos. Marta & Sergio');
+
   return (
     <footer className="footer">
       <div className="footer-content">
-        <p className="footer-text">Te esperamos. Marta & Sergio</p>
+        <p className="footer-text">{footerText}</p>
         <a href="/admin" className="admin-link" title="Acceso Administrador" aria-label="Acceso Administrador">
           <span className="lock-icon" aria-hidden>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

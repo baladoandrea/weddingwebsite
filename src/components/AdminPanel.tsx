@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import GalleryUpload from './GalleryUpload';
 import textsData from '../data/texts.json';
-import { ADMIN_PREVIEW_ITEMS, PAGE_LABELS, shouldHideInfoDynamicSection } from '../utils/textSyncConfig';
-import { parseCorunaCards } from '../utils/corunaContentParser';
+import { ADMIN_PREVIEW_ITEMS, PAGE_LABELS, shouldHideInfoDynamicSection, isCorunaCardSectionId } from '../utils/textSyncConfig';
 
 interface Section {
   id: string;
@@ -31,6 +30,14 @@ interface AdminToast {
   durationMs: number;
 }
 
+interface ImageSlot {
+  id: string;
+  label: string;
+  page: Section['page'];
+  fallbackUrl: string;
+  alt: string;
+}
+
 const FIXED_IDS = new Set(ADMIN_PREVIEW_ITEMS.map(item => item.id));
 const FIXED_ORDER_BY_ID = ADMIN_PREVIEW_ITEMS.reduce((acc, item, index) => {
   acc[item.id] = index * 10;
@@ -52,6 +59,65 @@ const URL_DEFAULTS: Record<string, string> = {
   'map-directions-url': 'https://www.google.com/maps/place/Plaza+de+Pontevedra,+A+Coru%C3%B1a',
   'spotify-playlist-url': 'https://open.spotify.com/embed/playlist/37i9dQZEVXbJwoKy8qKpHG?utm_source=generator',
 };
+
+const IMAGE_SLOT_CONFIG: ImageSlot[] = [
+  {
+    id: 'main-photo-image-url',
+    label: 'Principal - Foto de pareja',
+    page: 'principal',
+    fallbackUrl: '/assets/imagen01.png',
+    alt: 'Marta y Sergio',
+  },
+  {
+    id: 'info-hero-image-url',
+    label: 'Información - Imagen superior',
+    page: 'info',
+    fallbackUrl: '/assets/imagen02.png',
+    alt: 'Cómo llegar',
+  },
+  {
+    id: 'info-map-image-url',
+    label: 'Información - Imagen del mapa',
+    page: 'info',
+    fallbackUrl: '/assets/mapa.png',
+    alt: 'Mapa ubicación',
+  },
+  {
+    id: 'coruna-hero-image-url',
+    label: 'Coruña - Imagen cabecera',
+    page: 'coruna',
+    fallbackUrl: '/assets/imagen03.png',
+    alt: 'A Coruña',
+  },
+  {
+    id: 'eat-section-image-url',
+    label: 'Coruña - Imagen sección comer',
+    page: 'coruna',
+    fallbackUrl: '/assets/imagen05.png',
+    alt: 'Dónde comer',
+  },
+  {
+    id: 'drink-section-image-url',
+    label: 'Coruña - Imagen sección beber',
+    page: 'coruna',
+    fallbackUrl: '/assets/imagen06.png',
+    alt: 'Dónde beber',
+  },
+  {
+    id: 'stay-section-image-url',
+    label: 'Coruña - Imagen sección alojarse',
+    page: 'coruna',
+    fallbackUrl: '/assets/alojamiento.png',
+    alt: 'Dónde alojarse',
+  },
+  {
+    id: 'rsvp-bottom-image-url',
+    label: 'RSVP - Imagen inferior',
+    page: 'rsvp',
+    fallbackUrl: '/assets/imagen04.png',
+    alt: 'RSVP',
+  },
+];
 
 const parseUrl = (value: string): URL | null => {
   try {
@@ -129,7 +195,7 @@ export default function AdminPanel() {
   const toastTimeoutRef = useRef<number | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'texts' | 'gallery' | 'guests'>('texts');
+  const [activeTab, setActiveTab] = useState<'texts' | 'images' | 'gallery' | 'guests'>('texts');
   const [selectedPage, setSelectedPage] = useState<'all' | 'principal' | 'info' | 'coruna' | 'rsvp'>('all');
 
   const [sections, setSections] = useState<Section[]>([]);
@@ -141,6 +207,8 @@ export default function AdminPanel() {
   const [savingField, setSavingField] = useState<{ id: string; field: 'title' | 'content' } | null>(null);
   const [justSavedField, setJustSavedField] = useState<{ id: string; field: 'title' | 'content' } | null>(null);
   const [toast, setToast] = useState<AdminToast | null>(null);
+  const [uploadingImageId, setUploadingImageId] = useState<string | null>(null);
+  const [resettingImageId, setResettingImageId] = useState<string | null>(null);
 
   const toastIconByType: Record<AdminToast['type'], string> = {
     success: '✅',
@@ -462,8 +530,47 @@ export default function AdminPanel() {
     }
   };
 
+  const deleteCorunaCardPair = async (sectionId: string) => {
+    const match = sectionId.match(/^(eat|drink|stay|see)-card-([^-]+)-(title|content)$/);
+    if (!match) {
+      await deleteCustomSection(sectionId);
+      return;
+    }
+
+    const [, prefix, key] = match;
+    const titleId = `${prefix}-card-${key}-title`;
+    const contentId = `${prefix}-card-${key}-content`;
+
+    if (!confirm('¿Eliminar esta tarjeta completa?')) {
+      return;
+    }
+
+    try {
+      const [titleResponse, contentResponse] = await Promise.all([
+        fetch(`/api/texts?id=${encodeURIComponent(titleId)}`, { method: 'DELETE' }),
+        fetch(`/api/texts?id=${encodeURIComponent(contentId)}`, { method: 'DELETE' }),
+      ]);
+
+      if (!titleResponse.ok || !contentResponse.ok) {
+        showToast('error', 'No se pudo eliminar la tarjeta completa.');
+        return;
+      }
+
+      setSections(current => current.filter(section => section.id !== titleId && section.id !== contentId));
+      cancelInlineEdit();
+      showToast('success', 'Tarjeta eliminada correctamente.');
+    } catch {
+      showToast('error', 'Error al eliminar la tarjeta.');
+    }
+  };
+
   const handleTrashField = async (section: Section, field: 'title' | 'content') => {
     if (!FIXED_IDS.has(section.id)) {
+      if (isCorunaCardSectionId(section.id)) {
+        await deleteCorunaCardPair(section.id);
+        return;
+      }
+
       await deleteCustomSection(section.id);
       return;
     }
@@ -630,9 +737,76 @@ export default function AdminPanel() {
     );
   };
 
+  const handleSiteImageUpload = async (slot: ImageSlot, file: File) => {
+    setUploadingImageId(slot.id);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('slotId', slot.id);
+
+      const uploadResponse = await fetch('/api/site-images/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        const uploadError = await uploadResponse.json().catch(() => ({ error: 'No se pudo subir la imagen.' }));
+        showToast('error', uploadError.error || 'No se pudo subir la imagen.');
+        return;
+      }
+
+      const uploaded = await uploadResponse.json() as { url: string };
+      const saved = await upsertSection({
+        id: slot.id,
+        title: `Imagen - ${slot.label}`,
+        content: uploaded.url,
+        page: slot.page,
+      }, true);
+
+      if (!saved) {
+        showToast('error', 'La imagen se subió pero no se pudo guardar su URL.');
+        return;
+      }
+
+      showToast('success', 'Imagen actualizada correctamente.');
+    } catch {
+      showToast('error', 'Error al subir la imagen.');
+    } finally {
+      setUploadingImageId(null);
+    }
+  };
+
+  const handleResetSiteImage = async (slot: ImageSlot) => {
+    setResettingImageId(slot.id);
+
+    try {
+      const saved = await upsertSection({
+        id: slot.id,
+        title: `Imagen - ${slot.label}`,
+        content: slot.fallbackUrl,
+        page: slot.page,
+      }, true);
+
+      if (!saved) {
+        showToast('error', 'No se pudo restablecer la imagen.');
+        return;
+      }
+
+      showToast('success', 'Imagen restablecida al valor por defecto.');
+    } catch {
+      showToast('error', 'Error al restablecer la imagen.');
+    } finally {
+      setResettingImageId(null);
+    }
+  };
+
   const renderCustomSections = (pageId: string) => {
     const custom = (customSectionsByPage.get(pageId) || []).filter(section => {
       if (pageId !== 'info') {
+        if (pageId === 'coruna') {
+          return !isCorunaCardSectionId(section.id);
+        }
         return true;
       }
 
@@ -651,24 +825,169 @@ export default function AdminPanel() {
     ));
   };
 
-  const renderCorunaSectionEditor = (sectionId: string) => {
+  const createCorunaCard = async (prefix: 'eat' | 'drink' | 'stay' | 'see') => {
+    const regex = new RegExp(`^${prefix}-card-([^-]+)-title$`);
+    const usedNumbers = sections
+      .map(section => section.id.match(regex)?.[1])
+      .filter((value): value is string => Boolean(value))
+      .map(value => Number(value))
+      .filter(value => Number.isFinite(value));
+
+    const nextNumber = usedNumbers.length > 0
+      ? Math.max(...usedNumbers) + 1
+      : 1;
+
+    const key = `${nextNumber}`;
+
+    const titleSection = await upsertSection({
+      id: `${prefix}-card-${key}-title`,
+      title: `${prefix.toUpperCase()} - Tarjeta ${key} título`,
+      content: 'Nuevo título',
+      page: 'coruna',
+    }, true);
+
+    const contentSection = await upsertSection({
+      id: `${prefix}-card-${key}-content`,
+      title: `${prefix.toUpperCase()} - Tarjeta ${key} texto`,
+      content: 'Nuevo texto',
+      page: 'coruna',
+    }, true);
+
+    if (titleSection && contentSection) {
+      showToast('success', 'Tarjeta añadida. Ya puedes editarla.');
+      startInlineEdit(titleSection.id, 'content');
+    }
+  };
+
+  const getSortedCorunaCardKeys = (
+    prefix: 'eat' | 'drink' | 'stay' | 'see',
+    cards: Array<{ titleId: string; contentId: string }>
+  ): string[] => {
+    const regex = new RegExp(`^${prefix}-card-([^-]+)-title$`);
+    const dynamicCardIds = sections
+      .map(item => item.id.match(regex)?.[1])
+      .filter((value): value is string => Boolean(value));
+
+    return Array.from(new Set([
+      ...cards.map(card => card.titleId.replace(`${prefix}-card-`, '').replace('-title', '')),
+      ...dynamicCardIds,
+    ])).sort((left, right) => {
+      const leftNumber = Number(left);
+      const rightNumber = Number(right);
+      const leftIsNumber = Number.isFinite(leftNumber);
+      const rightIsNumber = Number.isFinite(rightNumber);
+
+      if (leftIsNumber && rightIsNumber) {
+        return leftNumber - rightNumber;
+      }
+
+      if (leftIsNumber) {
+        return -1;
+      }
+
+      if (rightIsNumber) {
+        return 1;
+      }
+
+      return left.localeCompare(right);
+    });
+  };
+
+  const moveCorunaCard = async (
+    prefix: 'eat' | 'drink' | 'stay' | 'see',
+    cards: Array<{ titleId: string; contentId: string }>,
+    key: string,
+    direction: 'up' | 'down'
+  ) => {
+    const allCardKeys = getSortedCorunaCardKeys(prefix, cards);
+    const currentIndex = allCardKeys.indexOf(key);
+    if (currentIndex === -1) {
+      return;
+    }
+
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= allCardKeys.length) {
+      return;
+    }
+
+    const targetKey = allCardKeys[targetIndex];
+    const fromTitleId = `${prefix}-card-${key}-title`;
+    const fromContentId = `${prefix}-card-${key}-content`;
+    const toTitleId = `${prefix}-card-${targetKey}-title`;
+    const toContentId = `${prefix}-card-${targetKey}-content`;
+
+    const fromTitleSection = getSection(fromTitleId, 'coruna');
+    const fromContentSection = getSection(fromContentId, 'coruna');
+    const toTitleSection = getSection(toTitleId, 'coruna');
+    const toContentSection = getSection(toContentId, 'coruna');
+
+    const [savedFromTitle, savedFromContent, savedToTitle, savedToContent] = await Promise.all([
+      upsertSection({ ...fromTitleSection, content: toTitleSection.content }, true),
+      upsertSection({ ...fromContentSection, content: toContentSection.content }, true),
+      upsertSection({ ...toTitleSection, content: fromTitleSection.content }, true),
+      upsertSection({ ...toContentSection, content: fromContentSection.content }, true),
+    ]);
+
+    if (savedFromTitle && savedFromContent && savedToTitle && savedToContent) {
+      showToast('success', 'Tarjeta reordenada.');
+    }
+  };
+
+  const renderCorunaSeparatedCardsEditor = (
+    sectionId: string,
+    prefix: 'eat' | 'drink' | 'stay' | 'see',
+    cards: Array<{
+      titleId: string;
+      contentId: string;
+    }>
+  ) => {
     const section = getSection(sectionId, 'coruna');
-    const cards = parseCorunaCards(section.content, section.title);
+    const allCardKeys = getSortedCorunaCardKeys(prefix, cards);
 
     return (
       <section className="coruna-section admin-mirror-section">
         {renderEditableField(section, 'title', { as: 'h2', allowEnter: false })}
-        <p className="admin-inline-help">
-          Formato recomendado: una tarjeta por línea usando “Subtítulo: descripción”.
-        </p>
-        {renderEditableField(section, 'content')}
         <div className="content-cards admin-structured-preview">
-          {cards.map((card, index) => (
-            <article key={`${section.id}-preview-${index}`} className="recommendation-card">
-              <h3>{card.title}</h3>
-              <p>{card.content}</p>
-            </article>
-          ))}
+          {allCardKeys.map((key, index) => {
+            const titleId = `${prefix}-card-${key}-title`;
+            const contentId = `${prefix}-card-${key}-content`;
+            return (
+              <article key={titleId} className="recommendation-card">
+              <div className="card-order-actions">
+                <button
+                  className="inline-icon-btn"
+                  title="Subir tarjeta"
+                  onClick={() => void moveCorunaCard(prefix, cards, key, 'up')}
+                  disabled={index === 0}
+                >
+                  ↑
+                </button>
+                <button
+                  className="inline-icon-btn"
+                  title="Bajar tarjeta"
+                  onClick={() => void moveCorunaCard(prefix, cards, key, 'down')}
+                  disabled={index === allCardKeys.length - 1}
+                >
+                  ↓
+                </button>
+              </div>
+              {renderEditableField(
+                getSection(titleId, 'coruna'),
+                'content',
+                { as: 'h3', allowEnter: false }
+              )}
+              {renderEditableField(
+                getSection(contentId, 'coruna'),
+                'content'
+              )}
+              </article>
+            );
+          })}
+        </div>
+        <div className="inline-add-row">
+          <button className="inline-add-btn" onClick={() => createCorunaCard(prefix)} title="Añadir tarjeta">
+            +
+          </button>
         </div>
       </section>
     );
@@ -742,6 +1061,9 @@ export default function AdminPanel() {
               <button className={`admin-sidebar-link ${activeTab === 'texts' ? 'active' : ''}`} onClick={() => { setActiveTab('texts'); setIsAdminMenuOpen(false); }}>
                 Textos
               </button>
+              <button className={`admin-sidebar-link ${activeTab === 'images' ? 'active' : ''}`} onClick={() => { setActiveTab('images'); setIsAdminMenuOpen(false); }}>
+                Imágenes
+              </button>
               <button className={`admin-sidebar-link ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => { setActiveTab('gallery'); setIsAdminMenuOpen(false); }}>
                 Galería
               </button>
@@ -789,10 +1111,18 @@ export default function AdminPanel() {
             {(selectedPage === 'all' || selectedPage === 'principal') && (
               <section className="admin-live-page admin-mirror-page principal-mirror">
                 <h3 className="admin-live-page-title">{PAGE_LABELS.principal}</h3>
+
+                <section className="text-section admin-mirror-section">
+                  {renderEditableField(getSection('site-header-title', 'principal'), 'content', { as: 'h2', className: 'header-title', allowEnter: false })}
+                  {renderEditableField(getSection('site-footer-text', 'principal'), 'content', { as: 'p', className: 'footer-text', allowEnter: false })}
+                </section>
+
                 <div className="video-section admin-mirror-hero" />
 
                 <section className="text-section admin-mirror-section">
                   {renderEditableField(getSection('main-quote', 'principal'), 'content', { as: 'h2', className: 'main-quote', allowEnter: true })}
+                  {renderEditableField(getSection('main-event-date-text', 'principal'), 'content', { as: 'p', className: 'event-date', allowEnter: false })}
+                  {renderEditableField(getSection('main-cta-button-text', 'principal'), 'content', { as: 'p', className: 'btn-primary', allowEnter: false })}
                 </section>
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('principal', 'main-quote')}>+</button></div>
 
@@ -837,10 +1167,10 @@ export default function AdminPanel() {
             {(selectedPage === 'all' || selectedPage === 'info') && (
               <section className="admin-live-page admin-mirror-page info-mirror">
                 <h3 className="admin-live-page-title">{PAGE_LABELS.info}</h3>
-                <img src="/assets/imagen02.png" alt="Info" className="info-hero-img" />
+                <img src={getSection('info-hero-image-url', 'info').content || '/assets/imagen02.png'} alt="Info" className="info-hero-img" />
 
                 <section className="info-section admin-mirror-section">
-                  <h2>¿Cómo llegar?</h2>
+                  {renderEditableField(getSection('info-howto-title', 'info'), 'content', { as: 'h2', allowEnter: false })}
                   <article className="subsection">
                     {renderEditableField(getSection('car-section', 'info'), 'title', { as: 'h3', allowEnter: false })}
                     {renderGuidedLongTextField(
@@ -849,6 +1179,7 @@ export default function AdminPanel() {
                     )}
                   </article>
                   <article className="subsection">
+                    {renderEditableField(getSection('info-bus-title', 'info'), 'content', { as: 'h3', allowEnter: false })}
                     <div className="bus-info">
                       <div className="admin-bus-row">
                         {renderEditableField(getSection('bus-out-label', 'info'), 'content', { as: 'span', allowEnter: false })}
@@ -859,7 +1190,8 @@ export default function AdminPanel() {
                         {renderEditableField(getSection('bus-return-text', 'info'), 'content', { as: 'span', allowEnter: true })}
                       </div>
                     </div>
-                    <div className="map-link admin-inline-link-block">{renderEditableField(getSection('map-directions-url', 'info'), 'content', { as: 'span', allowEnter: false })}</div>
+                    <div className="map-link admin-inline-link-block">{renderEditableField(getSection('info-map-link-text', 'info'), 'content', { as: 'span', allowEnter: false })}</div>
+                    <div className="admin-inline-link-block">{renderEditableField(getSection('map-directions-url', 'info'), 'content', { as: 'span', allowEnter: false })}</div>
                   </article>
                 </section>
 
@@ -883,7 +1215,7 @@ export default function AdminPanel() {
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'gift-section')}>+</button></div>
 
                 <section className="info-section playlist-section admin-mirror-section">
-                  <h2>Ve calentando motores</h2>
+                  {renderEditableField(getSection('info-playlist-title', 'info'), 'content', { as: 'h2', allowEnter: false })}
                   <div className="spotify-embed">
                     <iframe src={getSection('spotify-playlist-url', 'info').content} width="100%" height="300" title="Spotify playlist" />
                   </div>
@@ -901,15 +1233,52 @@ export default function AdminPanel() {
             {(selectedPage === 'all' || selectedPage === 'coruna') && (
               <section className="admin-live-page admin-mirror-page coruna-mirror">
                 <h3 className="admin-live-page-title">{PAGE_LABELS.coruna}</h3>
-                <div className="coruna-hero"><img src="/assets/imagen03.png" alt="A Coruña" className="coruna-hero-img" /></div>
+                <div className="coruna-hero"><img src={getSection('coruna-hero-image-url', 'coruna').content || '/assets/imagen03.png'} alt="A Coruña" className="coruna-hero-img" /></div>
+                {renderEditableField(getSection('coruna-page-title', 'coruna'), 'content', { as: 'h2', className: 'coruna-title', allowEnter: false })}
 
-                {renderCorunaSectionEditor('eat-section')}
+                {renderCorunaSeparatedCardsEditor('eat-section', 'eat', [
+                  {
+                    titleId: 'eat-card-1-title',
+                    contentId: 'eat-card-1-content',
+                  },
+                  {
+                    titleId: 'eat-card-2-title',
+                    contentId: 'eat-card-2-content',
+                  },
+                ])}
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'eat-section')}>+</button></div>
-                {renderCorunaSectionEditor('drink-section')}
+                {renderCorunaSeparatedCardsEditor('drink-section', 'drink', [
+                  {
+                    titleId: 'drink-card-1-title',
+                    contentId: 'drink-card-1-content',
+                  },
+                  {
+                    titleId: 'drink-card-2-title',
+                    contentId: 'drink-card-2-content',
+                  },
+                ])}
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'drink-section')}>+</button></div>
-                {renderCorunaSectionEditor('stay-section')}
+                {renderCorunaSeparatedCardsEditor('stay-section', 'stay', [
+                  {
+                    titleId: 'stay-card-1-title',
+                    contentId: 'stay-card-1-content',
+                  },
+                ])}
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'stay-section')}>+</button></div>
-                {renderCorunaSectionEditor('see-section')}
+                {renderCorunaSeparatedCardsEditor('see-section', 'see', [
+                  {
+                    titleId: 'see-card-1-title',
+                    contentId: 'see-card-1-content',
+                  },
+                  {
+                    titleId: 'see-card-2-title',
+                    contentId: 'see-card-2-content',
+                  },
+                  {
+                    titleId: 'see-card-3-title',
+                    contentId: 'see-card-3-content',
+                  },
+                ])}
                 <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'see-section')}>+</button></div>
 
                 {renderCustomSections('coruna')}
@@ -991,6 +1360,52 @@ export default function AdminPanel() {
               </section>
             )}
 
+          </div>
+        )}
+
+        {activeTab === 'images' && (
+          <div className="admin-section">
+            <h2>Modificar imágenes</h2>
+            <p className="admin-editor-note">
+              Sube una nueva imagen en cada bloque para reemplazar la que se muestra actualmente en la web.
+            </p>
+
+            <div className="admin-image-grid">
+              {IMAGE_SLOT_CONFIG.map(slot => {
+                const currentUrl = getSection(slot.id, slot.page).content || slot.fallbackUrl;
+                const isUploading = uploadingImageId === slot.id;
+                const isResetting = resettingImageId === slot.id;
+                return (
+                  <article key={slot.id} className="admin-image-card">
+                    <h3>{slot.label}</h3>
+                    <img src={currentUrl} alt={slot.alt} className="admin-image-preview" />
+                    <label className="upload-btn admin-image-upload-btn">
+                      {isUploading ? 'Subiendo...' : 'Subir nueva imagen'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={isUploading || isResetting}
+                        onChange={event => {
+                          const file = event.target.files?.[0];
+                          if (file) {
+                            void handleSiteImageUpload(slot, file);
+                          }
+                          event.currentTarget.value = '';
+                        }}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="admin-image-reset-btn"
+                      disabled={isUploading || isResetting}
+                      onClick={() => void handleResetSiteImage(slot)}
+                    >
+                      {isResetting ? 'Restableciendo...' : 'Restablecer por defecto'}
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
           </div>
         )}
 

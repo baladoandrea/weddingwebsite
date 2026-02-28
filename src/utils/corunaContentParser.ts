@@ -18,35 +18,26 @@ const splitCardCandidates = (rawContent: string): string[] => {
     return lines;
   }
 
-  const markerMatches = normalized.match(/[^:\n]+:\s*/g) || [];
-  if (markerMatches.length <= 1) {
+  const markerRegex = /(^|[.!?]\s+)([^:\n]{2,80}):\s*/g;
+  const markerPositions: number[] = [];
+  let match: RegExpExecArray | null;
+
+  while ((match = markerRegex.exec(normalized)) !== null) {
+    const separator = match[1] || '';
+    markerPositions.push(match.index + separator.length);
+  }
+
+  if (markerPositions.length <= 1) {
     return [normalized];
   }
 
   const parts: string[] = [];
-  let cursor = 0;
-
-  for (let index = 0; index < markerMatches.length; index += 1) {
-    const marker = markerMatches[index];
-    const markerIndex = normalized.indexOf(marker, cursor);
-    if (markerIndex === -1) {
-      continue;
-    }
-
-    if (index > 0) {
-      const segment = normalized.slice(cursor, markerIndex).trim();
-      if (segment) {
-        parts.push(segment);
-      }
-    }
-
-    cursor = markerIndex;
-
-    if (index === markerMatches.length - 1) {
-      const lastSegment = normalized.slice(cursor).trim();
-      if (lastSegment) {
-        parts.push(lastSegment);
-      }
+  for (let index = 0; index < markerPositions.length; index += 1) {
+    const start = markerPositions[index];
+    const end = markerPositions[index + 1] ?? normalized.length;
+    const segment = normalized.slice(start, end).trim();
+    if (segment) {
+      parts.push(segment);
     }
   }
 

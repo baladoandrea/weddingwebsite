@@ -1,8 +1,38 @@
 [
   {
+    "id": "site-header-title",
+    "title": "Global - Título cabecera",
+    "content": "Marta & Sergio",
+    "page": "principal"
+  },
+  {
+    "id": "site-footer-text",
+    "title": "Global - Texto pie de página",
+    "content": "Te esperamos. Marta & Sergio",
+    "page": "principal"
+  },
+  {
     "id": "main-quote",
     "title": "Cita Principal",
     "content": "En el Atlántico nos prometimos, y ante el mar queremos celebrar...",
+    "page": "principal"
+  },
+  {
+    "id": "main-event-date-text",
+    "title": "Principal - Fecha evento",
+    "content": "Boda Marta & Sergio · 29 de Agosto de 2026",
+    "page": "principal"
+  },
+  {
+    "id": "main-cta-button-text",
+    "title": "Principal - Botón confirmar",
+    "content": "✓ Confirmar Asistencia",
+    "page": "principal"
+  },
+  {
+    "id": "main-photo-image-url",
+    "title": "Principal - Imagen principal",
+    "content": "/assets/imagen01.png",
     "page": "principal"
   },
   {
@@ -78,6 +108,42 @@
     "page": "principal"
   },
   {
+    "id": "info-hero-image-url",
+    "title": "Info - Imagen superior",
+    "content": "/assets/imagen02.png",
+    "page": "info"
+  },
+  {
+    "id": "info-map-image-url",
+    "title": "Info - Imagen mapa",
+    "content": "/assets/mapa.png",
+    "page": "info"
+  },
+  {
+    "id": "info-howto-title",
+    "title": "Info - Título cómo llegar",
+    "content": "¿Cómo llegar?",
+    "page": "info"
+  },
+  {
+    "id": "info-bus-title",
+    "title": "Info - Título autobús",
+    "content": "En autobús",
+    "page": "info"
+  },
+  {
+    "id": "info-map-link-text",
+    "title": "Info - Texto botón Maps",
+    "content": "Ver ubicación en Maps",
+    "page": "info"
+  },
+  {
+    "id": "info-playlist-title",
+    "title": "Info - Título playlist",
+    "content": "Ve calentando motores",
+    "page": "info"
+  },
+  {
     "id": "car-section",
     "title": "Cómo llegar en coche",
     "content": "Para llegar al Casón Amor en coche, dirígete hacia el centro de A Coruña y sigue las indicaciones hacia la zona de la Ciudad Vieja. Desde la avenida principal (AC-11), toma la salida hacia el Paseo Marítimo en dirección norte. El lugar se encuentra en un área peatonal protegida, por lo que el acceso directo no está permitido. Existen zonas de aparcamiento en las inmediaciones.",
@@ -132,27 +198,153 @@
     "page": "info"
   },
   {
+    "id": "coruna-hero-image-url",
+    "title": "Coruña - Imagen cabecera",
+    "content": "/assets/imagen03.png",
+    "page": "coruna"
+  },
+  {
+    "id": "coruna-page-title",
+    "title": "Coruña - Título principal",
+    "content": "A Coruña",
+    "page": "coruna"
+  },
+  {
     "id": "eat-section",
     "title": "Dónde comer",
-    "content": "A Pulpeira de Melide: Para un pulpiño á feira. Casa Virginia: Recomendado el caldo y las filloas. Todo hecho con amor.",
+    "content": "Recomendaciones de comida en A Coruña.",
+    "page": "coruna"
+  },
+  {
+    "id": "eat-section-image-url",
+    "title": "Comer - Imagen sección",
+    "content": "/assets/imagen05.png",
+    "page": "coruna"
+  },
+  {
+    "id": "eat-card-1-title",
+    "title": "Comer - Tarjeta 1 título",
+    "content": "A Pulpeira de Melide",
+    "page": "coruna"
+  },
+  {
+    "id": "eat-card-1-content",
+    "title": "Comer - Tarjeta 1 texto",
+    "content": "Para un pulpiño á feira.",
+    "page": "coruna"
+  },
+  {
+    "id": "eat-card-2-title",
+    "title": "Comer - Tarjeta 2 título",
+    "content": "Casa Virginia",
+    "page": "coruna"
+  },
+  {
+    "id": "eat-card-2-content",
+    "title": "Comer - Tarjeta 2 texto",
+    "content": "Recomendado el caldo y las filloas. Todo hecho con amor.",
     "page": "coruna"
   },
   {
     "id": "drink-section",
     "title": "Dónde beber",
-    "content": "La Cervecería: Más conocida como LA ESTRELLA, parada imprescindible. Calle Galera: Repleta de buenos bares.",
+    "content": "Recomendaciones para tomar algo en A Coruña.",
+    "page": "coruna"
+  },
+  {
+    "id": "drink-section-image-url",
+    "title": "Beber - Imagen sección",
+    "content": "/assets/imagen06.png",
+    "page": "coruna"
+  },
+  {
+    "id": "drink-card-1-title",
+    "title": "Beber - Tarjeta 1 título",
+    "content": "La Cervecería",
+    "page": "coruna"
+  },
+  {
+    "id": "drink-card-1-content",
+    "title": "Beber - Tarjeta 1 texto",
+    "content": "Más conocida como LA ESTRELLA, parada imprescindible.",
+    "page": "coruna"
+  },
+  {
+    "id": "drink-card-2-title",
+    "title": "Beber - Tarjeta 2 título",
+    "content": "Calle Galera",
+    "page": "coruna"
+  },
+  {
+    "id": "drink-card-2-content",
+    "title": "Beber - Tarjeta 2 texto",
+    "content": "Repleta de buenos bares.",
     "page": "coruna"
   },
   {
     "id": "stay-section",
     "title": "Dónde alojarse",
-    "content": "Casa Gerardo: Buen anfitrión, mejor abuelo.",
+    "content": "Opciones de alojamiento recomendadas.",
+    "page": "coruna"
+  },
+  {
+    "id": "stay-section-image-url",
+    "title": "Alojarse - Imagen sección",
+    "content": "/assets/alojamiento.png",
+    "page": "coruna"
+  },
+  {
+    "id": "stay-card-1-title",
+    "title": "Alojarse - Tarjeta 1 título",
+    "content": "Casa Gerardo",
+    "page": "coruna"
+  },
+  {
+    "id": "stay-card-1-content",
+    "title": "Alojarse - Tarjeta 1 texto",
+    "content": "Buen anfitrión, mejor abuelo.",
     "page": "coruna"
   },
   {
     "id": "see-section",
     "title": "Qué ver",
-    "content": "Estadio de Riazor: Hogar del Deportivo de La Coruña. Si tienes la oportunidad, ve a un partido del depor, derrota garantizada.\nTorre de Hércules: El faro más antiguo del mundo en funcionamiento. Vistas espectaculares del Atlántico.\nPaseo Marítimo: Camina por el hermoso paseo marítimo, respira el aire del mar y disfruta de las vistas.",
+    "content": "Plan imprescindible para conocer la ciudad.",
+    "page": "coruna"
+  },
+  {
+    "id": "see-card-1-title",
+    "title": "Qué ver - Tarjeta 1 título",
+    "content": "Estadio de Riazor",
+    "page": "coruna"
+  },
+  {
+    "id": "see-card-1-content",
+    "title": "Qué ver - Tarjeta 1 texto",
+    "content": "Hogar del Deportivo de La Coruña. Si tienes la oportunidad, ve a un partido del depor, derrota garantizada.",
+    "page": "coruna"
+  },
+  {
+    "id": "see-card-2-title",
+    "title": "Qué ver - Tarjeta 2 título",
+    "content": "Torre de Hércules",
+    "page": "coruna"
+  },
+  {
+    "id": "see-card-2-content",
+    "title": "Qué ver - Tarjeta 2 texto",
+    "content": "El faro más antiguo del mundo en funcionamiento. Vistas espectaculares del Atlántico.",
+    "page": "coruna"
+  },
+  {
+    "id": "see-card-3-title",
+    "title": "Qué ver - Tarjeta 3 título",
+    "content": "Paseo Marítimo",
+    "page": "coruna"
+  },
+  {
+    "id": "see-card-3-content",
+    "title": "Qué ver - Tarjeta 3 texto",
+    "content": "Camina por el hermoso paseo marítimo, respira el aire del mar y disfruta de las vistas.",
     "page": "coruna"
   },
   {
@@ -291,6 +483,12 @@
     "id": "rsvp-success-button",
     "title": "RSVP - Texto botón éxito",
     "content": "Volver al inicio",
+    "page": "rsvp"
+  },
+  {
+    "id": "rsvp-bottom-image-url",
+    "title": "RSVP - Imagen inferior",
+    "content": "/assets/imagen04.png",
     "page": "rsvp"
   }
 ]

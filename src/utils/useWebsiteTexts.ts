@@ -67,5 +67,9 @@ export default function useWebsiteTexts() {
     return sections.filter(section => section.page === page && !excludedSet.has(section.id));
   };
 
-  return { getText, getTitle, getSection, getCustomSections };
+  const getSectionsByPage = (page: string): Section[] => {
+    return sections.filter(section => section.page === page);
+  };
+
+  return { getText, getTitle, getSection, getCustomSections, getSectionsByPage };
 }
