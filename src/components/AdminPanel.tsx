@@ -1191,7 +1191,8 @@ export default function AdminPanel() {
                       </div>
                     </div>
                     <div className="map-link admin-inline-link-block">{renderEditableField(getSection('info-map-link-text', 'info'), 'content', { as: 'span', allowEnter: false })}</div>
-                    <div className="admin-inline-link-block">{renderEditableField(getSection('map-directions-url', 'info'), 'content', { as: 'span', allowEnter: false })}</div>
+                    <p className="admin-inline-help">URL del botón “Ver en Google Maps”:</p>
+                    <div className="admin-inline-link-block">{renderEditableField(getSection('map-directions-url', 'info'), 'content', { as: 'p', className: 'inline-editable-url', allowEnter: false })}</div>
                   </article>
                 </section>
 

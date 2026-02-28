@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Missing pathname' });
   }
 
-  if (!pathname.startsWith('gallery/')) {
+  if (!pathname.startsWith('gallery/') && !pathname.startsWith('site-images/')) {
     return res.status(400).json({ error: 'Invalid pathname' });
   }
 
