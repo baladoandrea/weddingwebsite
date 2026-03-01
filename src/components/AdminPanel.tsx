@@ -1122,7 +1122,7 @@ export default function AdminPanel() {
       <header className="admin-header">
         <div className="admin-header-copy">
           <h1>Panel Administrativo</h1>
-          <p className="admin-header-subtitle">Edición visual y guiada para actualizar la web sin conocimientos técnicos.</p>
+          <p className="admin-header-subtitle">Edición visual y guiada para actualizar la web.</p>
         </div>
         <div className="admin-header-actions" ref={menuRef}>
           <span className="admin-active-chip" aria-live="polite">
@@ -1505,7 +1505,7 @@ export default function AdminPanel() {
               <p>Sube una imagen nueva o vuelve a la imagen original de cada bloque.</p>
             </div>
             <p className="admin-editor-note">
-              Recomendación: usa imágenes nítidas y en horizontal para que se vean bien en móvil y ordenador.
+              Recomendación: usa imágenes nítidas para que se vean bien en móvil.
             </p>
 
             <div className="admin-image-grid">
