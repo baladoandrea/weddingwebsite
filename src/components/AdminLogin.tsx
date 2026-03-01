@@ -7,6 +7,7 @@ export default function AdminLogin() {
   const [pass, setPass] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const hasError = Boolean(error);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,9 +35,9 @@ export default function AdminLogin() {
         return;
       }
 
-      setError(data.error || 'Usuario o contraseña incorrectos');
+      setError(data.error || 'Usuario o contraseña no válidos');
     } catch (error) {
-      setError('No se pudo iniciar sesión. Inténtalo de nuevo.');
+      setError('No hemos podido iniciar sesión. Vuelve a intentarlo.');
     } finally {
       setLoading(false);
     }
@@ -46,11 +47,15 @@ export default function AdminLogin() {
     <div className="admin-login-container">
       <div className="login-box">
         <div className="login-header">
-          <h1>Acceso Admin</h1>
+          <h1>Acceso al panel</h1>
           <p>Boda de Marta & Sergio</p>
         </div>
 
-        <form onSubmit={handleLogin} className="login-form">
+        <p id="login-help" className="login-helper">
+          Inicia sesión para editar textos, imágenes, galería e invitados.
+        </p>
+
+        <form onSubmit={handleLogin} className="login-form" aria-describedby="login-help">
           <div className="form-group">
             <label htmlFor="user">Usuario</label>
             <input
@@ -61,6 +66,8 @@ export default function AdminLogin() {
               onChange={e => setUser(e.target.value)}
               disabled={loading}
               autoComplete="username"
+              aria-invalid={hasError}
+              aria-describedby={hasError ? 'login-error' : undefined}
             />
           </div>
 
@@ -74,13 +81,23 @@ export default function AdminLogin() {
               onChange={e => setPass(e.target.value)}
               disabled={loading}
               autoComplete="current-password"
+              aria-invalid={hasError}
+              aria-describedby={hasError ? 'login-error' : undefined}
             />
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div id="login-error" className="error-message" role="alert" aria-live="assertive">
+              {error}
+            </div>
+          )}
 
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'Verificando...' : 'Entrar'}
+          <div className="sr-only" role="status" aria-live="polite">
+            {loading ? 'Comprobando credenciales…' : ''}
+          </div>
+
+          <button type="submit" className="login-btn" disabled={loading} aria-busy={loading}>
+            {loading ? 'Comprobando...' : 'Entrar'}
           </button>
         </form>
 

@@ -38,6 +38,42 @@ interface ImageSlot {
   alt: string;
 }
 
+type AdminTab = 'texts' | 'images' | 'gallery' | 'guests';
+type WebsitePageFilter = 'all' | 'principal' | 'info' | 'coruna' | 'rsvp';
+type AdminTabMeta = { label: string; icon: string; description: string };
+type PageFilterMeta = { label: string; icon: string };
+
+const ADMIN_TAB_META: Record<AdminTab, AdminTabMeta> = {
+  texts: {
+    label: 'Textos',
+    icon: '📝',
+    description: 'Cambia textos y botones viendo el resultado al momento.',
+  },
+  images: {
+    label: 'Imágenes',
+    icon: '🖼️',
+    description: 'Actualiza fotos clave de cada página en dos clics.',
+  },
+  gallery: {
+    label: 'Galería',
+    icon: '📸',
+    description: 'Sube, etiqueta y elimina fotos de la galería.',
+  },
+  guests: {
+    label: 'Invitados',
+    icon: '👥',
+    description: 'Consulta confirmaciones y gestiona invitados fácilmente.',
+  },
+};
+
+const PAGE_FILTER_META: Record<WebsitePageFilter, PageFilterMeta> = {
+  all: { label: 'Todas', icon: '🌐' },
+  principal: { label: 'Principal', icon: '🏠' },
+  info: { label: 'Información', icon: 'ℹ️' },
+  coruna: { label: 'A Coruña', icon: '📍' },
+  rsvp: { label: 'RSVP', icon: '💌' },
+};
+
 const FIXED_IDS = new Set(ADMIN_PREVIEW_ITEMS.map(item => item.id));
 const FIXED_ORDER_BY_ID = ADMIN_PREVIEW_ITEMS.reduce((acc, item, index) => {
   acc[item.id] = index * 10;
@@ -195,8 +231,8 @@ export default function AdminPanel() {
   const toastTimeoutRef = useRef<number | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'texts' | 'images' | 'gallery' | 'guests'>('texts');
-  const [selectedPage, setSelectedPage] = useState<'all' | 'principal' | 'info' | 'coruna' | 'rsvp'>('all');
+  const [activeTab, setActiveTab] = useState<AdminTab>('texts');
+  const [selectedPage, setSelectedPage] = useState<WebsitePageFilter>('all');
 
   const [sections, setSections] = useState<Section[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
@@ -398,6 +434,45 @@ export default function AdminPanel() {
 
     return grouped;
   }, [sections]);
+
+  const pendingGuests = useMemo(
+    () => guests.filter(guest => !guest.attendance || guest.attendance === 'Pendiente').length,
+    [guests]
+  );
+
+  const activeTabMeta = ADMIN_TAB_META[activeTab];
+
+  const quickStats = useMemo(() => ([
+    {
+      id: 'texts',
+      label: 'Bloques editables',
+      value: `${allDisplaySections.length}`,
+      helper: 'Textos y enlaces configurables',
+    },
+    {
+      id: 'images',
+      label: 'Imágenes del sitio',
+      value: `${IMAGE_SLOT_CONFIG.length}`,
+      helper: 'Fotos principales de páginas',
+    },
+    {
+      id: 'gallery',
+      label: 'Fotos en galería',
+      value: `${gallery.length}`,
+      helper: 'Imágenes subidas por admin',
+    },
+    {
+      id: 'guests',
+      label: 'Invitados pendientes',
+      value: `${pendingGuests}`,
+      helper: `${guests.length} invitados en total`,
+    },
+  ]), [allDisplaySections.length, gallery.length, guests.length, pendingGuests]);
+
+  const openTab = (tab: AdminTab) => {
+    setActiveTab(tab);
+    setIsAdminMenuOpen(false);
+  };
 
   const getSection = (id: string, page: string): Section => {
     const existing = sectionById.get(id);
@@ -718,6 +793,7 @@ export default function AdminPanel() {
             className="inline-icon-btn"
             onClick={() => startInlineEdit(section.id, field)}
             title={field === 'title' ? 'Editar título' : 'Editar contenido'}
+            aria-label={field === 'title' ? 'Editar título' : 'Editar contenido'}
             disabled={isSaving}
           >
             ✏️
@@ -726,6 +802,7 @@ export default function AdminPanel() {
             className="inline-icon-btn danger"
             onClick={() => handleTrashField(section, field)}
             title={field === 'title' ? 'Eliminar/restablecer título' : 'Eliminar/restablecer contenido'}
+            aria-label={field === 'title' ? 'Eliminar o restablecer título' : 'Eliminar o restablecer contenido'}
             disabled={isSaving}
           >
             🗑️
@@ -957,6 +1034,7 @@ export default function AdminPanel() {
                 <button
                   className="inline-icon-btn"
                   title="Subir tarjeta"
+                  aria-label={`Subir posición de la tarjeta ${key}`}
                   onClick={() => void moveCorunaCard(prefix, cards, key, 'up')}
                   disabled={index === 0}
                 >
@@ -965,6 +1043,7 @@ export default function AdminPanel() {
                 <button
                   className="inline-icon-btn"
                   title="Bajar tarjeta"
+                  aria-label={`Bajar posición de la tarjeta ${key}`}
                   onClick={() => void moveCorunaCard(prefix, cards, key, 'down')}
                   disabled={index === allCardKeys.length - 1}
                 >
@@ -1010,7 +1089,7 @@ export default function AdminPanel() {
 
   const renderGuidedLongTextField = (
     section: Section,
-    hint = 'Consejo: usa saltos de línea para separar párrafos y mejorar la lectura.'
+    hint = 'Consejo: usa saltos de línea para separar ideas y que sea más fácil de leer.'
   ) => (
     <>
       {renderEditableField(section, 'content')}
@@ -1041,8 +1120,14 @@ export default function AdminPanel() {
       )}
 
       <header className="admin-header">
-        <h1>Panel Administrativo</h1>
+        <div className="admin-header-copy">
+          <h1>Panel Administrativo</h1>
+          <p className="admin-header-subtitle">Edición visual y guiada para actualizar la web sin conocimientos técnicos.</p>
+        </div>
         <div className="admin-header-actions" ref={menuRef}>
+          <span className="admin-active-chip" aria-live="polite">
+            {activeTabMeta.icon} {activeTabMeta.label}
+          </span>
           <button
             className="menu-btn"
             onClick={() => setIsAdminMenuOpen(current => !current)}
@@ -1058,17 +1143,17 @@ export default function AdminPanel() {
 
           {isAdminMenuOpen && (
             <nav className="admin-sidebar" aria-label="Navegación de admin">
-              <button className={`admin-sidebar-link ${activeTab === 'texts' ? 'active' : ''}`} onClick={() => { setActiveTab('texts'); setIsAdminMenuOpen(false); }}>
-                Textos
+              <button className={`admin-sidebar-link ${activeTab === 'texts' ? 'active' : ''}`} onClick={() => openTab('texts')}>
+                📝 Textos
               </button>
-              <button className={`admin-sidebar-link ${activeTab === 'images' ? 'active' : ''}`} onClick={() => { setActiveTab('images'); setIsAdminMenuOpen(false); }}>
-                Imágenes
+              <button className={`admin-sidebar-link ${activeTab === 'images' ? 'active' : ''}`} onClick={() => openTab('images')}>
+                🖼️ Imágenes
               </button>
-              <button className={`admin-sidebar-link ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => { setActiveTab('gallery'); setIsAdminMenuOpen(false); }}>
-                Galería
+              <button className={`admin-sidebar-link ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => openTab('gallery')}>
+                📸 Galería
               </button>
-              <button className={`admin-sidebar-link ${activeTab === 'guests' ? 'active' : ''}`} onClick={() => { setActiveTab('guests'); setIsAdminMenuOpen(false); }}>
-                Invitados
+              <button className={`admin-sidebar-link ${activeTab === 'guests' ? 'active' : ''}`} onClick={() => openTab('guests')}>
+                👥 Invitados
               </button>
               <button
                 className="admin-sidebar-link admin-sidebar-danger"
@@ -1085,27 +1170,72 @@ export default function AdminPanel() {
       </header>
 
       <div className="admin-content">
+        <section className="admin-overview">
+          <div className="admin-overview-top">
+            <div>
+              <p className="admin-overview-kicker">Edición guiada</p>
+              <h2>Selecciona qué quieres actualizar</h2>
+              <p>{activeTabMeta.description}</p>
+            </div>
+            <div className="admin-quick-tabs" role="tablist" aria-label="Pestañas principales de administración">
+              {(Object.entries(ADMIN_TAB_META) as Array<[AdminTab, AdminTabMeta]>).map(([tabKey, tabMeta]) => (
+                <button
+                  key={tabKey}
+                  type="button"
+                  className={`admin-quick-tab ${activeTab === tabKey ? 'active' : ''}`}
+                  role="tab"
+                  id={`admin-tab-${tabKey}`}
+                  aria-controls={`admin-panel-${tabKey}`}
+                  aria-selected={activeTab === tabKey}
+                  title={`Abrir sección ${tabMeta.label}`}
+                  onClick={() => openTab(tabKey)}
+                >
+                  <span aria-hidden>{tabMeta.icon}</span>
+                  <span>{tabMeta.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="admin-stats-grid">
+            {quickStats.map(stat => (
+              <article key={stat.id} className="admin-stat-card">
+                <p className="admin-stat-label">{stat.label}</p>
+                <p className="admin-stat-value">{stat.value}</p>
+                <p className="admin-stat-helper">{stat.helper}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
         {activeTab === 'texts' && (
-          <div className="admin-section admin-inline-editor">
+          <div
+            className="admin-section admin-inline-editor"
+            role="tabpanel"
+            id="admin-panel-texts"
+            aria-labelledby="admin-tab-texts"
+          >
+            <div className="admin-section-head">
+              <h2>Textos de la web</h2>
+              <p>Selecciona una página y pulsa ✏️ sobre el texto que quieras cambiar.</p>
+            </div>
             <p className="admin-editor-note">
-              Edición en vivo: usa ✏️ para editar y 🗑️ para restablecer/eliminar. Los cambios se guardan automáticamente al salir del campo.
+              Paso 1: elige una página. Paso 2: edita en la vista previa. Paso 3: haz clic fuera para guardar.
             </p>
             <div className="page-filter-tabs">
-              <button className={`page-filter-btn ${selectedPage === 'all' ? 'active' : ''}`} onClick={() => setSelectedPage('all')}>
-                Todas
-              </button>
-              <button className={`page-filter-btn ${selectedPage === 'principal' ? 'active' : ''}`} onClick={() => setSelectedPage('principal')}>
-                Principal
-              </button>
-              <button className={`page-filter-btn ${selectedPage === 'info' ? 'active' : ''}`} onClick={() => setSelectedPage('info')}>
-                Información
-              </button>
-              <button className={`page-filter-btn ${selectedPage === 'coruna' ? 'active' : ''}`} onClick={() => setSelectedPage('coruna')}>
-                A Coruña
-              </button>
-              <button className={`page-filter-btn ${selectedPage === 'rsvp' ? 'active' : ''}`} onClick={() => setSelectedPage('rsvp')}>
-                RSVP
-              </button>
+              {(Object.entries(PAGE_FILTER_META) as Array<[WebsitePageFilter, PageFilterMeta]>).map(([pageId, pageMeta]) => (
+                <button
+                  key={pageId}
+                  className={`page-filter-btn ${selectedPage === pageId ? 'active' : ''}`}
+                  type="button"
+                  aria-pressed={selectedPage === pageId}
+                  title={`Filtrar por ${pageMeta.label}`}
+                  onClick={() => setSelectedPage(pageId)}
+                >
+                  <span aria-hidden>{pageMeta.icon}</span>
+                  <span>{pageMeta.label}</span>
+                </button>
+              ))}
             </div>
 
             {(selectedPage === 'all' || selectedPage === 'principal') && (
@@ -1124,7 +1254,7 @@ export default function AdminPanel() {
                   {renderEditableField(getSection('main-event-date-text', 'principal'), 'content', { as: 'p', className: 'event-date', allowEnter: false })}
                   {renderEditableField(getSection('main-cta-button-text', 'principal'), 'content', { as: 'p', className: 'btn-primary', allowEnter: false })}
                 </section>
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('principal', 'main-quote')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página principal" aria-label="Añadir sección en página principal" onClick={() => createSectionBetween('principal', 'main-quote')}>+</button></div>
 
                 <section className="location-section admin-mirror-section">
                   {renderEditableField(getSection('location-title', 'principal'), 'content', { as: 'h3', className: 'location-title', allowEnter: false })}
@@ -1158,7 +1288,7 @@ export default function AdminPanel() {
                   </div>
                 </section>
 
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('principal', 'map-embed-url')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página principal" aria-label="Añadir sección en página principal" onClick={() => createSectionBetween('principal', 'map-embed-url')}>+</button></div>
 
                 {renderCustomSections('principal')}
               </section>
@@ -1175,7 +1305,7 @@ export default function AdminPanel() {
                     {renderEditableField(getSection('car-section', 'info'), 'title', { as: 'h3', allowEnter: false })}
                     {renderGuidedLongTextField(
                       getSection('car-section', 'info'),
-                      'Consejo: describe la ruta en pasos cortos para que sea más clara.'
+                      'Consejo: describe la ruta en pasos cortos para que sea más fácil de seguir.'
                     )}
                   </article>
                   <article className="subsection">
@@ -1196,24 +1326,24 @@ export default function AdminPanel() {
                   </article>
                 </section>
 
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'bus-return-text')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página información" aria-label="Añadir sección en página información" onClick={() => createSectionBetween('info', 'bus-return-text')}>+</button></div>
 
                 <section className="info-section admin-mirror-section">
                   {renderEditableField(getSection('questions-section', 'info'), 'title', { as: 'h2', allowEnter: false })}
                   {renderGuidedLongTextField(getSection('questions-section', 'info'))}
                 </section>
 
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'questions-section')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página información" aria-label="Añadir sección en página información" onClick={() => createSectionBetween('info', 'questions-section')}>+</button></div>
 
                 <section className="info-section gift-section admin-mirror-section">
                   {renderEditableField(getSection('gift-section', 'info'), 'title', { as: 'h2', allowEnter: false })}
                   {renderGuidedLongTextField(
                     getSection('gift-section', 'info'),
-                    'Consejo: puedes separar mensaje emocional y datos prácticos en líneas distintas.'
+                    'Consejo: separa el mensaje emocional y los datos prácticos en líneas distintas.'
                   )}
                 </section>
 
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'gift-section')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página información" aria-label="Añadir sección en página información" onClick={() => createSectionBetween('info', 'gift-section')}>+</button></div>
 
                 <section className="info-section playlist-section admin-mirror-section">
                   {renderEditableField(getSection('info-playlist-title', 'info'), 'content', { as: 'h2', allowEnter: false })}
@@ -1225,7 +1355,7 @@ export default function AdminPanel() {
                   </div>
                 </section>
 
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('info', 'spotify-playlist-url')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página información" aria-label="Añadir sección en página información" onClick={() => createSectionBetween('info', 'spotify-playlist-url')}>+</button></div>
 
                 {renderCustomSections('info')}
               </section>
@@ -1247,7 +1377,7 @@ export default function AdminPanel() {
                     contentId: 'eat-card-2-content',
                   },
                 ])}
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'eat-section')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página A Coruña" aria-label="Añadir sección en página A Coruña" onClick={() => createSectionBetween('coruna', 'eat-section')}>+</button></div>
                 {renderCorunaSeparatedCardsEditor('drink-section', 'drink', [
                   {
                     titleId: 'drink-card-1-title',
@@ -1258,14 +1388,14 @@ export default function AdminPanel() {
                     contentId: 'drink-card-2-content',
                   },
                 ])}
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'drink-section')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página A Coruña" aria-label="Añadir sección en página A Coruña" onClick={() => createSectionBetween('coruna', 'drink-section')}>+</button></div>
                 {renderCorunaSeparatedCardsEditor('stay-section', 'stay', [
                   {
                     titleId: 'stay-card-1-title',
                     contentId: 'stay-card-1-content',
                   },
                 ])}
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'stay-section')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página A Coruña" aria-label="Añadir sección en página A Coruña" onClick={() => createSectionBetween('coruna', 'stay-section')}>+</button></div>
                 {renderCorunaSeparatedCardsEditor('see-section', 'see', [
                   {
                     titleId: 'see-card-1-title',
@@ -1280,7 +1410,7 @@ export default function AdminPanel() {
                     contentId: 'see-card-3-content',
                   },
                 ])}
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('coruna', 'see-section')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página A Coruña" aria-label="Añadir sección en página A Coruña" onClick={() => createSectionBetween('coruna', 'see-section')}>+</button></div>
 
                 {renderCustomSections('coruna')}
               </section>
@@ -1294,11 +1424,11 @@ export default function AdminPanel() {
                   {renderEditableField(getSection('rsvp-intro-title', 'rsvp'), 'content', { as: 'h2', allowEnter: false })}
                   {renderGuidedLongTextField(
                     getSection('rsvp-intro-text', 'rsvp'),
-                    'Consejo: usa un tono cercano y párrafos breves para facilitar lectura móvil.'
+                    'Consejo: usa frases cortas y cercanas para facilitar la lectura en móvil.'
                   )}
                 </section>
 
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('rsvp', 'rsvp-intro-text')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página RSVP" aria-label="Añadir sección en página RSVP" onClick={() => createSectionBetween('rsvp', 'rsvp-intro-text')}>+</button></div>
 
                 <section className="attendance-options admin-mirror-section">
                   {renderEditableField(getSection('rsvp-attendance-title', 'rsvp'), 'content', { as: 'h3', allowEnter: false })}
@@ -1348,7 +1478,7 @@ export default function AdminPanel() {
                   </div>
                 </section>
 
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('rsvp', 'rsvp-attendance-option-no-value')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página RSVP" aria-label="Añadir sección en página RSVP" onClick={() => createSectionBetween('rsvp', 'rsvp-attendance-option-no-value')}>+</button></div>
 
                 <section className="rsvp-success admin-mirror-section">
                   <div className="success-modal">
@@ -1359,7 +1489,7 @@ export default function AdminPanel() {
                   </div>
                 </section>
 
-                <div className="inline-add-row"><button className="inline-add-btn" onClick={() => createSectionBetween('rsvp', 'rsvp-success-button')}>+</button></div>
+                <div className="inline-add-row"><button className="inline-add-btn" title="Añadir sección en página RSVP" aria-label="Añadir sección en página RSVP" onClick={() => createSectionBetween('rsvp', 'rsvp-success-button')}>+</button></div>
 
                 {renderCustomSections('rsvp')}
               </section>
@@ -1369,10 +1499,13 @@ export default function AdminPanel() {
         )}
 
         {activeTab === 'images' && (
-          <div className="admin-section">
-            <h2>Modificar imágenes</h2>
+          <div className="admin-section" role="tabpanel" id="admin-panel-images" aria-labelledby="admin-tab-images">
+            <div className="admin-section-head">
+              <h2>Imágenes principales</h2>
+              <p>Sube una imagen nueva o vuelve a la imagen original de cada bloque.</p>
+            </div>
             <p className="admin-editor-note">
-              Sube una nueva imagen en cada bloque para reemplazar la que se muestra actualmente en la web.
+              Recomendación: usa imágenes nítidas y en horizontal para que se vean bien en móvil y ordenador.
             </p>
 
             <div className="admin-image-grid">
@@ -1389,6 +1522,7 @@ export default function AdminPanel() {
                       <input
                         type="file"
                         accept="image/*"
+                        aria-label={`Subir imagen para ${slot.label}`}
                         disabled={isUploading || isResetting}
                         onChange={event => {
                           const file = event.target.files?.[0];
@@ -1402,6 +1536,7 @@ export default function AdminPanel() {
                     <button
                       type="button"
                       className="admin-image-reset-btn"
+                      aria-label={`Restablecer imagen por defecto para ${slot.label}`}
                       disabled={isUploading || isResetting}
                       onClick={() => void handleResetSiteImage(slot)}
                     >
@@ -1415,8 +1550,11 @@ export default function AdminPanel() {
         )}
 
         {activeTab === 'gallery' && (
-          <div className="admin-section">
-            <h2>Gestionar Galería</h2>
+          <div className="admin-section" role="tabpanel" id="admin-panel-gallery" aria-labelledby="admin-tab-gallery">
+            <div className="admin-section-head">
+              <h2>Galería de fotos</h2>
+              <p>Sube fotos, añade etiquetas y elimina las que no quieras mostrar.</p>
+            </div>
             <GalleryUpload onUpload={handleGalleryUpload} />
             <div className="gallery-grid">
               {gallery.map(item => (
@@ -1427,7 +1565,7 @@ export default function AdminPanel() {
                       <span key={tag} className="tag">{tag}</span>
                     ))}
                   </div>
-                  <button className="delete-btn" onClick={() => handleDeleteGalleryItem(item.id)}>
+                  <button className="delete-btn" aria-label={`Eliminar foto de galería ${item.id}`} onClick={() => handleDeleteGalleryItem(item.id)}>
                     Eliminar
                   </button>
                 </div>
@@ -1437,8 +1575,11 @@ export default function AdminPanel() {
         )}
 
         {activeTab === 'guests' && (
-          <div className="admin-section">
-            <h2>Gestionar Invitados</h2>
+          <div className="admin-section" role="tabpanel" id="admin-panel-guests" aria-labelledby="admin-tab-guests">
+            <div className="admin-section-head">
+              <h2>Lista de invitados</h2>
+              <p>Consulta quién ha confirmado y elimina registros si lo necesitas.</p>
+            </div>
             <div className="guests-table">
               <table>
                 <thead>
@@ -1456,7 +1597,7 @@ export default function AdminPanel() {
                       <td>{guest.attendance || 'Pendiente'}</td>
                       <td>{guest.notes || '-'}</td>
                       <td>
-                        <button className="delete-btn" onClick={() => handleDeleteGuest(guest.id)}>
+                        <button className="delete-btn" aria-label={`Eliminar invitado ${guest.name}`} onClick={() => handleDeleteGuest(guest.id)}>
                           Eliminar
                         </button>
                       </td>
