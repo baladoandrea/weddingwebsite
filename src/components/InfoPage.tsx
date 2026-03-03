@@ -42,7 +42,7 @@ export default function InfoPage() {
   const { getSection, getText, getCustomSections } = useWebsiteTexts();
   const carSection = getSection('car-section', {
     title: 'Cómo llegar en coche',
-    content: 'Para llegar al Casón Amor en coche, dirígete hacia el centro de A Coruña y sigue las indicaciones hacia la zona de la Ciudad Vieja o Torre de Hércules. Existen zonas de aparcamiento habilitadas en las inmediaciones.',
+    content: 'Para llegar a Costa Caión desde A Coruña, Toma la autopista AG-55 dirección Arteixo. a los 5 km hay que desviarse en el ramal para acceder a la AC-551 que dará paso a la carretera de la costa DP-0514. Continua la carretera de la costa disfrutando las vistas hasta llegar al recinto tras dejar atrás el pueblo de caion. El trayecto desde A Coruña son unos 30 minutos (25km). No dudes en utilizar apps de navegación para llegar sin problema! ante cualquier duda, pregúntanos sin problema',
     page: 'info',
   });
   const questionsSection = getSection('questions-section', {
