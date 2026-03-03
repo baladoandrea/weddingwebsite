@@ -19,7 +19,10 @@ interface SubmitResponse {
 }
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'baladoandrea@gmail.com';
+const NOTIFICATION_EMAILS = (process.env.NOTIFICATION_EMAIL || 'sergio.balado.rodriguez@gmail.com ,martagarran1@hotmail.com, baladoandrea@gmail.com')
+  .split(',')
+  .map((email: string) => email.trim())
+  .filter(Boolean);
 
 const normalizeAttendance = (value: string): string => {
   return value
@@ -155,7 +158,7 @@ export default async function handler(
 
         await resend.emails.send({
           from: 'Boda Marta & Sergio <onboarding@resend.dev>',
-          to: NOTIFICATION_EMAIL,
+          to: NOTIFICATION_EMAILS,
           subject: `Nueva confirmación RSVP: ${guestName}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -175,7 +178,7 @@ export default async function handler(
             </div>
           `,
         });
-        console.log('✅ Email enviado a:', NOTIFICATION_EMAIL);
+        console.log('✅ Email enviado a:', NOTIFICATION_EMAILS.join(', '));
       } catch (emailError) {
         console.error('⚠️  Error enviando email:', emailError);
       }
