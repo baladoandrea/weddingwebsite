@@ -17,7 +17,7 @@ function doPost(e) {
   try {
     // Parsear datos del request
     const data = JSON.parse(e.postData.contents);
-    const { guestId, attendance, notes } = data;
+    const { guestId, attendance, notes, bus, intolerances } = data;
     
     // Obtener la hoja "Invitados"
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Invitados');
@@ -32,6 +32,21 @@ function doPost(e) {
     // Buscar el invitado por ID (Columna A)
     const dataRange = sheet.getDataRange();
     const values = dataRange.getValues();
+
+    const headers = (values[0] || []).map(value => value.toString().trim().toLowerCase());
+    const findColumn = (...candidates) => {
+      for (let i = 0; i < headers.length; i++) {
+        if (candidates.includes(headers[i])) {
+          return i + 1; // Google Sheets columns are 1-based
+        }
+      }
+      return -1;
+    };
+
+    const attendanceCol = findColumn('asistencia');
+    const notesCol = findColumn('notas');
+    const busCol = findColumn('bus');
+    const intolerancesCol = findColumn('intolerancias', 'alergias', 'intolerancias o alergias alimentarias');
     
     let rowFound = -1;
     for (let i = 1; i < values.length; i++) { // Empezar en 1 para saltar header
@@ -48,12 +63,29 @@ function doPost(e) {
       })).setMimeType(ContentService.MimeType.JSON);
     }
     
-    // Actualizar la asistencia (Columna C) y notas (Columna D)
-    sheet.getRange(rowFound, 3).setValue(attendance); // Columna C = Asistencia
-    sheet.getRange(rowFound, 4).setValue(notes || ''); // Columna D = Notas
+    // Actualizar columnas por nombre de cabecera (con fallback si no existe)
+    if (attendanceCol > 0) {
+      sheet.getRange(rowFound, attendanceCol).setValue(attendance || '');
+    } else {
+      sheet.getRange(rowFound, 3).setValue(attendance || '');
+    }
+
+    if (notesCol > 0) {
+      sheet.getRange(rowFound, notesCol).setValue(notes || '');
+    } else {
+      sheet.getRange(rowFound, 4).setValue(notes || '');
+    }
+
+    if (busCol > 0) {
+      sheet.getRange(rowFound, busCol).setValue(bus || '');
+    }
+
+    if (intolerancesCol > 0) {
+      sheet.getRange(rowFound, intolerancesCol).setValue(intolerances || '');
+    }
     
     // Log de la actualización
-    Logger.log(`✅ Actualizado: ${values[rowFound-1][1]} → ${attendance}`);
+    Logger.log(`✅ Actualizado: ${values[rowFound-1][1]} → ${attendance} | Bus: ${bus || '-'} | Intolerancias: ${intolerances || '-'}`);
     
     return ContentService.createTextOutput(JSON.stringify({
       success: true,

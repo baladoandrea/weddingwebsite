@@ -13,14 +13,16 @@ B1: Nombre
 C1: Asistencia
 D1: Notas
 E1: Imagen
+F1: Bus
+G1: Intolerancias
 ```
 
 **Datos (desde fila 2):**
 ```
-| ID | Nombre              | Asistencia | Notas | Imagen                    |
-|----|---------------------|------------|-------|---------------------------|
-| 1  | Juan García López   |            |       | /assets/thank-you-1.png   |
-| 2  | María Rodríguez     |            |       | /assets/thank-you-2.png   |
+| ID | Nombre              | Asistencia | Notas | Imagen                  | Bus | Intolerancias |
+|----|---------------------|------------|-------|-------------------------|-----|---------------|
+| 1  | Juan García López   |            |       | /assets/thank-you-1.png |     |               |
+| 2  | María Rodríguez     |            |       | /assets/thank-you-2.png |     |               |
 ```
 
 ### 2️⃣ La hoja debe ser pública (solo lectura)

@@ -14,6 +14,8 @@ interface Guest {
 interface RSVPFormData {
   guestName: string;
   attendance: string;
+  bus: string;
+  intolerances: string;
   notes: string;
 }
 
@@ -66,6 +68,13 @@ export default function RSVPPage() {
     content: 'No puedo',
     page: 'rsvp',
   });
+  const optionPlusOneLabel = getText('rsvp-attendance-option-plusone-label', 'Sí, iré con acompañante.');
+  const optionPlusOneValue = getText('rsvp-attendance-option-plusone-value', 'Sí, iré con acompañante');
+  const busQuestionTitle = getText('rsvp-bus-question-title', '¿Necesitas transporte?');
+  const busYesLabel = getText('rsvp-bus-option-yes-label', 'Sí, iré en bus.');
+  const busNoLabel = getText('rsvp-bus-option-no-label', 'No.');
+  const intolerancesLabel = getText('rsvp-intolerances-label', 'Intolerancias o alergias alimentarias');
+  const intolerancesPlaceholder = getText('rsvp-intolerances-placeholder', 'Indica aquí si tienes alguna intolerancia o alergia...');
   const successTitle = getSection('rsvp-success-title', {
     title: 'RSVP - Título éxito',
     content: '¡Gracias!',
@@ -94,7 +103,7 @@ export default function RSVPPage() {
   const notesPlaceholder = getText('rsvp-notes-placeholder', 'Cuéntanos algo especial...');
   const submitButton = getText('rsvp-submit-button', 'Enviar Confirmación');
   const submittingButton = getText('rsvp-submitting-button', 'Enviando...');
-  const validationAlert = getText('rsvp-validation-alert', 'Por favor selecciona tu nombre y una opción de asistencia');
+  const validationAlert = getText('rsvp-validation-alert', 'Por favor selecciona tu nombre, una opción de asistencia y si necesitas bus');
   const submitErrorAlert = getText('rsvp-submit-error-alert', 'Error al enviar la confirmación');
   const bottomImageUrl = getText('rsvp-bottom-image-url', '/assets/imagen04.png');
 
@@ -105,6 +114,8 @@ export default function RSVPPage() {
   const [formData, setFormData] = useState<RSVPFormData>({
     guestName: '',
     attendance: '',
+    bus: '',
+    intolerances: '',
     notes: '',
   });
   const [submitted, setSubmitted] = useState(false);
@@ -157,6 +168,8 @@ export default function RSVPPage() {
     setFormData({
       guestName: guest.name,
       attendance: guest.attendance || '',
+      bus: '',
+      intolerances: '',
       notes: guest.notes || '',
     });
     setSearchQuery('');
@@ -173,10 +186,20 @@ export default function RSVPPage() {
     }
   };
 
+  const handleBusChange = (bus: string) => {
+    setFormData({ ...formData, bus });
+  };
+
+  const handleIntolerancesChange = (intolerances: string) => {
+    if (intolerances.length <= 240) {
+      setFormData({ ...formData, intolerances });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedGuest || !formData.attendance) {
+    if (!selectedGuest || !formData.attendance || !formData.bus) {
       alert(validationAlert);
       return;
     }
@@ -191,6 +214,8 @@ export default function RSVPPage() {
           guestId: selectedGuest.id,
           guestName: selectedGuest.name,
           attendance: formData.attendance,
+          bus: formData.bus,
+          intolerances: formData.intolerances,
           notes: formData.notes,
         }),
       });
@@ -288,7 +313,7 @@ export default function RSVPPage() {
                 className="change-guest-btn"
                 onClick={() => {
                   setSelectedGuest(null);
-                  setFormData({ guestName: '', attendance: '', notes: '' });
+                  setFormData({ guestName: '', attendance: '', bus: '', intolerances: '', notes: '' });
                 }}
               >
                 {changeGuestButton}
@@ -324,12 +349,62 @@ export default function RSVPPage() {
                 <input
                   type="radio"
                   name="attendance"
+                  value={optionPlusOneValue}
+                  checked={formData.attendance === optionPlusOneValue}
+                  onChange={e => handleAttendanceChange(e.target.value)}
+                />
+                <span className="option-text">{optionPlusOneLabel}</span>
+              </label>
+
+              <label className="attendance-option">
+                <input
+                  type="radio"
+                  name="attendance"
                   value={optionNoValue.content}
                   checked={formData.attendance === optionNoValue.content}
                   onChange={e => handleAttendanceChange(e.target.value)}
                 />
                 <span className="option-text">{optionNoLabel.content}</span>
               </label>
+            </div>
+
+            <div className="attendance-options">
+              <h3>{busQuestionTitle}</h3>
+
+              <label className="attendance-option">
+                <input
+                  type="radio"
+                  name="bus"
+                  value="sí"
+                  checked={formData.bus === 'sí'}
+                  onChange={e => handleBusChange(e.target.value)}
+                />
+                <span className="option-text">{busYesLabel}</span>
+              </label>
+
+              <label className="attendance-option">
+                <input
+                  type="radio"
+                  name="bus"
+                  value="no"
+                  checked={formData.bus === 'no'}
+                  onChange={e => handleBusChange(e.target.value)}
+                />
+                <span className="option-text">{busNoLabel}</span>
+              </label>
+            </div>
+
+            <div className="notes-field">
+              <label htmlFor="intolerances">{intolerancesLabel}</label>
+              <textarea
+                id="intolerances"
+                placeholder={intolerancesPlaceholder}
+                value={formData.intolerances}
+                onChange={e => handleIntolerancesChange(e.target.value)}
+                maxLength={240}
+                rows={3}
+              />
+              <small>{formData.intolerances.length}/240</small>
             </div>
 
             <div className="notes-field">

@@ -5,6 +5,8 @@ interface RSVPSubmission {
   guestId: string;
   guestName: string;
   attendance: string;
+  bus: 'sí' | 'no';
+  intolerances: string;
   notes: string;
 }
 
@@ -18,6 +20,36 @@ interface SubmitResponse {
 const resend = new Resend(process.env.RESEND_API_KEY);
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'baladoandrea@gmail.com';
 
+const normalizeAttendance = (value: string): string => {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+};
+
+const getAttendanceEmailText = (attendance: string): string => {
+  const normalized = normalizeAttendance(attendance);
+
+  if (normalized.includes('no puedo') || normalized.startsWith('no')) {
+    return `❌ ${attendance}`;
+  }
+
+  if (normalized.includes('acompanante')) {
+    return `✅ ${attendance}`;
+  }
+
+  if (normalized.includes('nino') || normalized.includes('ninos')) {
+    return `✅ ${attendance}`;
+  }
+
+  if (normalized.includes('si') || normalized.includes('asistire') || normalized.includes('estare')) {
+    return `✅ ${attendance}`;
+  }
+
+  return attendance ? `ℹ️ ${attendance}` : '⚠️ Sin respuesta';
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SubmitResponse>
@@ -30,16 +62,16 @@ export default async function handler(
   }
 
   try {
-    const { guestId, guestName, attendance, notes } = req.body as RSVPSubmission;
+    const { guestId, guestName, attendance, bus, intolerances, notes } = req.body as RSVPSubmission;
 
-    if (!guestId || !guestName || !attendance) {
+    if (!guestId || !guestName || !attendance || !bus) {
       return res.status(400).json({
         success: false,
         message: 'Missing required fields',
       });
     }
 
-    console.log(`📝 RSVP submitted for ${guestName}:`, { attendance, notes });
+    console.log(`📝 RSVP submitted for ${guestName}:`, { attendance, bus, intolerances, notes });
 
     // 1. Actualizar Google Sheets usando Apps Script Web App
     const APPS_SCRIPT_URL = process.env.GOOGLE_APPS_SCRIPT_URL;
@@ -52,6 +84,8 @@ export default async function handler(
           body: JSON.stringify({
             guestId,
             attendance,
+            bus,
+            intolerances,
             notes,
           }),
         });
@@ -72,9 +106,8 @@ export default async function handler(
     // 2. Enviar email de notificación
     if (process.env.RESEND_API_KEY) {
       try {
-        const attendanceText = attendance === 'yes' ? '✅ Confirmó asistencia' :
-                              attendance === 'no' ? '❌ No podrá asistir' :
-                              '❓ Pendiente';
+        const attendanceText = getAttendanceEmailText(attendance);
+        const busText = bus === 'sí' ? '✅ Sí' : '❌ No';
 
         await resend.emails.send({
           from: 'Boda Marta & Sergio <onboarding@resend.dev>',
@@ -87,6 +120,8 @@ export default async function handler(
               <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
                 <p><strong>Invitado:</strong> ${guestName}</p>
                 <p><strong>Asistencia:</strong> ${attendanceText}</p>
+                <p><strong>Bus:</strong> ${busText}</p>
+                ${intolerances ? `<p><strong>Intolerancias:</strong> ${intolerances}</p>` : ''}
                 ${notes ? `<p><strong>Notas:</strong> ${notes}</p>` : ''}
               </div>
 

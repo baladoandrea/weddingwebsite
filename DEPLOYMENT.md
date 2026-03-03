@@ -209,6 +209,8 @@ El archivo `src/data/guests.json` contiene la lista de invitados. Puedes editarl
 
 Con Resend configurado, los emails se enviarán automáticamente cuando alguien confirme su asistencia.
 
+**Importante:** si cambias la lógica de asistencia en `src/pages/api/rsvp/submit.ts` (por ejemplo, el texto que aparece en el email), debes hacer **redeploy** para verlo en producción.
+
 ---
 
 ## 🔒 Seguridad
@@ -253,6 +255,12 @@ npm run build
 1. Verifica que `RESEND_API_KEY` esté configurada
 2. Verifica los logs en Vercel: Dashboard > "Functions" > "Logs"
 3. Prueba en local primero: `npm run dev`
+
+### El email muestra asistencia incorrecta (ej. "Pendiente")
+
+1. Verifica que el backend en producción esté actualizado (nuevo deploy)
+2. Revisa que Vercel haya tomado el último commit de `src/pages/api/rsvp/submit.ts`
+3. Envía una confirmación de prueba y valida el valor exacto de "Asistencia" recibido
 
 ### El formulario RSVP no funciona
 
