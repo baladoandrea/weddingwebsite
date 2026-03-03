@@ -19,10 +19,11 @@ interface SubmitResponse {
 }
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const NOTIFICATION_EMAILS = (process.env.NOTIFICATION_EMAIL || 'sergio.balado.rodriguez@gmail.com ,martagarran1@hotmail.com, baladoandrea@gmail.com')
+const NOTIFICATION_EMAILS = (process.env.NOTIFICATION_EMAILS || 'sergio.balado.rodriguez@gmail.com, martagarran1@hotmail.com, baladoandrea@gmail.com')
   .split(',')
   .map((email: string) => email.trim())
   .filter(Boolean);
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Boda Marta & Sergio <onboarding@resend.dev>';
 
 const normalizeAttendance = (value: string): string => {
   return value
@@ -156,8 +157,8 @@ export default async function handler(
         const attendanceText = getAttendanceEmailText(attendance);
         const busText = bus === 'sí' ? '✅ Sí' : '❌ No';
 
-        await resend.emails.send({
-          from: 'Boda Marta & Sergio <onboarding@resend.dev>',
+        const emailResponse = await resend.emails.send({
+          from: RESEND_FROM_EMAIL,
           to: NOTIFICATION_EMAILS,
           subject: `Nueva confirmación RSVP: ${guestName}`,
           html: `
@@ -178,7 +179,13 @@ export default async function handler(
             </div>
           `,
         });
-        console.log('✅ Email enviado a:', NOTIFICATION_EMAILS.join(', '));
+
+        if (emailResponse.error) {
+          console.error('❌ Resend rechazó el email:', emailResponse.error);
+          throw new Error(emailResponse.error.message || 'Resend rejected email');
+        }
+
+        console.log('✅ Email enviado a:', NOTIFICATION_EMAILS.join(', '), 'ID:', emailResponse.data?.id);
       } catch (emailError) {
         console.error('⚠️  Error enviando email:', emailError);
       }
