@@ -7,6 +7,8 @@ interface Guest {
   attendance: string;
   notes: string;
   image: string;
+  bus?: string;
+  intolerancias?: string;
 }
 
 const GOOGLE_SHEETS_ID = process.env.GOOGLE_SHEETS_ID;
@@ -30,6 +32,8 @@ let guestsCache = [...guestsData];
  * Columna C: Asistencia
  * Columna D: Notas
  * Columna E: Imagen
+ * Columna F: Bus
+ * Columna G: Intolerancias
  */
 async function getGuestsFromSheets(): Promise<Guest[]> {
   if (!USE_GOOGLE_SHEETS) {
@@ -38,7 +42,7 @@ async function getGuestsFromSheets(): Promise<Guest[]> {
   }
 
   try {
-    const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/Invitados!A2:E?key=${GOOGLE_SHEETS_API_KEY}`;
+    const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/Invitados!A2:G?key=${GOOGLE_SHEETS_API_KEY}`;
     console.log('📡 Intentando conectar con Google Sheets...');
     
     const response = await fetch(sheetsUrl);
@@ -61,6 +65,8 @@ async function getGuestsFromSheets(): Promise<Guest[]> {
       attendance: row[2] || '',
       notes: row[3] || '',
       image: row[4] || '/assets/thank-you-1.png',
+      bus: row[5] || '',
+      intolerancias: row[6] || '',
     }));
 
     // Actualizamos el cache
@@ -93,7 +99,7 @@ async function updateGuestInSheets(guestId: string, updates: Partial<Guest>): Pr
     const updatedGuest = { ...guests[guestIndex], ...updates };
 
     // URL para actualizar la fila específica
-    const updateUrl = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/Invitados!A${rowNumber}:E${rowNumber}?valueInputOption=RAW&key=${GOOGLE_SHEETS_API_KEY}`;
+    const updateUrl = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/Invitados!A${rowNumber}:G${rowNumber}?valueInputOption=RAW&key=${GOOGLE_SHEETS_API_KEY}`;
     
     const response = await fetch(updateUrl, {
       method: 'PUT',
@@ -107,6 +113,8 @@ async function updateGuestInSheets(guestId: string, updates: Partial<Guest>): Pr
           updatedGuest.attendance,
           updatedGuest.notes,
           updatedGuest.image,
+          updatedGuest.bus || '',
+          updatedGuest.intolerancias || '',
         ]],
       }),
     });
@@ -116,6 +124,22 @@ async function updateGuestInSheets(guestId: string, updates: Partial<Guest>): Pr
     console.error('Error updating Google Sheets:', error);
     return false;
   }
+}
+
+function normalizeGuestUpdates(rawUpdates: Record<string, unknown>): Partial<Guest> {
+  const normalized: Partial<Guest> = {};
+
+  if (typeof rawUpdates.name === 'string') normalized.name = rawUpdates.name;
+  if (typeof rawUpdates.attendance === 'string') normalized.attendance = rawUpdates.attendance;
+  if (typeof rawUpdates.asistencia === 'string') normalized.attendance = rawUpdates.asistencia;
+  if (typeof rawUpdates.notes === 'string') normalized.notes = rawUpdates.notes;
+  if (typeof rawUpdates.notas === 'string') normalized.notes = rawUpdates.notas;
+  if (typeof rawUpdates.image === 'string') normalized.image = rawUpdates.image;
+  if (typeof rawUpdates.bus === 'string') normalized.bus = rawUpdates.bus;
+  if (typeof rawUpdates.intolerancias === 'string') normalized.intolerancias = rawUpdates.intolerancias;
+  if (typeof rawUpdates.intolerances === 'string') normalized.intolerancias = rawUpdates.intolerances;
+
+  return normalized;
 }
 
 export default async function handler(
@@ -154,11 +178,12 @@ export default async function handler(
         return res.status(404).json({ error: 'Guest not found' });
       }
 
-      const updatedGuest = { ...guests[guestIndex], ...req.body };
+      const normalizedUpdates = normalizeGuestUpdates(req.body as Record<string, unknown>);
+      const updatedGuest = { ...guests[guestIndex], ...normalizedUpdates };
       
       // Actualizar en Google Sheets si está configurado
       if (USE_GOOGLE_SHEETS) {
-        await updateGuestInSheets(id, req.body);
+        await updateGuestInSheets(id, normalizedUpdates);
       }
       
       // Actualizar cache local
