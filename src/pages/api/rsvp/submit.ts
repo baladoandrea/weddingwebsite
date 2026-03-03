@@ -19,7 +19,7 @@ interface SubmitResponse {
 }
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const NOTIFICATION_EMAILS = (process.env.NOTIFICATION_EMAILS || 'sergio.balado.rodriguez@gmail.com, martagarran1@hotmail.com, baladoandrea@gmail.com')
+const NOTIFICATION_EMAILS = (process.env.NOTIFICATION_EMAILS || 'baladoandrea@gmail.com')
   .split(',')
   .map((email: string) => email.trim())
   .filter(Boolean);
