@@ -213,6 +213,7 @@ export default function RSVPPage() {
         body: JSON.stringify({
           guestId: selectedGuest.id,
           guestName: selectedGuest.name,
+          guestImage: selectedGuest.image,
           attendance: formData.attendance,
           bus: formData.bus,
           intolerances: formData.intolerances,

@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 interface RSVPSubmission {
   guestId: string;
   guestName: string;
+  guestImage?: string;
   attendance: string;
   bus: 'sí' | 'no';
   intolerances: string;
@@ -50,6 +51,31 @@ const getAttendanceEmailText = (attendance: string): string => {
   return attendance ? `ℹ️ ${attendance}` : '⚠️ Sin respuesta';
 };
 
+const normalizeImagePath = (imagePath?: string): string => {
+  if (!imagePath) {
+    return '';
+  }
+
+  const trimmed = imagePath.trim();
+  if (!trimmed) {
+    return '';
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('public/')) {
+    return `/${trimmed.replace(/^public\//, '')}`;
+  }
+
+  if (trimmed.startsWith('assets/')) {
+    return `/${trimmed}`;
+  }
+
+  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SubmitResponse>
@@ -62,7 +88,7 @@ export default async function handler(
   }
 
   try {
-    const { guestId, guestName, attendance, bus, intolerances, notes } = req.body as RSVPSubmission;
+    const { guestId, guestName, guestImage, attendance, bus, intolerances, notes } = req.body as RSVPSubmission;
 
     if (!guestId || !guestName || !attendance || !bus) {
       return res.status(400).json({
@@ -146,11 +172,12 @@ export default async function handler(
       '/assets/thank-you-3.png',
     ];
     const randomImage = mockImages[Math.floor(Math.random() * mockImages.length)];
+    const resolvedImage = normalizeImagePath(guestImage) || randomImage;
 
     return res.status(200).json({
       success: true,
       message: 'RSVP recorded successfully',
-      image: randomImage,
+      image: resolvedImage,
     });
   } catch (error) {
     console.error('❌ Error submitting RSVP:', error);

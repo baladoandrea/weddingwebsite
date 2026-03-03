@@ -45,7 +45,7 @@ function doPost(e) {
 
     const attendanceCol = findColumn('asistencia');
     const notesCol = findColumn('notas');
-    const busCol = findColumn('bus');
+    const busCol = findColumn('bus', 'autobus', 'transporte');
     const intolerancesCol = findColumn('intolerancias', 'alergias', 'intolerancias o alergias alimentarias');
     
     let rowFound = -1;
@@ -76,13 +76,11 @@ function doPost(e) {
       sheet.getRange(rowFound, 4).setValue(notes || '');
     }
 
-    if (busCol > 0) {
-      sheet.getRange(rowFound, busCol).setValue(bus || '');
-    }
+    const busTargetCol = busCol > 0 ? busCol : 6; // F = Bus
+    const intolerancesTargetCol = intolerancesCol > 0 ? intolerancesCol : 7; // G = Intolerancias
 
-    if (intolerancesCol > 0) {
-      sheet.getRange(rowFound, intolerancesCol).setValue(intolerances || '');
-    }
+    sheet.getRange(rowFound, busTargetCol).setValue(bus || '');
+    sheet.getRange(rowFound, intolerancesTargetCol).setValue(intolerances || '');
     
     // Log de la actualización
     Logger.log(`✅ Actualizado: ${values[rowFound-1][1]} → ${attendance} | Bus: ${bus || '-'} | Intolerancias: ${intolerances || '-'}`);

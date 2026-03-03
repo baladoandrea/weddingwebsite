@@ -135,6 +135,7 @@ Tu Google Sheet debe tener:
 ```
 
 El script actualiza las columnas **C (Asistencia)** y **D (Notas)** automáticamente.
+Si quieres que también guarde **Bus** e **Intolerancias**, asegúrate de tener esas columnas en la hoja (F y G) y de **volver a desplegar** la Web App tras pegar el código actualizado.
 
 ---
 
