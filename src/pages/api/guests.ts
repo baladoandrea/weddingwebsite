@@ -32,8 +32,8 @@ let guestsCache = [...guestsData];
  * Columna C: Asistencia
  * Columna D: Notas
  * Columna E: Imagen
- * Columna F: Bus
- * Columna G: Intolerancias
+ * Columna F: Intelerancias
+ * Columna G: Bus
  */
 async function getGuestsFromSheets(): Promise<Guest[]> {
   if (!USE_GOOGLE_SHEETS) {
@@ -65,8 +65,8 @@ async function getGuestsFromSheets(): Promise<Guest[]> {
       attendance: row[2] || '',
       notes: row[3] || '',
       image: row[4] || '/assets/thank-you-1.png',
-      bus: row[5] || '',
-      intolerancias: row[6] || '',
+      intolerancias: row[5] || '',
+      bus: row[6] || '',
     }));
 
     // Actualizamos el cache
@@ -113,8 +113,8 @@ async function updateGuestInSheets(guestId: string, updates: Partial<Guest>): Pr
           updatedGuest.attendance,
           updatedGuest.notes,
           updatedGuest.image,
-          updatedGuest.bus || '',
           updatedGuest.intolerancias || '',
+          updatedGuest.bus || '',
         ]],
       }),
     });

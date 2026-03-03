@@ -18,7 +18,31 @@ function doPost(e) {
     // Parsear datos del request
     const data = JSON.parse(e.postData.contents);
     const { guestId, attendance, notes, bus, intolerances, intolerancias } = data;
-    const resolvedIntolerances = intolerances || intolerancias || '';
+
+    const normalize = (value) => (value || '')
+      .toString()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+
+    const isBusAnswer = (value) => {
+      const normalized = normalize(value);
+      return normalized === 'si' || normalized === 'sí' || normalized === 'no';
+    };
+
+    let resolvedBus = (bus || '').toString().trim();
+    let resolvedIntolerances = (intolerances || intolerancias || '').toString().trim();
+
+    if (resolvedBus && !isBusAnswer(resolvedBus) && !resolvedIntolerances) {
+      resolvedIntolerances = resolvedBus;
+      resolvedBus = '';
+    }
+
+    if (!resolvedBus && isBusAnswer(resolvedIntolerances)) {
+      resolvedBus = resolvedIntolerances;
+      resolvedIntolerances = '';
+    }
     
     // Obtener la hoja "Invitados"
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Invitados');
@@ -34,7 +58,7 @@ function doPost(e) {
     const dataRange = sheet.getDataRange();
     const values = dataRange.getValues();
 
-    const headers = (values[0] || []).map(value => value.toString().trim().toLowerCase());
+    const headers = (values[0] || []).map(value => normalize(value));
     const findColumn = (...candidates) => {
       for (let i = 0; i < headers.length; i++) {
         if (candidates.includes(headers[i])) {
@@ -47,7 +71,7 @@ function doPost(e) {
     const attendanceCol = findColumn('asistencia');
     const notesCol = findColumn('notas');
     const busCol = findColumn('bus', 'autobus', 'transporte');
-    const intolerancesCol = findColumn('intolerancias', 'alergias', 'intolerancias o alergias alimentarias');
+    const intolerancesCol = findColumn('intolerancias', 'intelerancias', 'alergias', 'intolerancias o alergias alimentarias');
     
     let rowFound = -1;
     for (let i = 1; i < values.length; i++) { // Empezar en 1 para saltar header
@@ -77,14 +101,14 @@ function doPost(e) {
       sheet.getRange(rowFound, 4).setValue(notes || '');
     }
 
-    const busTargetCol = busCol > 0 ? busCol : 6; // F = Bus
-    const intolerancesTargetCol = intolerancesCol > 0 ? intolerancesCol : 7; // G = Intolerancias
+    const intolerancesTargetCol = intolerancesCol > 0 ? intolerancesCol : 6; // F = Intelerancias
+    const busTargetCol = busCol > 0 ? busCol : 7; // G = Bus
 
-    sheet.getRange(rowFound, busTargetCol).setValue(bus || '');
+    sheet.getRange(rowFound, busTargetCol).setValue(resolvedBus);
     sheet.getRange(rowFound, intolerancesTargetCol).setValue(resolvedIntolerances);
     
     // Log de la actualización
-    Logger.log(`✅ Actualizado: ${values[rowFound-1][1]} → ${attendance} | Bus: ${bus || '-'} | Intolerancias: ${resolvedIntolerances || '-'}`);
+    Logger.log(`✅ Actualizado: ${values[rowFound-1][1]} → ${attendance} | Bus: ${resolvedBus || '-'} | Intolerancias: ${resolvedIntolerances || '-'}`);
     
     return ContentService.createTextOutput(JSON.stringify({
       success: true,

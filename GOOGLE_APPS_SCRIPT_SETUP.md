@@ -61,6 +61,9 @@ Ve a tu hoja de invitados en [sheets.google.com](https://sheets.google.com)
    Key: GOOGLE_APPS_SCRIPT_URL
    Value: https://script.google.com/macros/s/AKfycby.../exec
    ```
+   También se aceptan `NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL` y `APPS_SCRIPT_URL`, pero la recomendada es `GOOGLE_APPS_SCRIPT_URL`.
+
+   ⚠️ Usa la URL de **Aplicación web** que termina en `/exec` (no la URL del editor de Apps Script).
    - Pega la URL que copiaste en el paso 4
    - Marca: ☑️ Production  ☑️ Preview  ☑️ Development
    - Click **Save**

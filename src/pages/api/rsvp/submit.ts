@@ -100,38 +100,51 @@ export default async function handler(
     console.log(`📝 RSVP submitted for ${guestName}:`, { attendance, bus, intolerances, notes });
 
     // 1. Actualizar Google Sheets usando Apps Script Web App
-    const APPS_SCRIPT_URL = process.env.GOOGLE_APPS_SCRIPT_URL;
+    const APPS_SCRIPT_URL =
+      process.env.GOOGLE_APPS_SCRIPT_URL ||
+      process.env.NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL ||
+      process.env.APPS_SCRIPT_URL;
     
-    if (APPS_SCRIPT_URL) {
+    if (!APPS_SCRIPT_URL) {
+      console.error('⚠️  Apps Script URL no configurada. Define GOOGLE_APPS_SCRIPT_URL (o NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL / APPS_SCRIPT_URL).');
+    } else if (!APPS_SCRIPT_URL.includes('/exec')) {
+      console.error('⚠️  Apps Script URL inválida (debe ser la URL Web App que termina en /exec):', APPS_SCRIPT_URL);
+    } else {
       try {
+        const updatePayload = {
+          guestId,
+          attendance,
+          bus,
+          intolerances,
+          intolerancias: intolerances,
+          notes,
+        };
+
         const updateResponse = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            guestId,
-            attendance,
-            bus,
-            intolerances,
-            intolerancias: intolerances,
-            notes,
-          }),
+          body: JSON.stringify(updatePayload),
         });
 
-        if (updateResponse.ok) {
-          const result = await updateResponse.json();
-          if (result?.success === false) {
-            console.error('⚠️  Apps Script respondió error:', result);
-          } else {
-            console.log('✅ Google Sheets actualizado:', result);
-          }
+        let result: { success?: boolean; error?: string; message?: string } | null = null;
+        try {
+          result = await updateResponse.json();
+        } catch {
+          result = null;
+        }
+
+        if (!updateResponse.ok || result?.success === false) {
+          console.error('❌ Error actualizando Google Sheets:', {
+            status: updateResponse.status,
+            result,
+            payload: updatePayload,
+          });
         } else {
-          console.error('⚠️  Error actualizando Google Sheets:', updateResponse.status);
+          console.log('✅ Google Sheets actualizado:', result || { success: true });
         }
       } catch (error) {
-        console.error('⚠️  Error conectando con Google Apps Script:', error);
+        console.error('❌ Error conectando con Google Apps Script:', error);
       }
-    } else {
-      console.log('⚠️  GOOGLE_APPS_SCRIPT_URL no configurado. Sheet no actualizado.');
     }
 
     // 2. Enviar email de notificación
