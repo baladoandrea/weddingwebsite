@@ -17,7 +17,8 @@ function doPost(e) {
   try {
     // Parsear datos del request
     const data = JSON.parse(e.postData.contents);
-    const { guestId, attendance, notes, bus, intolerances } = data;
+    const { guestId, attendance, notes, bus, intolerances, intolerancias } = data;
+    const resolvedIntolerances = intolerances || intolerancias || '';
     
     // Obtener la hoja "Invitados"
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Invitados');
@@ -80,10 +81,10 @@ function doPost(e) {
     const intolerancesTargetCol = intolerancesCol > 0 ? intolerancesCol : 7; // G = Intolerancias
 
     sheet.getRange(rowFound, busTargetCol).setValue(bus || '');
-    sheet.getRange(rowFound, intolerancesTargetCol).setValue(intolerances || '');
+    sheet.getRange(rowFound, intolerancesTargetCol).setValue(resolvedIntolerances);
     
     // Log de la actualización
-    Logger.log(`✅ Actualizado: ${values[rowFound-1][1]} → ${attendance} | Bus: ${bus || '-'} | Intolerancias: ${intolerances || '-'}`);
+    Logger.log(`✅ Actualizado: ${values[rowFound-1][1]} → ${attendance} | Bus: ${bus || '-'} | Intolerancias: ${resolvedIntolerances || '-'}`);
     
     return ContentService.createTextOutput(JSON.stringify({
       success: true,

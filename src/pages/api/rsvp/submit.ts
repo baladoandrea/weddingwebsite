@@ -112,13 +112,18 @@ export default async function handler(
             attendance,
             bus,
             intolerances,
+            intolerancias: intolerances,
             notes,
           }),
         });
 
         if (updateResponse.ok) {
           const result = await updateResponse.json();
-          console.log('✅ Google Sheets actualizado:', result);
+          if (result?.success === false) {
+            console.error('⚠️  Apps Script respondió error:', result);
+          } else {
+            console.log('✅ Google Sheets actualizado:', result);
+          }
         } else {
           console.error('⚠️  Error actualizando Google Sheets:', updateResponse.status);
         }
