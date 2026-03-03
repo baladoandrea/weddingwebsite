@@ -10,6 +10,8 @@ interface GuestRecord {
   asistencia: string;
   notas: string;
   imagenAsociada: string;
+  bus?: string;
+  intolerancias?: string;
 }
 
 interface SearchResult {
@@ -194,12 +196,14 @@ export const updateGuestNotes = async (
 };
 
 /**
- * Actualiza tanto asistencia como notas
+ * Actualiza asistencia, notas, bus e intolerancias
  */
 export const updateGuestRSVP = async (
   guestId: string,
   attendance: string,
-  notes: string
+  notes: string,
+  bus: string,
+  intolerances: string
 ): Promise<UpdateResult> => {
   try {
     if (notes.length > 240) {
@@ -209,12 +213,21 @@ export const updateGuestRSVP = async (
       };
     }
 
+    if (intolerances.length > 240) {
+      return {
+        success: false,
+        message: 'Las intolerancias no pueden exceder 240 caracteres',
+      };
+    }
+
     const response = await fetch(`/api/guests/${guestId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         asistencia: attendance,
         notas: notes,
+        bus,
+        intolerancias: intolerances,
       }),
     });
 
@@ -294,8 +307,14 @@ export const exportAttendanceData = async (): Promise<string> => {
     const guests = await getAllGuests();
 
     const csv = [
-      ['Nombre', 'Asistencia', 'Notas'],
-      ...guests.map(g => [g.nombre, g.asistencia || 'Pendiente', g.notas || '']),
+      ['Nombre', 'Asistencia', 'Bus', 'Intolerancias', 'Notas'],
+      ...guests.map(g => [
+        g.nombre,
+        g.asistencia || 'Pendiente',
+        g.bus || '',
+        g.intolerancias || '',
+        g.notas || '',
+      ]),
     ]
       .map(row => row.map(cell => `"${cell}"`).join(','))
       .join('\n');
@@ -341,7 +360,7 @@ export const downloadAttendanceCSV = async (): Promise<void> => {
  * const GOOGLE_SHEETS_ID = process.env.GOOGLE_SHEETS_ID;
  * const GOOGLE_SHEETS_API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
  *
- * const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/Invitados!A:D?key=${GOOGLE_SHEETS_API_KEY}`;
+ * const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/Invitados!A:G?key=${GOOGLE_SHEETS_API_KEY}`;
  *
  * async function getGuestsFromSheets() {
  *   const response = await fetch(sheetsUrl);
