@@ -19,7 +19,7 @@ interface RSVPFormData {
   notes: string;
 }
 
-const MIN_SEARCH_CHARS = 7;
+const MIN_SEARCH_CHARS = 4;
 
 export default function RSVPPage() {
   const { getSection, getText } = useWebsiteTexts();
