@@ -24,8 +24,8 @@ const isValidGoogleMapsEmbedUrl = (value: string): boolean => {
 };
 
 export default function MapEmbed({ 
-  location = "Casón Amor, Calle Vistas 2, A Coruña",
-  address = "Casón Amor, A Coruña",
+  location = "Lugar, Campo Costa, 1, 15145 A Laracha, A Coruña",
+  address = "Costa Caión, A Laracha, A Coruña",
   embedUrl,
 }: MapEmbedProps) {
   const encodedLocation = encodeURIComponent(location);

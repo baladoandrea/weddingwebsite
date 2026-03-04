@@ -72,18 +72,18 @@ export default function MainPage() {
             </div>
             <div className="info-row">
               <span className="label">{getText('location-place-label', 'Lugar:')}</span>
-              <span className="value">{getText('location-place-value', 'Casón Amor')}</span>
+              <span className="value">{getText('location-place-value', 'Costa Caión')}</span>
             </div>
             <div className="info-row">
               <span className="label">{getText('location-address-label', 'Dirección:')}</span>
-              <span className="value">{getText('location-address-value', 'Calle Vistas, 2 Villabonita, A Coruña')}</span>
+              <span className="value">{getText('location-address-value', 'Costa Caión, A Laracha, A Coruña')}</span>
             </div>
           </div>
 
           <MapEmbed
             embedUrl={getText(
               'map-embed-url',
-              'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2963.7456321!2d-8.3855!3d43.3704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s!2sCas%C3%B3n%20Amor%2C%20Calle%20Vistas%202%2C%20A%20Coru%C3%B1a!5e0!3m2!1ses!2ses!4v1629728200000'
+              'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2903.2414586255272!2d-8.617596522653614!3d43.30920457460991!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd2e8f7f419d63e3%3A0xfc4146c0f14f392b!2sCosta%20Cai%C3%B3n!5e0!3m2!1ses!2ses!4v1772631679030!5m2!1ses!2ses'
             )}
           />
         </div>
