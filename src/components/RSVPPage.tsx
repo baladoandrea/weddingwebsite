@@ -167,10 +167,10 @@ export default function RSVPPage() {
     setSelectedGuest(guest);
     setFormData({
       guestName: guest.name,
-      attendance: guest.attendance || '',
+      attendance: '',
       bus: '',
       intolerances: '',
-      notes: guest.notes || '',
+      notes: '',
     });
     setSearchQuery('');
     setMatchedGuests([]);
